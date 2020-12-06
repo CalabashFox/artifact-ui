@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react",
+    "module": "commonjs",
+    "outDir": "dist/src",
+    "target": "es6",
+    "baseUrl": "src",
+    "paths": {
+      "containers/*": [
+        "components/*"
+      ],
+      "models/*": [
+        "models/*"
+      ],
+      "components/*": [
+        "components/*"
+      ],
+      "actions/*": [
+        "actions/*"
+      ],
+      "utils/*": [
+        "utils/*"
+      ],
+      "reducers/*": [
+        "reducers/*"
+      ]
+    }
+  },
+  "include": [
+    "./src",
+    "./src/artifact.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
+}
