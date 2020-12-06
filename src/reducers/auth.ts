@@ -1,7 +1,6 @@
 import {AuthAction, LOADING, LOGIN_FAIL, LOGIN_SUCCESS, LOGOUT_COMPLETE, SET_AUTH_ERROR} from 'actions/auth';
 import {AuthState} from 'models/StoreState';
-import {Rank, UserState} from 'models/User';
-import TokenUtils from 'utils/commons';
+import TokenUtils from 'utils/tokenUtils';
 
 const initialState = {
     user: null,

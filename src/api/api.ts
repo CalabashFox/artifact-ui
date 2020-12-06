@@ -1,5 +1,5 @@
 import axios, {AxiosPromise} from 'axios';
-import TokenUtils from 'utils/commons';
+import TokenUtils from 'utils/tokenUtils';
 
 const BASE_URL = 'http://localhost:8080/api';
 
@@ -9,16 +9,17 @@ export interface ApiResponse<T> {
     message: string | null
 }
 
-export function post<T>(api: string, data?: any): AxiosPromise<ApiResponse<T>> {
+export function post<T>(api: string, data: Record<string,unknown>): AxiosPromise<ApiResponse<T>> {
     return axios({
-        url: `${BASE_URL}${api}`,
+        baseURL: BASE_URL,
+        url: api,
         method: 'POST',
         data: data || {},
         headers: getHeaders()
     });
 }
 
-function getHeaders(): any {
+function getHeaders(): Record<string, string> {
     const headers = {
         'Content-Type': 'application/json'
     }

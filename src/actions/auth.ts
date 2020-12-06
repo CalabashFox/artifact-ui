@@ -1,11 +1,9 @@
-import {Dispatch} from 'react';
-import {Simulate} from 'react-dom/test-utils';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk'
-import axios, {AxiosError, AxiosResponse} from 'axios';
+import {AxiosError, AxiosResponse} from 'axios';
 import {AuthState} from 'models/StoreState';
 import {ApiResponse, post} from '../api/api';
-import TokenUtils from 'utils/commons';
-import {Rank, User, UserState} from 'models/User';
+import {User} from 'models/User';
+import TokenUtils from 'utils/tokenUtils';
 
 export const LOGIN = 'LOGIN';
 export type LOGIN = typeof LOGIN;
@@ -39,13 +37,6 @@ export interface LoginAction {
 
 export interface LogoutAction {
     type: LOGOUT_COMPLETE;
-}
-
-export interface AuthorizeAction {
-    type: AUTHORIZE;
-    payload: {
-        auth: string;
-    }
 }
 
 export interface LoadingAction {
@@ -83,7 +74,7 @@ export type AuthAction = LoginAction | LogoutAction | LoadingAction | SetAuthErr
 export const logout = (): ThunkAction<Promise<void>, AuthState, null, AuthAction> => {
     return (dispatch: ThunkDispatch<AuthState, null, AuthAction>) => {
         dispatch(loading(true));
-        return post<void>('/auth/logout', {})
+        return post<void>('auth/logout', {})
             .then(() => {
                 dispatch(loading(false));
                 dispatch(logoutComplete());
@@ -95,9 +86,10 @@ export const authorize = (auth: string, token: string)
     : ThunkAction<Promise<void>, AuthState, null, AuthAction> => {
     return (dispatch: ThunkDispatch<AuthState, null, AuthAction>) => {
         dispatch(loading(true));
-        return post<User>('/auth/validate', {
-            token
-        })
+        return post<User>('auth/validate',
+            {
+                token
+            })
             .then((res: AxiosResponse<ApiResponse<User>>) => authSuccess(dispatch, res, true))
             .catch((err: AxiosError<ApiResponse<User>>) => authFail(dispatch, err))
             .then(() => authComplete(dispatch));
@@ -108,7 +100,7 @@ export const login = (email: string, password: string, rememberMe: boolean)
     : ThunkAction<Promise<void>, AuthState, null, AuthAction> => {
     return (dispatch: ThunkDispatch<AuthState, null, AuthAction>) => {
         dispatch(loading(true));
-        return post<User>('/auth/login',
+        return post<User>('auth/login',
             {
                 email,
                 password,

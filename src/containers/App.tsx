@@ -12,7 +12,7 @@ import {createMuiTheme, MuiThemeProvider, responsiveFontSizes} from '@material-u
 import {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import {authorize} from 'actions/auth';
-import TokenUtils from 'utils/commons';
+import TokenUtils from 'utils/tokenUtils';
 
 let theme = createMuiTheme({
     palette: {

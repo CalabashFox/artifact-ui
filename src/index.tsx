@@ -16,12 +16,9 @@ const history: History = createBrowserHistory();
 export const routerMiddleware = createRouterMiddleware(history);
 
 export function configureStore(initialState: StoreState): Store<StoreState> {
-    // configure middlewares
     const middlewares = [thunk, routerMiddleware];
-    // compose enhancers
     const enhancer = composeWithDevTools(applyMiddleware(...middlewares));
 
-    // create store
     return createStore(rootReducer, initialState, enhancer);
 }
 
