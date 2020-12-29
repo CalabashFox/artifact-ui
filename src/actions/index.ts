@@ -1,3 +1,3 @@
-import {loadGame, loadGameList} from 'actions/game';
+import {uploadSGFFile} from 'actions/sgf';
 
-export {loadGameList, loadGame};
+export {uploadSGFFile};

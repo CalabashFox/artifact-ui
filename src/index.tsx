@@ -23,8 +23,16 @@ export function configureStore(initialState: StoreState): Store<StoreState> {
 }
 
 const store = configureStore({
-    gameState: {
-        game: null
+    sgfState: {
+        analyzedSGF: undefined,
+        analysisProgress: undefined,
+        error: null,
+        sgfProperties: {
+            currentMove: 0,
+            displayOwnership: true,
+            displayPolicy: true
+        },
+        uploading: false
     },
     authState: {
         user: null,
@@ -33,6 +41,7 @@ const store = configureStore({
         auth: null
     },
 });
+
 
 ReactDOM.render(
     <Provider store={store}>

@@ -1,21 +1,27 @@
-import {Game} from 'models/Game';
 import {User} from 'models/User';
+import {AnalysisProgress, AnalyzedSGF} from 'models/SGF';
+import {SGFProperties} from 'models/Katago';
 
-type NullableString = string | null;
+export type Nullable<T> = T | null;
+export type NullableString = Nullable<string>;
 
 export interface AuthState {
-    user: User | null;
-    isLoading: boolean;
-    error: NullableString;
-    auth: NullableString;
+    user: Nullable<User>
+    isLoading: boolean
+    error: NullableString
+    auth: NullableString
 }
 
 
 export interface StoreState {
-    gameState: GameState;
+    sgfState: SGFState;
     authState: AuthState;
 }
 
-export interface GameState {
-    game: Game | null;
+export interface SGFState {
+    analyzedSGF?: AnalyzedSGF
+    analysisProgress?: AnalysisProgress
+    error: NullableString
+    sgfProperties: SGFProperties
+    uploading: boolean
 }

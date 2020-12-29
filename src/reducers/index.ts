@@ -1,9 +1,9 @@
 import {StoreState} from 'models/StoreState';
-import {gameReducer} from 'reducers/game';
+import {sgfReducer} from 'reducers/sgf';
 import {combineReducers} from 'redux';
 import {authReducer} from 'reducers/auth';
 
 export const rootReducer = combineReducers<StoreState>({
-    gameState: gameReducer,
+    sgfState: sgfReducer,
     authState: authReducer
 });

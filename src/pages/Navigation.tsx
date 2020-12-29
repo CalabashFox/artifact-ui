@@ -1,6 +1,8 @@
 import React, {ReactElement} from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
+import Button from '@material-ui/core/Button';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
@@ -17,12 +19,15 @@ import {ReactComponent as ArtifactIcon} from 'assets/images/icon.svg';
 import {useDispatch, useSelector} from 'react-redux';
 import {logout} from 'actions/auth';
 import {AuthState, StoreState} from 'models/StoreState';
-import {emptyValue} from 'utils/commons';
+import {uploadSGFFile} from 'actions/sgf';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         grow: {
             flexGrow: 1,
+        },
+        button: {
+            margin: theme.spacing(1),
         },
         menuButton: {
             marginRight: theme.spacing(2),
@@ -48,6 +53,9 @@ const useStyles = makeStyles((theme: Theme) =>
                 display: 'none',
             },
         },
+        input: {
+            display: 'none'
+        }
     }),
 );
 
@@ -60,6 +68,10 @@ export default function Navigation(): ReactElement {
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+    const handleSGFFileUpload = () => {
+        dispatch(uploadSGFFile(''));
+    };
 
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -139,10 +151,10 @@ export default function Navigation(): ReactElement {
             </MenuItem>
         </Menu>
     );
-
+    /* ignore login state
     if (emptyValue(authState.auth)) {
         return <div />;
-    }
+    }*/
 
     return (
         <div className={classes.grow}>
@@ -158,8 +170,29 @@ export default function Navigation(): ReactElement {
                     </IconButton>
                     <SvgIcon className={classes.icon} component={ArtifactIcon} viewBox="0 0 980 980" />
                     <Typography className={classes.title} variant="h6" noWrap>
-                        Artifact
+                        Artifact {authState.error}
                     </Typography>
+
+
+                    <input
+                        accept=".sgf"
+                        className={classes.input}
+                        id="contained-button-file"
+                        name="sgfUpload"
+                        type="file"
+                    />
+
+                    <label htmlFor="contained-button-file">
+                        <Button
+                            variant="contained"
+                            color="default"
+                            className={classes.button}
+                            startIcon={<CloudUploadIcon />}
+                            onClick={handleSGFFileUpload}>
+                            Upload SGF
+                        </Button>
+                    </label>
+
                     <div className={classes.grow} />
                     <div className={classes.sectionDesktop}>
                         <IconButton aria-label="show 4 new mails" color="inherit">

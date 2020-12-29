@@ -3,9 +3,6 @@ import * as React from 'react';
 import {Switch} from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Navigation from '../pages/Navigation';
-import AuthRoute from './AuthRoute';
-import SignIn from '../pages/SignIn';
-import Account from '../pages/Account';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import {createMuiTheme, MuiThemeProvider, responsiveFontSizes} from '@material-ui/core/styles';
@@ -52,21 +49,23 @@ const App: React.FC = () => {
             <CssBaseline />
             <Navigation/>
             <Switch>
-                <AuthRoute path="/dashboard" auth="authorized">
-                    <Dashboard/>
-                </AuthRoute>
-                <AuthRoute path="/my-account" auth="authorized">
-                    <Account />
-                </AuthRoute>
-                <AuthRoute auth="unauthorized">
-                    <SignIn />
-                </AuthRoute>
-                <AuthRoute auth="authorized">
-                    <Dashboard/>
-                </AuthRoute>
+                <Dashboard/>
             </Switch>
         </MuiThemeProvider>
     );
 };
+/*
+<AuthRoute path="/dashboard" auth="authorized">
+    <Dashboard/>
+</AuthRoute>
+<AuthRoute path="/my-account" auth="authorized">
+    <Account />
+</AuthRoute>
+<AuthRoute auth="unauthorized">
+    <SignIn />
+</AuthRoute>
+<AuthRoute auth="authorized">
+    <Dashboard/>
+</AuthRoute>*/
 
 export default App;
