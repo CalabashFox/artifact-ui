@@ -30,7 +30,8 @@ const store = configureStore({
         sgfProperties: {
             currentMove: 0,
             displayOwnership: true,
-            displayPolicy: true
+            displayPolicy: true,
+            displayMoves: true
         },
         uploading: false
     },

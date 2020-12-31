@@ -38,4 +38,5 @@ export interface SGFProperties {
     currentMove: number
     displayOwnership: boolean
     displayPolicy: boolean
+    displayMoves: boolean
 }

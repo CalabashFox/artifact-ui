@@ -31,7 +31,7 @@ export interface SGFMove {
 export interface SGFSnapshot {
     stones: Array<SGFStone>
     index: number
-    katagoResult? : KatagoResult
+    katagoResults : Array<KatagoResult>
 }
 
 export enum SGFColor {

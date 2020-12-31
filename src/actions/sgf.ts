@@ -28,10 +28,30 @@ export type UPLOADING = typeof UPLOADING;
 export const SET = 'SET';
 export type SET = typeof SET;
 
+export const SET_MOVE = 'SET_MOVE';
+export type SET_MOVE = typeof SET_MOVE;
+
+export const BROWSE_MOVE = 'BROWSE_MOVE';
+export type BROWSE_MOVE = typeof BROWSE_MOVE;
+
 export interface SetAction {
     type: SET,
     payload: {
         analyzedSGF: AnalyzedSGF
+    }
+}
+
+export interface BrowseMoveAction {
+    type: BROWSE_MOVE,
+    payload: {
+        diff: number
+    }
+}
+
+export interface SetMoveAction {
+    type: SET_MOVE,
+    payload: {
+        move: number
     }
 }
 
@@ -84,7 +104,7 @@ export interface UploadingAction {
     }
 }
 
-export type SGFAction = UploadSGFFileAction | ReceiveProgress | UploadingAction | UploadSuccess | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction
+export type SGFAction = LoadProgressAction | UploadSGFFileAction | UploadingAction | UploadSuccess | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction | SetMoveAction | BrowseMoveAction
 
 
 export const uploadSGFFile = (file: string)
@@ -166,6 +186,24 @@ export const set = (analyzedSGF: AnalyzedSGF): SGFAction => {
     };
 }
 
+export const browseMove = (diff: number): SGFAction => {
+    return {
+        type: BROWSE_MOVE,
+        payload: {
+            diff
+        }
+    };
+}
+
+
+export const setMove = (move: number): SGFAction => {
+    return {
+        type: SET_MOVE,
+        payload: {
+            move
+        }
+    };
+}
 
 export const receiveProgress = (analysisProgress: AnalysisProgress): SGFAction => {
     return {
