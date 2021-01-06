@@ -34,6 +34,16 @@ export type SET_MOVE = typeof SET_MOVE;
 export const BROWSE_MOVE = 'BROWSE_MOVE';
 export type BROWSE_MOVE = typeof BROWSE_MOVE;
 
+export const RECALCULATE_ANALYSIS_DATA = 'RECALCULATE_ANALYSIS_DATA';
+export type RECALCULATE_ANALYSIS_DATA = typeof RECALCULATE_ANALYSIS_DATA;
+
+export interface RecalculateAnalysisDataAction {
+    type: RECALCULATE_ANALYSIS_DATA,
+    payload: {
+
+    }
+}
+
 export interface SetAction {
     type: SET,
     payload: {
@@ -104,7 +114,7 @@ export interface UploadingAction {
     }
 }
 
-export type SGFAction = LoadProgressAction | UploadSGFFileAction | UploadingAction | UploadSuccess | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction | SetMoveAction | BrowseMoveAction
+export type SGFAction = RecalculateAnalysisDataAction | LoadProgressAction | UploadSGFFileAction | UploadingAction | UploadSuccess | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction | SetMoveAction | BrowseMoveAction
 
 
 export const uploadSGFFile = (file: string)
@@ -210,6 +220,15 @@ export const receiveProgress = (analysisProgress: AnalysisProgress): SGFAction =
         type: RECEIVE_PROGRESS,
         payload: {
             analysisProgress
+        }
+    };
+}
+
+export const recalculateAnalysisData = (): SGFAction => {
+    return {
+        type: RECALCULATE_ANALYSIS_DATA,
+        payload: {
+
         }
     };
 }

@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     font: {
         fontSize: 10,
         fontWeight: 100,
-        fontFamily: 'Lucida Grande,Tahoma,Verdana,Arial,sans-serif',
+        fontFamily: 'Courier New, monospace',
         textAnchor: 'middle'
     }
 }));
@@ -57,10 +57,15 @@ const svgProps = {
     stoneHolderOffset: BASE_DIM * 0.5,
     stoneDim: BASE_DIM * 0.9 * 0.5, // radius
     stoneOffset: BASE_DIM * 0.45,
+    currentStoneDim: BASE_DIM * 0.9 * 0.5 * 0.7,
+    currentStoneWidth: 2,
     stoneTextOffset: 0,
     stoneTextOffsetY: 4,
     ownershipDim: BASE_DIM * 0.5,
     ownershipOffset: BASE_DIM * 0.25,
+    textColor: '#000',
+    winrateOffsetY: -4,
+    leadOffsetY: 10,
 }
 
 export default function SGFBoard(): ReactElement {
@@ -105,22 +110,33 @@ export default function SGFBoard(): ReactElement {
             const color = svgRenderer.color(stone[0]);
             stones.push(<rect key={`stone-holder-${stone[1]}`} x={x - svgProps.stoneHolderOffset} y={y - svgProps.stoneHolderOffset} width={svgProps.stoneHolderDim} height={svgProps.stoneHolderDim} fill={svgProps.boardColor}/>);
             stones.push(<circle key={`stone-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} fill={color}/>);
-            const displayMoves = !sgfProperties.displayMoves || index === sgfProperties.currentMove;
-            if (displayMoves) {
-                const moveColor = stone[0] === 'B' ? svgProps.whiteColor : svgProps.blackColor;
-                stones.push(<text key={`snapshot-text-${index}`} x={x - svgProps.stoneTextOffset} y={y + svgProps.stoneTextOffsetY} className={classes.font} stroke={moveColor}>{index + 1}</text>);
+            if (!sgfProperties.displayMoves) {
+                stones.push(<text key={`snapshot-text-${index}`} x={x - svgProps.stoneTextOffset} y={y + svgProps.stoneTextOffsetY} className={classes.font} stroke={svgRenderer.oppositeColor(stone[0])}>{index + 1}</text>);
+            }
+            if (index === sgfProperties.currentMove) {
+                stones.push(<circle key={`current-stone-${stone[1]}`} cx={x} cy={y} r={svgProps.currentStoneDim} strokeWidth={svgProps.currentStoneWidth} stroke={svgRenderer.oppositeColor(stone[0])} fill={color}/>);
             }
 
             usedCoordinate[i][j] = true;
         });
+
+        for (const move of snapshot.analysisData.moves) {
+            const [i, j] = SgfUtils.translateToCoordinate(move.move);
+            const [x, y] = svgRenderer.loc([i, j]);
+            stones.push(<circle key={`stone-${move.move}`} cx={x} cy={y} r={svgProps.stoneDim} fill={'yellow'}/>);
+            stones.push(<text key={`move-winrate-${i}-${j}`} x={x} y={y + svgProps.winrateOffsetY} className={classes.font} stroke={svgProps.textColor}>{(move.winrate * 100).toFixed(1)}</text>);
+            stones.push(<text key={`move-lead-${i}-${j}`} x={x} y={y + svgProps.leadOffsetY} className={classes.font} stroke={svgProps.textColor}>{move.scoreLead.toFixed(1)}</text>);
+            usedCoordinate[i][j] = true;
+        }
         const analysis = new Array<React.SVGProps<SVGRectElement>>();
         if (sgfProperties.displayOwnership && snapshot.katagoResults.length !== 0) {
             const result = snapshot.katagoResults[0];
             result.ownership.forEach((ownership, index) => {
-                const opacity = Math.abs(ownership);
+                let opacity = Math.abs(ownership);
                 if (opacity < 0.1) { // TODO make this as settings
                     return;
                 }
+                opacity *= 0.5;
                 const [i, j] = svgRenderer.dim(index);
                 if (usedCoordinate[i][j]) {
                     return;
@@ -129,10 +145,12 @@ export default function SGFBoard(): ReactElement {
                 const color = svgRenderer.ownershipColor(ownership);
                 analysis.push(<rect key={`ownership-${currentMove}-${index}`} x={x - svgProps.ownershipOffset} y={y - svgProps.ownershipOffset}
                                     width={svgProps.ownershipDim} height={svgProps.ownershipDim} fillOpacity={opacity} fill={color}/>);
+                usedCoordinate[i][j] = true;
             });
-            result.moveInfos.forEach((moveInfo, index) => {
-                console.log(moveInfo, index);
-            });
+        }
+
+        if (sgfProperties.displayPolicy && snapshot.katagoResults.length !== 0) {
+            const result = snapshot.katagoResults[0];
             result.policy.forEach((policy, index) => {
                 if (index === 19 * 19) {
                     return;
@@ -140,15 +158,17 @@ export default function SGFBoard(): ReactElement {
                 if (policy === -1) {
                     return;
                 }
-                const p = policy * 100;
-                const minimumPolicy = 10; // TODO settings
-                if (p <= minimumPolicy) {
+                if (policy <= sgfProperties.minimumPolicyValue) {
                     return;
                 }
                 const [i, j] = svgRenderer.dim(index);
+                if (usedCoordinate[i][j]) {
+                    return;
+                }
                 const [x, y] = svgRenderer.loc([i, j]);
                 analysis.push(<rect key={`policy-${currentMove}-${index}`} x={x - svgProps.ownershipOffset} y={y - svgProps.ownershipOffset}
                                     width={svgProps.ownershipDim} height={svgProps.ownershipDim} fill={'green'}/>);
+                usedCoordinate[i][j] = true;
             });
         }
 

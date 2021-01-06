@@ -1,5 +1,6 @@
 import {
     BROWSE_MOVE,
+    RECALCULATE_ANALYSIS_DATA,
     RECEIVE_PROGRESS,
     RECEIVE_PROGRESS_FAIL,
     SET,
@@ -10,7 +11,8 @@ import {
     UPLOADING
 } from 'actions/sgf';
 import {SGFState} from 'models/StoreState';
-import {AnalyzedSGF} from 'models/SGF';
+import {MovePriority} from 'models/SGF';
+import SgfUtils from 'utils/sgfUtils';
 
 const initialState = {
     analyzedSGF: undefined,
@@ -20,13 +22,20 @@ const initialState = {
         currentMove: 0,
         displayOwnership: true,
         displayPolicy: true,
-        displayMoves: true
+        displayMoves: true,
+        movePriority: MovePriority.WINRATE,
+        moveCount: 3,
+        minimumPolicyValue: 0.1
     },
     uploading: false
 };
 
 export function sgfReducer(state: SGFState = initialState, action: SGFAction): SGFState {
     switch (action.type) {
+        case RECALCULATE_ANALYSIS_DATA:
+            return {
+                ...state, analyzedSGF: SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, state.analyzedSGF)
+            }
         case BROWSE_MOVE:
             return {...state, sgfProperties: {
                     ...state.sgfProperties, currentMove: state.sgfProperties.currentMove + action.payload.diff
@@ -38,8 +47,10 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
                 }
             };
         case SET:
+            let sgf = SgfUtils.calculateSGFAnalysisData(action.payload.analyzedSGF);
+            sgf = SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, sgf);
             return {
-                ...state, analyzedSGF: action.payload.analyzedSGF as AnalyzedSGF,
+                ...state, analyzedSGF: sgf,
                 sgfProperties: {
                     ...state.sgfProperties, currentMove: 0
                 }

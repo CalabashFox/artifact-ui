@@ -12,6 +12,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import {setMove} from 'actions/sgf';
 import TextField from '@material-ui/core/TextField';
+import SGFInformation from './SGFInformation';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -119,7 +120,7 @@ export default function SGFView(): ReactElement {
 
     return <div>
         <Grid container spacing={1}>
-            <Grid container item xs={8}>
+            <Grid container item xs={7}>
                 <Grid item xs={12}>
                     <Paper className={`${classes.paper} ${classes.board}`} onWheel={(e) => scroll(e)}>
                         <SGFBoard/>
@@ -140,11 +141,14 @@ export default function SGFView(): ReactElement {
                                     }}/>
                         <NavigateNextIcon className={classes.icon} fontSize="large" color={currentMove !== totalMoves - 1 ? 'primary' : 'disabled'} onClick={() => navigateForward(1)} />
                         <LastPageIcon className={classes.icon} fontSize="large" color={currentMove !== totalMoves - 1 ? 'primary' : 'disabled'} onClick={() => updateMove(totalMoves - 1)} />
+                        <Grid container spacing={1}>
+
+                        </Grid>
                     </Paper>
                 </Grid>
             </Grid>
-            <Grid item xs={4}>
-                <Paper className={classes.paper}> black vs white </Paper>
+            <Grid item xs={5}>
+                <SGFInformation/>
             </Grid>
         </Grid>
     </div>;

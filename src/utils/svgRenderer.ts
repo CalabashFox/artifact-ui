@@ -12,12 +12,17 @@ export interface SVGProperties {
     whiteColor: string
     stoneHolderDim: number
     stoneHolderOffset: number
+    currentStoneDim: number
+    currentStoneWidth: number
     stoneDim: number
     stoneOffset: number
     stoneTextOffset: number
     stoneTextOffsetY: number
     ownershipDim: number
     ownershipOffset: number
+    textColor: string
+    winrateOffsetY: number
+    leadOffsetY: number
 }
 
 export default class SvgRenderer {

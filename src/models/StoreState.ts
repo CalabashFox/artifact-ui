@@ -1,6 +1,5 @@
 import {User} from 'models/User';
-import {AnalysisProgress, AnalyzedSGF} from 'models/SGF';
-import {SGFProperties} from 'models/Katago';
+import {AnalysisProgress, AnalyzedSGF, SGFProperties} from 'models/SGF';
 
 export type Nullable<T> = T | null;
 export type NullableString = Nullable<string>;

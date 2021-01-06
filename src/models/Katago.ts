@@ -33,10 +33,3 @@ export interface KatagoMoveInfo {
     pvVisits: number
     pv: Array<string>
 }
-
-export interface SGFProperties {
-    currentMove: number
-    displayOwnership: boolean
-    displayPolicy: boolean
-    displayMoves: boolean
-}

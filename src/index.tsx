@@ -9,8 +9,9 @@ import {rootReducer} from 'reducers';
 import {applyMiddleware, createStore, Store} from 'redux';
 import thunk from 'redux-thunk';
 import {BrowserRouter} from 'react-router-dom';
-import {Provider} from 'react-redux'
-import { composeWithDevTools } from 'redux-devtools-extension';
+import {Provider} from 'react-redux';
+import {composeWithDevTools} from 'redux-devtools-extension';
+import {MovePriority} from 'models/SGF';
 
 const history: History = createBrowserHistory();
 export const routerMiddleware = createRouterMiddleware(history);
@@ -31,7 +32,10 @@ const store = configureStore({
             currentMove: 0,
             displayOwnership: true,
             displayPolicy: true,
-            displayMoves: true
+            displayMoves: true,
+            movePriority: MovePriority.WINRATE,
+            moveCount: 3,
+            minimumPolicyValue: 0.1
         },
         uploading: false
     },

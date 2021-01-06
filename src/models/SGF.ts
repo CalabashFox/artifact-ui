@@ -1,4 +1,4 @@
-import {KatagoResult} from 'models/Katago';
+import {KatagoMoveInfo, KatagoResult} from 'models/Katago';
 
 export interface AnalyzedSGF {
     snapShotsAnalyzed: number
@@ -17,7 +17,22 @@ export interface AnalyzedSGF {
     result: string
     place: string
     rules: string
-    moves: Array<SGFMove>
+    moves: Array<SGFMove>,
+    analysisData: SGFAnalysisData
+}
+
+export interface SGFGraphValue {
+    label: string
+    value: number | null
+}
+
+export interface SGFAnalysisData {
+    blackWinrate: Array<SGFGraphValue>
+    whiteWinrate: Array<SGFGraphValue>
+    blackScoreLead: Array<SGFGraphValue>
+    whiteScoreLead: Array<SGFGraphValue>
+    blackSelfplay: Array<SGFGraphValue>
+    whiteSelfplay: Array<SGFGraphValue>
 }
 
 export interface SGFMove {
@@ -32,6 +47,11 @@ export interface SGFSnapshot {
     stones: Array<SGFStone>
     index: number
     katagoResults : Array<KatagoResult>
+    analysisData: SnapshotAnalysisData
+}
+
+export interface SnapshotAnalysisData {
+    moves: Array<KatagoMoveInfo>
 }
 
 export enum SGFColor {
@@ -49,4 +69,18 @@ export interface SGFCoordinate {
     x: number
     y: number
     gtpLocation: string
+}
+
+export interface SGFProperties {
+    currentMove: number
+    displayOwnership: boolean
+    displayPolicy: boolean
+    displayMoves: boolean
+    movePriority: MovePriority
+    moveCount: number
+    minimumPolicyValue: number
+}
+
+export enum MovePriority {
+    WINRATE, MEAN, LEAD, PRIOR, ORDER
 }
