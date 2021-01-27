@@ -1,38 +1,66 @@
 import React, {ReactElement} from 'react';
 import {
-    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine
+    BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
-import {useSelector} from 'react-redux';
-import {SGFState, StoreState} from 'models/StoreState';
-import {SGFGraphValue} from 'models/SGF';
+import {SGFStackGraphValue} from 'models/SGF';
+import { StoreState, ViewState } from 'models/StoreState';
+import { useSelector } from 'react-redux';
+import { makeStyles } from '@material-ui/core';
 
-export interface SGFGraphProps {
+export interface SGFStackGraphProps {
     identifier: string
-    data: Array<SGFGraphValue>
-    color: string
+    data: Array<SGFStackGraphValue>
     name: string
 }
 
-export default function SGFGraph(props: SGFGraphProps): ReactElement {
-    const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
-    const {identifier, data, color, name} = props;
-
+const useStyles = makeStyles((theme) => ({
+    tooltip: {
+      backgroundColor: '#fff',
+      padding: theme.spacing(1)
+    }
+}));
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const GraphTooltip = ({ active, payload, label }: any) => {
+    const classes = useStyles();
+    if (active && payload.length !== 0) {
+        const data = payload[0].payload;
+        const color = data.diff >= 0 ? '#b71c1c' : '#54cc7c';
+        return (
+            <div className={classes.tooltip}>
+                <p className="label">{`move ${label}`}</p>
+                <p className="label">{`winrate ${data.player.toFixed(2)}`}</p>
+                <p className="label" style={{color: color}}>{`katago diff ${data.diff.toFixed(2)}`}</p>
+            </div>
+        );
+    }
+    return null;
+};
+export default function SGFStackGraph(props: SGFStackGraphProps): ReactElement {
+    const viewState = useSelector<StoreState, ViewState>(state => state.viewState);
+    const {identifier, data, name} = props;
+    const margin = 10;
+    //#54cc7c gr
+    //#b71c1c re
     return (
-        <LineChart
-            width={380}
-            height={200}
+        <BarChart
+            width={viewState.screenWidth / 2}
+            height={360}
             data={data}
             margin={{
-                left: 5, right: 5
+                top: margin, right: margin, bottom: margin, left: margin
             }}
         >
-            <ReferenceLine x={sgfState.sgfProperties.currentMove} stroke={color}/>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis stroke={'#fff'} dataKey="label" minTickGap={50}/>
-            <YAxis stroke={'#fff'}/>
-            <Tooltip />
+            <XAxis stroke={'#78909c'} dataKey="label" minTickGap={50}/>
+            <YAxis stroke={'#78909c'}/>
+            <Tooltip content={<GraphTooltip/>}/>
             <Legend />
-            <Line key={`${identifier}`} connectNulls dataKey="value" type="monotone" name={name} stroke={color} dot={false} />
-        </LineChart>
+            <Bar key={`stack-${identifier}-player`} dataKey="player" name={name} stackId="stack" fill={'#78909c'}/>
+            <Bar key={`stack-${identifier}-ai`} dataKey="diff" name={'katago'} stackId="stack" fill={'#54cc7c'}>
+                {data.map((entry) => (
+                    <Cell key={`stack-${identifier}-entry-${entry.label}-ai`} fill={entry.diff >= 0 ? '#54cc7c' : '#b71c1c' }/>
+                ))}
+            </Bar>
+        </BarChart>
     );
 }

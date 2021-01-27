@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import {Switch} from 'react-router-dom';
 import Dashboard from './Dashboard';
-import Navigation from '../pages/Navigation';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import {createMuiTheme, MuiThemeProvider, responsiveFontSizes} from '@material-ui/core/styles';
@@ -47,7 +46,7 @@ const App: React.FC = () => {
     return (
         <MuiThemeProvider theme={theme}>
             <CssBaseline />
-            <Navigation/>
+            {/*<Navigation/>*/}
             <Switch>
                 <Dashboard/>
             </Switch>

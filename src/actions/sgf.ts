@@ -82,7 +82,7 @@ export interface UploadSuccess {
 export interface UploadFail {
     type: UPLOAD_FAIL
     payload: {
-        message: string | null;
+        message: string;
     }
 }
 
@@ -103,7 +103,7 @@ export interface ReceiveProgress {
 export interface ReceiveProgressFail {
     type: RECEIVE_PROGRESS_FAIL;
     payload: {
-        message: string | null;
+        message: string;
     }
 }
 
@@ -126,7 +126,7 @@ export const uploadSGFFile = (file: string)
                 file
             })
             .then((res: AxiosResponse<ApiResponse<AnalyzedSGF>>) => {
-                dispatch(uploadSuccess(res.data.entity));
+                dispatch(uploadSuccess(res.data.content));
             })
             .catch((err: AxiosError<ApiResponse<AnalyzedSGF>>) => {
                 if (err.response?.data.message) {
@@ -174,7 +174,7 @@ export const loadProgress = () : ThunkAction<Promise<void>, SGFState, null, SGFA
     return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
         return post<AnalysisProgress>('api/sgf/progress', {})
             .then((res: AxiosResponse<ApiResponse<AnalysisProgress>>) => {
-                dispatch(receiveProgress(res.data.entity));
+                dispatch(receiveProgress(res.data.content));
             })
             .catch((err: AxiosError<ApiResponse<AnalysisProgress>>) => {
                 if (err.response?.data.message) {

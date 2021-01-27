@@ -118,7 +118,7 @@ function authComplete(dispatch: ThunkDispatch<AuthState, null, AuthAction>) {
 
 function authSuccess(dispatch: ThunkDispatch<AuthState, null, AuthAction>, res: AxiosResponse<ApiResponse<User>>, rememberMe: boolean) {
     const auth = TokenUtils.getAuthorization(res.headers['authorization']);
-    dispatch(loginSuccess(res.data.entity, auth, rememberMe));
+    dispatch(loginSuccess(res.data.content, auth, rememberMe));
 }
 
 function authFail(dispatch: ThunkDispatch<AuthState, null, AuthAction>, err: AxiosError<ApiResponse<User>>) {

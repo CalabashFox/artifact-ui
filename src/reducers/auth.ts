@@ -1,13 +1,9 @@
 import {AuthAction, LOADING, LOGIN_FAIL, LOGIN_SUCCESS, LOGOUT_COMPLETE, SET_AUTH_ERROR} from 'actions/auth';
 import {AuthState} from 'models/StoreState';
+import { InitialAuthState } from 'models/User';
 import TokenUtils from 'utils/tokenUtils';
 
-const initialState = {
-    user: null,
-    isLoading: false,
-    error: null,
-    auth: null
-};
+const initialState = InitialAuthState;
 
 export function authReducer(state: AuthState = initialState, action: AuthAction): AuthState {
     switch (action.type) {

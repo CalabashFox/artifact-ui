@@ -11,7 +11,10 @@ import thunk from 'redux-thunk';
 import {BrowserRouter} from 'react-router-dom';
 import {Provider} from 'react-redux';
 import {composeWithDevTools} from 'redux-devtools-extension';
-import {MovePriority} from 'models/SGF';
+import {InitialSGFState} from 'models/SGF';
+import { InitialGameState } from 'models/Game';
+import { InitialAuthState } from 'models/User';
+import { InitialViewState } from 'models/view';
 
 const history: History = createBrowserHistory();
 export const routerMiddleware = createRouterMiddleware(history);
@@ -24,27 +27,10 @@ export function configureStore(initialState: StoreState): Store<StoreState> {
 }
 
 const store = configureStore({
-    sgfState: {
-        analyzedSGF: undefined,
-        analysisProgress: undefined,
-        error: null,
-        sgfProperties: {
-            currentMove: 0,
-            displayOwnership: true,
-            displayPolicy: true,
-            displayMoves: true,
-            movePriority: MovePriority.WINRATE,
-            moveCount: 3,
-            minimumPolicyValue: 0.1
-        },
-        uploading: false
-    },
-    authState: {
-        user: null,
-        isLoading: false,
-        error: null,
-        auth: null
-    },
+    sgfState: InitialSGFState,
+    gameState: InitialGameState,
+    viewState: InitialViewState,
+    authState: InitialAuthState
 });
 
 

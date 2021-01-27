@@ -1,9 +1,11 @@
-import React, {ReactElement} from "react";
+import React, {ReactElement, useState} from "react";
 import {useSelector} from "react-redux";
 import {SGFState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
 import SgfUtils from 'utils/sgfUtils';
 import SvgRenderer from 'utils/svgRenderer';
+import { SGFStone } from "models/SGF";
+import { KatagoMoveInfo } from "models/Katago";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -41,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const BASE_DIM = 30
+const BASE_DIM = 30;
 
 const svgProps = {
     dim: 600,
@@ -66,122 +68,242 @@ const svgProps = {
     textColor: '#000',
     winrateOffsetY: -4,
     leadOffsetY: 10,
+    nextMoveOpacity: 0.75,
+    moveBoarderColor: '#aaa',
+    moveColor: '#FCDC05',
+    bestMoveColor: '#0C6CD4',
+    worstMoveColor: '#b71c1c'
 }
 
-export default function SGFBoard(): ReactElement {
+interface SGFBoardProperties {
+    click: (x: number, y: number) => void
+    currentMove: number
+    stones: Array<SGFStone>
+    policy: Array<number>
+    ownership: Array<number>
+    moveInfos: Array<KatagoMoveInfo>
+    hoverEffect: boolean
+}
+
+const createHoverStone = (svgRenderer: SvgRenderer, stone: HoverStone, hoverEffect: boolean): Array<React.SVGProps<SVGRectElement>> => {
+    const hoverStones = new Array<React.SVGProps<SVGRectElement>>();
+    if (!hoverEffect || stone.x === -1 || stone.y === -1 || stone.x === 19 || stone.y === 19) {
+        return hoverStones;
+    }
+    const i = stone.x;
+    const j = stone.y;
+    const color = svgRenderer.color(stone.color);
+    const [x, y] = svgRenderer.loc([i, j]);
+    hoverStones.push(<circle key={`stone-hover`} cx={x} cy={y} r={svgProps.stoneDim} fill={color} fillOpacity={0.75}/>);
+    
+    return hoverStones;
+}
+
+const createSVGStones = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], stones: Array<SGFStone>): Array<React.SVGProps<SVGRectElement>> => {
+    const svgStones = new Array<React.SVGProps<SVGRectElement>>();
+    stones.forEach((stone, index) => {
+        const [i, j] = SgfUtils.translateToCoordinate(stone[1]);
+        const [x, y] = svgRenderer.loc([i, j]);
+        const color = svgRenderer.color(stone[0]);
+        svgStones.push(<rect key={`stone-holder-${stone[1]}`} x={x - svgProps.stoneHolderOffset} y={y - svgProps.stoneHolderOffset} width={svgProps.stoneHolderDim} height={svgProps.stoneHolderDim} fill={svgProps.boardColor}/>);
+        if (stone[0] === 'W') {
+            //stones.push(<circle key={`white-stone-boarder-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} strokeWidth={2} stroke={svgRenderer.oppositeColor(stone[0])} />);
+        }
+        svgStones.push(<circle key={`stone-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} fill={color}/>);
+        if (!svgRenderer.getSgfProperties().displayMoves) {
+            svgStones.push(<text key={`snapshot-text-${index}`} x={x - svgProps.stoneTextOffset} y={y + svgProps.stoneTextOffsetY} stroke={svgRenderer.oppositeColor(stone[0])}>{index + 1}</text>);
+        }     
+        if (index === stones.length - 1) {
+            svgStones.push(<circle key={`current-stone-${stone[1]}`} cx={x} cy={y} r={svgProps.currentStoneDim} strokeWidth={svgProps.currentStoneWidth} stroke={svgRenderer.oppositeColor(stone[0])} fill={color}/>);
+        }
+        occupiedCoordinates[i][j] = true;
+    });
+    return svgStones;
+}
+
+const createSVGPoliy = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], policy: Array<number>): Array<React.SVGProps<SVGRectElement>> => {
+    const svgPolicy = new Array<React.SVGProps<SVGRectElement>>();
+    if (!svgRenderer.getSgfProperties().displayPolicy)  {
+        return svgPolicy;
+    }
+    policy.forEach((value, index) => {
+        if (index === 19 * 19) {
+            return;
+        }
+        if (value === -1) {
+            return;
+        }
+        if (value <= svgRenderer.getSgfProperties().minimumPolicyValue) {
+            return;
+        }
+        const [i, j] = svgRenderer.dim(index);
+        if (occupiedCoordinates[i][j]) {
+            return;
+        }
+        const opacity = value * 0.5;
+        const [x, y] = svgRenderer.loc([i, j]);
+        svgPolicy.push(<rect key={`policy-${index}`} x={x - svgProps.ownershipOffset} y={y - svgProps.ownershipOffset}
+                            width={svgProps.ownershipDim} height={svgProps.ownershipDim} fill={'green'} fillOpacity={opacity}/>);
+        occupiedCoordinates[i][j] = true;
+    });
+    return svgPolicy;
+}
+
+const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], ownership: Array<number>): Array<React.SVGProps<SVGRectElement>> => {
+    const svgOwnership = new Array<React.SVGProps<SVGRectElement>>();
+    if (!svgRenderer.getSgfProperties().displayOwnership)  {
+        return svgOwnership;
+    }
+    ownership.forEach((value, index) => {
+        let opacity = Math.abs(value);
+        if (opacity < 0.1) { // TODO make this as settings
+            return;
+        }
+        opacity *= 0.5;
+        const [i, j] = svgRenderer.dim(index);
+        if (occupiedCoordinates[i][j]) {
+            return;
+        }
+        const [x, y] = svgRenderer.loc([i, j]);
+        const color = svgRenderer.ownershipColor(value);
+        svgOwnership.push(<rect key={`ownership-${index}`} x={x - svgProps.ownershipOffset} y={y - svgProps.ownershipOffset}
+                            width={svgProps.ownershipDim} height={svgProps.ownershipDim} fillOpacity={opacity} fill={color}/>);
+        occupiedCoordinates[i][j] = true;
+    });
+    return svgOwnership;
+}
+
+const createSVGMoves = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], moves: Array<KatagoMoveInfo>): Array<React.SVGProps<SVGRectElement>> => {
+    const svgMoves = new Array<React.SVGProps<SVGRectElement>>();
+    for (let index = 0; index < moves.length; index++) {
+        const move = moves[index];
+        const [i, j] = SgfUtils.translateToCoordinate(move.move);
+        const [x, y] = svgRenderer.loc([i, j]);
+        const color = svgRenderer.moveColor(index, moves.length);
+        svgMoves.push(<circle key={`move-${move.move}`} cx={x} cy={y} r={svgProps.stoneDim} fill={color} strokeWidth={1} fillOpacity={svgProps.nextMoveOpacity} stroke={svgProps.moveBoarderColor}/>);
+        svgMoves.push(<text key={`move-winrate-${i}-${j}`} x={x} y={y + svgProps.winrateOffsetY} stroke={svgProps.textColor}>{(move.winrate * 100).toFixed(1)}</text>);
+        svgMoves.push(<text key={`move-lead-${i}-${j}`} x={x} y={y + svgProps.leadOffsetY} stroke={svgProps.textColor}>{move.scoreLead.toFixed(1)}</text>);
+        occupiedCoordinates[i][j] = true;
+    }
+    return svgMoves;
+}
+
+const createSVGBoard = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][]): Array<React.SVGProps<SVGRectElement>> => {
+    const svgLines = new Array<React.SVGProps<SVGRectElement>>();
+    const svgDecorations = new Array<React.SVGProps<SVGRectElement>>();
+    const dimension = svgRenderer.getBoardDimension();
+    for (let i = 0; i < dimension; i++) {
+        const length = dimension * svgProps.blockDim;
+        const offset = i * svgProps.blockDim + svgProps.blockOffset;
+
+        occupiedCoordinates[i] = [];
+        // vertical
+        svgLines.push(<line pointerEvents={'none'} key={`line-x-${i}`} x1={svgProps.blockOffset} x2={length} y1={offset} y2={offset} stroke={svgProps.blockColor}/>);
+        // horizontal
+        svgLines.push(<line pointerEvents={'none'} key={`line-y-${i}`} x1={offset} x2={offset} y1={svgProps.blockOffset} y2={length} stroke={svgProps.blockColor}/>);
+        for (let j = 0; j < dimension; j++) {
+            const [x, y] = svgRenderer.loc([i, j]);
+            if (SgfUtils.isHoshi([i, j])) {
+                svgDecorations.push(<circle pointerEvents={'none'} key={`hoshi-${i}-${j}`} cx={x} cy={y} r={svgProps.hoshiDim} stroke={svgProps.blockColor}/>);
+            }
+            if (SgfUtils.isTengen([i, j])) {
+                svgDecorations.push(<circle pointerEvents={'none'} key={`tengen`} cx={x} cy={y} r={svgProps.tengenDim} stroke={svgProps.blockColor}/>);
+            }
+        }
+    }
+    return svgLines.concat(svgDecorations);
+}
+
+interface HoverStone {
+    color: string
+    x: number
+    y: number
+}
+
+export default function SGFBoard(props: SGFBoardProperties): ReactElement {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
-    const analyzedSGF = sgfState.analyzedSGF;
     const sgfProperties = sgfState.sgfProperties;
     const dimension = 19;
-    const currentMove = sgfState.sgfProperties.currentMove;
+    const {click, stones, policy, ownership, moveInfos, hoverEffect} = props;
 
-    const svgRenderer = new SvgRenderer(dimension, svgProps);
+    const blackTurn = stones.length === 0 ? true : 
+        stones[stones.length - 1][0] === 'B' ? false : true;
 
-    if (analyzedSGF !== undefined) {
-        const usedCoordinate: boolean[][] = [];
-        const lines = new Array<React.SVGProps<SVGRectElement>>();
-        const decorations = new Array<React.SVGProps<SVGRectElement>>();
-        for (let i = 0; i < dimension; i++) {
-            const length = dimension * svgProps.blockDim;
-            const offset = i * svgProps.blockDim + svgProps.blockOffset;
+    const svgRenderer = new SvgRenderer(dimension, svgProps, sgfProperties);
 
-            usedCoordinate[i] = [];
-            // vertical
-            lines.push(<line key={`line-x-${i}`} x1={svgProps.blockOffset} x2={length} y1={offset} y2={offset} stroke={svgProps.blockColor}/>);
-            // horizontal
-            lines.push(<line key={`line-y-${i}`} x1={offset} x2={offset} y1={svgProps.blockOffset} y2={length} stroke={svgProps.blockColor}/>);
-            for (let j = 0; j < dimension; j++) {
-                const [x, y] = svgRenderer.loc([i, j]);
-                if (SgfUtils.isHoshi([i, j])) {
-                    decorations.push(<circle key={`hoshi-${i}-${j}`} cx={x} cy={y} r={svgProps.hoshiDim} stroke={svgProps.blockColor}/>);
-                }
-                if (SgfUtils.isTengen([i, j])) {
-                    decorations.push(<circle key={`tengen`} cx={x} cy={y} r={svgProps.tengenDim} stroke={svgProps.blockColor}/>);
-                }
-            }
+    const [hoverStone, setHoverStone] = useState({
+        color: 'B',
+        x: -1,
+        y: -1
+    });
+
+    const transformLocation = (event: React.MouseEvent<SVGSVGElement, MouseEvent>): [number, number] => {
+        const svg = event.currentTarget;
+        const pt = svg.createSVGPoint();
+      
+        pt.x = event.clientX;
+        pt.y = event.clientY;
+      
+        const ctm = svg.getScreenCTM();
+        if (ctm) {
+            const cursorPt = pt.matrixTransform(ctm.inverse());
+            return svgRenderer.deloc([cursorPt.x, cursorPt.y]);
+        } else {
+            return svgRenderer.deloc([pt.x, pt.y]); 
         }
-        const stones = new Array<React.SVGProps<SVGRectElement>>();
-        const snapshot = analyzedSGF.snapshotList[sgfState.sgfProperties.currentMove];
-        //const currentStone = snapshot.stones[snapshot.stones.length - 1];
-        snapshot.stones.forEach((stone, index) => {
-            const [i, j] = SgfUtils.translateToCoordinate(stone[1]);
-            const [x, y] = svgRenderer.loc([i, j]);
-            const color = svgRenderer.color(stone[0]);
-            stones.push(<rect key={`stone-holder-${stone[1]}`} x={x - svgProps.stoneHolderOffset} y={y - svgProps.stoneHolderOffset} width={svgProps.stoneHolderDim} height={svgProps.stoneHolderDim} fill={svgProps.boardColor}/>);
-            stones.push(<circle key={`stone-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} fill={color}/>);
-            if (!sgfProperties.displayMoves) {
-                stones.push(<text key={`snapshot-text-${index}`} x={x - svgProps.stoneTextOffset} y={y + svgProps.stoneTextOffsetY} className={classes.font} stroke={svgRenderer.oppositeColor(stone[0])}>{index + 1}</text>);
-            }
-            if (index === sgfProperties.currentMove) {
-                stones.push(<circle key={`current-stone-${stone[1]}`} cx={x} cy={y} r={svgProps.currentStoneDim} strokeWidth={svgProps.currentStoneWidth} stroke={svgRenderer.oppositeColor(stone[0])} fill={color}/>);
-            }
-
-            usedCoordinate[i][j] = true;
-        });
-
-        for (const move of snapshot.analysisData.moves) {
-            const [i, j] = SgfUtils.translateToCoordinate(move.move);
-            const [x, y] = svgRenderer.loc([i, j]);
-            stones.push(<circle key={`stone-${move.move}`} cx={x} cy={y} r={svgProps.stoneDim} fill={'yellow'}/>);
-            stones.push(<text key={`move-winrate-${i}-${j}`} x={x} y={y + svgProps.winrateOffsetY} className={classes.font} stroke={svgProps.textColor}>{(move.winrate * 100).toFixed(1)}</text>);
-            stones.push(<text key={`move-lead-${i}-${j}`} x={x} y={y + svgProps.leadOffsetY} className={classes.font} stroke={svgProps.textColor}>{move.scoreLead.toFixed(1)}</text>);
-            usedCoordinate[i][j] = true;
-        }
-        const analysis = new Array<React.SVGProps<SVGRectElement>>();
-        if (sgfProperties.displayOwnership && snapshot.katagoResults.length !== 0) {
-            const result = snapshot.katagoResults[0];
-            result.ownership.forEach((ownership, index) => {
-                let opacity = Math.abs(ownership);
-                if (opacity < 0.1) { // TODO make this as settings
-                    return;
-                }
-                opacity *= 0.5;
-                const [i, j] = svgRenderer.dim(index);
-                if (usedCoordinate[i][j]) {
-                    return;
-                }
-                const [x, y] = svgRenderer.loc([i, j]);
-                const color = svgRenderer.ownershipColor(ownership);
-                analysis.push(<rect key={`ownership-${currentMove}-${index}`} x={x - svgProps.ownershipOffset} y={y - svgProps.ownershipOffset}
-                                    width={svgProps.ownershipDim} height={svgProps.ownershipDim} fillOpacity={opacity} fill={color}/>);
-                usedCoordinate[i][j] = true;
-            });
-        }
-
-        if (sgfProperties.displayPolicy && snapshot.katagoResults.length !== 0) {
-            const result = snapshot.katagoResults[0];
-            result.policy.forEach((policy, index) => {
-                if (index === 19 * 19) {
-                    return;
-                }
-                if (policy === -1) {
-                    return;
-                }
-                if (policy <= sgfProperties.minimumPolicyValue) {
-                    return;
-                }
-                const [i, j] = svgRenderer.dim(index);
-                if (usedCoordinate[i][j]) {
-                    return;
-                }
-                const [x, y] = svgRenderer.loc([i, j]);
-                analysis.push(<rect key={`policy-${currentMove}-${index}`} x={x - svgProps.ownershipOffset} y={y - svgProps.ownershipOffset}
-                                    width={svgProps.ownershipDim} height={svgProps.ownershipDim} fill={'green'}/>);
-                usedCoordinate[i][j] = true;
-            });
-        }
-
-        return <svg width={svgProps.dim} height={svgProps.dim}>
-            <rect width={svgProps.dim} height={svgProps.dim} fill={svgProps.boardColor} />
-            {lines}
-            {decorations}
-            {stones}
-            {analysis}
-        </svg>;
     }
-    return <svg width={svgProps.dim} height={svgProps.dim}>
-        <rect width={svgProps.dim} height={svgProps.dim} fill={svgProps.boardColor} />
-    </svg>;
 
+    const handleClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+        const [x, y] = transformLocation(event);
+        click(x, y);
+    };
+
+    const handleMouseOut = () => {
+        if (!hoverEffect) {
+            return;
+        }
+        setHoverStone({
+            color: blackTurn ? 'B' : 'W',
+            x: -1,
+            y: -1
+        });
+    };
+
+    const handleMouseMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+        if (!hoverEffect) {
+            return;
+        }
+        const [x, y] = transformLocation(event);
+        if (hoverStone.x === x && hoverStone.y === y) {
+            return;
+        }
+        setHoverStone({
+            color: blackTurn ? 'B' : 'W',
+            x: x,
+            y: y
+        });
+    };
+
+    const occupiedCoordinates: boolean[][] = [];
+    const svgBoardDecorations = createSVGBoard(svgRenderer, occupiedCoordinates);
+    const svgStones = createSVGStones(svgRenderer, occupiedCoordinates, stones);
+    const svgMoves = createSVGMoves(svgRenderer, occupiedCoordinates, moveInfos);
+    const svgOwnership = createSVGOwnership(svgRenderer, occupiedCoordinates, ownership);
+    const svgPolicy = createSVGPoliy(svgRenderer, occupiedCoordinates, policy);
+    const svgHoverStones = createHoverStone(svgRenderer, hoverStone, hoverEffect);
+
+    return <svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" className={classes.font}
+        pointerEvents={'none'}
+        onClick={(e) => handleClick(e)} 
+        onMouseOut={() => handleMouseOut()}
+        onMouseMove={(e) => handleMouseMove(e)}>
+        <rect width={svgProps.dim} height={svgProps.dim} fill={svgProps.boardColor} pointerEvents={'all'}/>
+        {svgBoardDecorations}
+        {svgStones}
+        {svgMoves}
+        {svgHoverStones}
+        {svgOwnership}
+        {svgPolicy}
+    </svg>;
 }

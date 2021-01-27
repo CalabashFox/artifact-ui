@@ -5,7 +5,7 @@ const BASE_URL = 'http://localhost:8080/api';
 
 export interface ApiResponse<T> {
     status: number
-    entity: T
+    content: T
     message: string | null
 }
 

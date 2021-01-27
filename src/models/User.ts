@@ -13,3 +13,10 @@ export interface User {
     state: UserState,
     token: string;
 }
+
+export const InitialAuthState = {
+    user: null,
+    isLoading: false,
+    error: null,
+    auth: null
+}

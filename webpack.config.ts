@@ -3,6 +3,8 @@ import webpack from 'webpack';
 
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
+const SRC = path.resolve(__dirname, 'src/main/js');
+
 const config: webpack.Configuration = {
     entry: './src/index.tsx',
     module: {
@@ -31,7 +33,11 @@ const config: webpack.Configuration = {
                 ]
             },
             {
-                test: /\.[(png)|(obj)|(json)]$/,
+                test: /\.[(png)|(obj)|(json)|(mp3)]$/,
+                loader: 'file-loader'
+            },
+            {
+                test: /\.mp3$/,
                 loader: 'file-loader'
             },
             {
@@ -77,7 +83,12 @@ const config: webpack.Configuration = {
                 files: './src/**/*.tsx'
             }
         })
-    ]
+    ],
+    performance: {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
+    }
 };
 
 export default config;

@@ -12,6 +12,8 @@ import whiteIcon from 'assets/images/white.svg';
 import whiteTurnIcon from 'assets/images/white-turn.svg';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Divider from '@material-ui/core/Divider';
+import { SGFGraphValue } from 'models/SGF';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -37,8 +39,8 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 20,
         display: 'inline-block',
         verticalAlign: 'middle',
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1)
+        marginLeft: theme.spacing(0.5),
+        marginRight: theme.spacing(0.5)
     },
     statusContainer: {
         width: '100%'
@@ -59,6 +61,14 @@ const useStyles = makeStyles((theme) => ({
     graphContainer: {
         boxSizing: 'border-box',
         padding: theme.spacing(1)
+    },
+    divider: {
+        color: '#fff',
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1)
+    },
+    info: {
+        color: '#fff'
     }
 }));
 
@@ -81,20 +91,19 @@ const SGFInformation: React.FC = () => {
     const winrateList = useBlackData ? sgfState.analyzedSGF.analysisData.blackWinrate : sgfState.analyzedSGF.analysisData.whiteWinrate;
     const winrate = winrateList[index].value ?? 0;
     const blackWinrate = useBlackData ? winrate : 100 - winrate;
-    const whiteWinrate = useBlackData ? 100 - winrate : winrate;
+    const whiteWinrate = 100 - blackWinrate;
 
-    const showDiff = index > 1;
+    const showDiff = index >= 1;
 
-    let prevBlackWinrate = 0;
-    let prevWhiteWinrate = 0;
+    let previousWinrate = 0;
     let blackWinrateDiff = 0;
     let whiteWinrateDiff = 0;
     if (showDiff) {
-        const prevWinrate = winrateList[index - 2].value ?? 0;
-        prevBlackWinrate = useBlackData ? prevWinrate : 100 - prevWinrate;
-        prevWhiteWinrate = useBlackData ? 100 - prevWinrate : prevWinrate;
-        blackWinrateDiff = blackWinrate - prevBlackWinrate;
-        whiteWinrateDiff = whiteWinrate - prevWhiteWinrate;
+        const previousWinrateList = useBlackData ? sgfState.analyzedSGF.analysisData.whiteWinrate : sgfState.analyzedSGF.analysisData.blackWinrate;
+        const prevWinrate = previousWinrateList[index - 1].value ?? 0;
+        previousWinrate = useBlackData ? prevWinrate : 100 - prevWinrate;
+        whiteWinrateDiff = whiteWinrate - previousWinrate;
+        blackWinrateDiff = -whiteWinrateDiff;
     }
 
     let graph;
@@ -110,8 +119,74 @@ const SGFInformation: React.FC = () => {
             break;
     }
 
+    const gameInfo = sgfState.analyzedSGF;
+    const headers = [];
+    const info = [];
+    if (gameInfo.event) {
+        headers.push(<Typography noWrap>Event: </Typography>);
+        info.push(<Typography noWrap>{gameInfo.event} (Round {gameInfo.round})</Typography>);
+    }
+    if (gameInfo.date) {
+        headers.push(<Typography noWrap>Date: </Typography>);
+        info.push(<Typography noWrap>{gameInfo.date}</Typography>);
+    }
+
+    if (gameInfo.rules) {
+        headers.push(<Typography noWrap>Rule: </Typography>);
+        info.push(<Typography noWrap>{gameInfo.rules}</Typography>);
+    }
+
+    if (gameInfo.timeLimit) {
+        headers.push(<Typography noWrap>Time: </Typography>);
+        info.push(<Typography noWrap>{gameInfo.timeLimit}</Typography>);
+    }
+
+    if (gameInfo.komi) {
+        headers.push(<Typography noWrap>Komi: </Typography>);
+        info.push(<Typography noWrap>{gameInfo.komi}</Typography>);
+    }
+
+    if (gameInfo.result) {
+        headers.push(<Typography noWrap>Result: </Typography>);
+        info.push(<Typography noWrap>{gameInfo.result}</Typography>);
+    }
+
+    const blackMatchAnalysis = new Array<SGFGraphValue>();
+    const whiteMatchAnalysis = new Array<SGFGraphValue>();
+    
+    let blackMatch = 0;
+    sgfState.analyzedSGF.analysisData.blackMatchAnalysis.forEach((match, index) => {
+        if (match) {
+            blackMatch++;
+        }
+        blackMatchAnalysis.push({
+            label: index.toString(),
+            value: blackMatch / (index + 1) * 100
+        })
+    });
+
+    let whiteMatch = 0;
+    sgfState.analyzedSGF.analysisData.whiteMatchAnalysis.forEach((match, index) => {
+        if (match) {
+            whiteMatch++;
+        }
+        whiteMatchAnalysis.push({
+            label: index.toString(),
+            value: whiteMatch / (index + 1) * 100
+        })
+    });
+
     return <div>
         <Paper className={classes.paper}>
+            <Grid container spacing={1} className={classes.info}>
+                <Grid item xs={3}>
+                    {headers}
+                </Grid>
+                <Grid item xs={9}>
+                    {info}
+                </Grid>
+            </Grid>
+            <Divider className={classes.divider}/>
             <Grid container spacing={1}>
                 <Grid item xs={6} className={classes.blackPlayer}>
                     <img src={useBlackData ? blackTurnIcon : blackIcon} className={classes.playerTitle} alt="black"/>
@@ -155,6 +230,13 @@ const SGFInformation: React.FC = () => {
             <div className={classes.graphContainer}>
                 {graph}
             </div>
+        </Paper>
+        <Paper className={classes.paper}>
+            <SGFGraph identifier={`winrate-analysis-black`} name={sgfState.analyzedSGF.playerBlack} data={blackMatchAnalysis} color={'#fff'}/>
+        </Paper>
+
+        <Paper className={classes.paper}>
+            <SGFGraph identifier={`winrate-analysis-white`} name={sgfState.analyzedSGF.playerWhite} data={whiteMatchAnalysis} color={'#fff'}/>
         </Paper>
     </div>;
 };

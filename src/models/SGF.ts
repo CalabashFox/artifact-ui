@@ -1,6 +1,8 @@
 import {KatagoMoveInfo, KatagoResult} from 'models/Katago';
+import { SGFState } from './StoreState';
 
 export interface AnalyzedSGF {
+    isValid: boolean
     snapShotsAnalyzed: number
     snapshotList: Array<SGFSnapshot>
     annotation: string
@@ -26,13 +28,26 @@ export interface SGFGraphValue {
     value: number | null
 }
 
+export interface SGFStackGraphValue {
+    label: string
+    player: number
+    ai: number
+    diff: number
+}
+
 export interface SGFAnalysisData {
+    blackMatchAnalysis: Array<boolean>
+    whiteMatchAnalysis: Array<boolean>
+    blackMatch: number
+    whiteMatch: number
     blackWinrate: Array<SGFGraphValue>
     whiteWinrate: Array<SGFGraphValue>
     blackScoreLead: Array<SGFGraphValue>
     whiteScoreLead: Array<SGFGraphValue>
     blackSelfplay: Array<SGFGraphValue>
     whiteSelfplay: Array<SGFGraphValue>
+    blackWinrateAnalysis: Array<SGFStackGraphValue>
+    whiteWinrateAnalysis: Array<SGFStackGraphValue>
 }
 
 export interface SGFMove {
@@ -79,8 +94,62 @@ export interface SGFProperties {
     movePriority: MovePriority
     moveCount: number
     minimumPolicyValue: number
+    topMatch: number
 }
 
 export enum MovePriority {
     WINRATE, MEAN, LEAD, PRIOR, ORDER
 }
+
+export const InitialSGFState: SGFState = {
+    analyzedSGF: {
+        isValid: false,
+        snapShotsAnalyzed: 0,
+        snapshotList: new Array<SGFSnapshot>(),
+        annotation: '',
+        application: '',
+        date: new Date(),
+        event: '',
+        playerWhite: '',
+        playerBlack: '',
+        rankBlack: '',
+        rankWhite: '',
+        round: '',
+        timeLimit: '',
+        komi: 0,
+        result: '',
+        place: '',
+        rules: '',
+        moves: new Array<SGFMove>(),
+        analysisData: { 
+            blackMatchAnalysis: new Array<boolean>(),
+            whiteMatchAnalysis: new Array<boolean>(),
+            blackMatch: 0,
+            whiteMatch: 0,
+            blackWinrate: new Array<SGFGraphValue>(),
+            whiteWinrate: new Array<SGFGraphValue>(),
+            blackScoreLead: new Array<SGFGraphValue>(),
+            whiteScoreLead: new Array<SGFGraphValue>(),
+            blackSelfplay: new Array<SGFGraphValue>(),
+            whiteSelfplay: new Array<SGFGraphValue>(),
+            blackWinrateAnalysis: new Array<SGFStackGraphValue>(),
+            whiteWinrateAnalysis: new Array<SGFStackGraphValue>()
+        }
+    },
+    analysisProgress: {
+        analyzed: 0,
+        total: 0
+    },
+    error: '',
+    sgfProperties: {
+        currentMove: 0,
+        displayOwnership: true,
+        displayPolicy: true,
+        displayMoves: true,
+        movePriority: MovePriority.WINRATE,
+        moveCount: 5,
+        minimumPolicyValue: 0.1,
+        topMatch: 5
+    },
+    uploading: false
+};

@@ -10,31 +10,17 @@ import {
     UPLOAD_SUCCESS,
     UPLOADING
 } from 'actions/sgf';
+import { InitialSGFState } from 'models/SGF';
 import {SGFState} from 'models/StoreState';
-import {MovePriority} from 'models/SGF';
 import SgfUtils from 'utils/sgfUtils';
 
-const initialState = {
-    analyzedSGF: undefined,
-    error: null,
-    analysisProgress: undefined,
-    sgfProperties: {
-        currentMove: 0,
-        displayOwnership: true,
-        displayPolicy: true,
-        displayMoves: true,
-        movePriority: MovePriority.WINRATE,
-        moveCount: 3,
-        minimumPolicyValue: 0.1
-    },
-    uploading: false
-};
+const initialState = InitialSGFState;
 
 export function sgfReducer(state: SGFState = initialState, action: SGFAction): SGFState {
     switch (action.type) {
         case RECALCULATE_ANALYSIS_DATA:
             return {
-                ...state, analyzedSGF: SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, state.analyzedSGF)
+                ...state, analyzedSGF: SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, state.analyzedSGF!)
             }
         case BROWSE_MOVE:
             return {...state, sgfProperties: {
@@ -47,8 +33,9 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
                 }
             };
         case SET:
-            let sgf = SgfUtils.calculateSGFAnalysisData(action.payload.analyzedSGF);
+            let sgf = SgfUtils.calculateSGFAnalysisData(action.payload.analyzedSGF)!;
             sgf = SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, sgf);
+            sgf = SgfUtils.calculateSGFMatchAnalysisData(state.sgfProperties, sgf);
             return {
                 ...state, analyzedSGF: sgf,
                 sgfProperties: {
@@ -74,7 +61,7 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
             }
         case RECEIVE_PROGRESS_FAIL:
             return {
-                ...state, analysisProgress: undefined, error: action.payload.message
+                ...state, analysisProgress: {analyzed: 0, total: 0}, error: action.payload.message
             }
         default:
             return state;
