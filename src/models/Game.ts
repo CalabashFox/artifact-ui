@@ -1,5 +1,5 @@
 import SocketHandler from "utils/socketHandler";
-import { KatagoMoveInfo } from "./Katago";
+import { KatagoLog, KatagoMoveInfo, KatagoResult } from "./Katago";
 import { SGFMove, SGFStone } from "./SGF";
 
 export interface Game {
@@ -40,6 +40,27 @@ export interface SocketState {
     connected: boolean
 }
 
+export enum GameActionState {
+    PENDING, NONE, FAIL, SUCCESS, SUCCESS_REMOVE_STONE
+}
+
+export const EmptyResult: KatagoResult = {
+    id: '',
+        isDuringSearch: false,
+        turnNumber: 0,
+        moveInfos: new Array<KatagoMoveInfo>(),
+        rootInfo: {
+            scoreLead: 0,
+            scoreSelfplay: 0,
+            scoreStdev: 0,
+            utility: 0,
+            visits: 0,
+            winrate: 0
+        },
+        ownership: new Array<number>(),
+        policy: new Array<number>()
+}
+
 export const InitialGameState = {
     game: {
         black: {
@@ -62,21 +83,9 @@ export const InitialGameState = {
         stones: new Array<SGFStone>(),
         removedStones: new Array<SGFMove>()
     },
-    currentResult: {
-        isDuringSearch: false,
-        turnNumber: 0,
-        moveInfos: new Array<KatagoMoveInfo>(),
-        rootInfo: {
-            scoreLead: 0,
-            scoreSelfplay: 0,
-            scoreStdev: 0,
-            utility: 0,
-            visits: 0,
-            winrate: 0
-        },
-        ownership: new Array<number>(),
-        policy: new Array<number>()
-    },
+    actionState: GameActionState.NONE,
+    logs: new Array<KatagoLog>(),
+    currentResult: EmptyResult,
     gameProperties: {
 
     }

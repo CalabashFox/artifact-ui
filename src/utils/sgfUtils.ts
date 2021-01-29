@@ -10,7 +10,7 @@ const hoshi = [[3, 3], [3, 9], [3, 15],
 ];
 
 export default class SgfUtils {
-
+    
     static translateToCoordinate(gtpLocation: string): Point {
         let col = gtpLocation.charCodeAt(0);
         if (col >= 'I'.charCodeAt(0)) {

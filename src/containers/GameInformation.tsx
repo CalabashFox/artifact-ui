@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {useSelector} from 'react-redux';
 import {GameState, StoreState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
@@ -10,6 +10,7 @@ import blackTurnIcon from 'assets/images/black-turn.svg';
 import whiteIcon from 'assets/images/white.svg';
 import whiteTurnIcon from 'assets/images/white-turn.svg';
 import Divider from '@material-ui/core/Divider';
+import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -24,6 +25,15 @@ const useStyles = makeStyles((theme) => ({
         whiteSpace: 'nowrap',
         marginBottom: theme.spacing(1),
         backgroundColor: theme.palette.primary.light
+    },
+    logContainer: {
+        padding: theme.spacing(2),
+        backgroundColor: theme.palette.primary.light,
+        fontSize: 12
+    },
+    logField: {
+        backgroundColor: '#fff',
+        width: '100%'
     },
     whitePlayer: {
         color: '#fff'
@@ -75,6 +85,19 @@ const GameInformation: React.FC = () => {
     const game = gameState.game;
     const black = game.black;
     const white = game.white;
+
+    const logs = gameState.logs;
+
+    const logContent = logs.length === 0 ? '\n' : logs.map((log) => {
+        return `(${log.timestamp}): ${log.text}`;
+    }).join('\n');
+
+    const logElement = useRef<HTMLInputElement>();
+
+    useEffect(() => {
+        const elem = logElement.current ?? new HTMLInputElement();
+        elem.scrollTop = elem.scrollHeight ?? 0;
+    }, [logs]);
     
     return <div>
         <Paper className={classes.paper}>
@@ -104,6 +127,21 @@ const GameInformation: React.FC = () => {
 
                     </Typography>
                 </Grid>
+            </Grid>
+        </Paper>
+        <Paper className={classes.logContainer}>
+            <Grid container spacing={1}> 
+                <TextField
+                    inputRef={logElement}
+                    className={classes.logField}
+                    label="Katago log"
+                    multiline
+                    rows={12}
+                    value={logContent}
+                    variant="outlined"
+                    inputProps={{
+                        readOnly: true
+                    }}/>
             </Grid>
         </Paper>
     </div>;

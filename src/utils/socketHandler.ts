@@ -1,31 +1,33 @@
-import { GameAction } from "actions/game";
+import { appendLog, GameAction, setKatagoAnalysis } from "actions/game";
+import { KatagoLog, KatagoMessage, KatagoResult } from "models/Katago";
 import { Dispatch } from "react";
 
 export default class SocketHandler {
     
     private connected: boolean;
-    private dispatch: Dispatch<GameAction>;
-    private socket: WebSocket;
 
-    public constructor(dispatch: Dispatch<GameAction>) {
+    public constructor() {
         this.connected = false;
-        this.dispatch = dispatch;
-        this.socket = new WebSocket('ws://localhost:8080/artifact/session');
     }
 
-    sendMessage() {
-        this.socket.send('');
-    }
-
-    connect() {
-        this.socket.onopen = () => {
+    connect(dispatch: Dispatch<GameAction>) {
+        const socket = new WebSocket('ws://localhost:8080');
+        socket.onopen = () => {
             this.connected = true;
         };
-        this.socket.onmessage = this.onMessage;
+        socket.onmessage = (e: MessageEvent) => {
+            this.onMessage(dispatch, e);
+        }
     }
 
-    onMessage(e: MessageEvent) {
-        console.log(e.data);
+    onMessage(dispatch: Dispatch<GameAction>, e: MessageEvent) {
+        const message: KatagoMessage = JSON.parse(e.data);
+        if (message.type === 'LOG') {
+            dispatch(appendLog(JSON.parse(e.data)));
+        } else if (message.type === 'QUERY') {
+            const result: KatagoResult = JSON.parse(e.data);
+            dispatch(setKatagoAnalysis(result));
+        }    
     }
 
     disconnect() {

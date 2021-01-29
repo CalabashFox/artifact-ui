@@ -1,5 +1,6 @@
 
 export interface KatagoResult {
+    id: string
     isDuringSearch: boolean
     turnNumber: number
     moveInfos: Array<KatagoMoveInfo>
@@ -32,4 +33,13 @@ export interface KatagoMoveInfo {
     order: number
     pvVisits: number
     pv: Array<string>
+}
+
+export interface KatagoLog {
+    timestamp: string
+    text: string
+}
+
+export interface KatagoMessage {
+    type: string
 }

@@ -5,11 +5,14 @@ import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import SGFBoard from './SGFBoard';
-import {Left, DoubleLeft, ToLeft, Right, DoubleRight, ToRight, ChartHistogram, Analysis, Download} from '@icon-park/react'
-import { placeStone, startGame } from "actions/game";
+import {Undo, CloseOne, RightOne, ChartHistogram, Analysis} from '@icon-park/react'
+import { placeStone, startGame, stopGame, undo } from "actions/game";
 import SocketHandler from "utils/socketHandler";
 import GameInformation from "./GameInformation";
-import * as x from 'assets/audio/placestone.mp3';
+import * as placeStoneSound from 'assets/audio/placestone.mp3';
+import * as invalidMoveSound from 'assets/audio/invalidmove.mp3';
+import * as removeStoneSound from 'assets/audio/removestone.mp3';
+import { GameActionState } from "models/Game";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -71,6 +74,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function GameView(): ReactElement {
     const gameState = useSelector<StoreState, GameState>(state => state.gameState);
+    const actionState = gameState.actionState;
     const classes = useStyles();
     const dispatch = useDispatch();
     const game = gameState.game;
@@ -79,16 +83,42 @@ export default function GameView(): ReactElement {
     const currentMove = game.currentMove;
     const {policy, ownership, moveInfos} = gameState.currentResult;
 
-    const [socket] = useState(new SocketHandler(dispatch));
+    const [socket] = useState(new SocketHandler());
+    const [placeStoneAudio] = useState(new Audio(placeStoneSound.default));
+    const [invalidActionAudio] = useState(new Audio(invalidMoveSound.default));
+    const [removeStoneAudio] = useState(new Audio(removeStoneSound.default));
 
-    const blackTurn = stones.length % 2 === 0;
-
-    let placeStoneSound = null;
+    const blackTurn = game.black.turn;
 
     const initConnection = useCallback(() => {
-        dispatch(startGame());
-        socket.connect();
+        socket.connect(dispatch);
     }, [dispatch, socket]);
+
+    useEffect(() => {
+        invalidActionAudio.currentTime = 0;
+        placeStoneAudio.currentTime = 0;
+        removeStoneAudio.currentTime = 0;
+        switch (actionState) {
+            case GameActionState.FAIL:
+                invalidActionAudio.play();
+                return;
+            case GameActionState.SUCCESS:
+                placeStoneAudio.play();
+                return;
+            case GameActionState.SUCCESS_REMOVE_STONE:
+                placeStoneAudio.play();
+                removeStoneAudio.play();
+                return;
+            case GameActionState.PENDING:
+            case GameActionState.NONE:
+            default:
+                placeStoneAudio.pause();
+                invalidActionAudio.pause();
+                removeStoneAudio.pause();
+                return;
+        }
+    }, [actionState, placeStoneAudio, invalidActionAudio, removeStoneAudio]);
+
 
     useEffect(() => {
         initConnection();
@@ -97,23 +127,35 @@ export default function GameView(): ReactElement {
         };
     }, [initConnection, socket]);
 
-    const handleClick = (x: number, y: number) => {    
-        placeStoneSound = new Audio('');
-        dispatch(placeStone(blackTurn ? 'B' : 'W', x, y));
-        placeStoneSound.play();
+    const handleClick = (x: number, y: number) => {
+        if (!gameState.game.inGame) {
+            return;
+        }
+        const color = blackTurn ? 'B' : 'W';
+        dispatch(placeStone(color, x, y));  
+    };
+
+    const handleStartClick = () => {
+        dispatch(startGame());
+    };
+
+    const handleUndoClick = () => {
+        dispatch(undo());
+    };
+
+    const handleStopClick = () => {
+        dispatch(stopGame());
+    };
+
+    const handleChartClick = () => {
+        console.log('chart');
+    };
+
+    const handleAnalysisClick = () => {
+        console.log('analysis');
     };
     
     const iconFill = '#fff';
-    const disabledIconFill = '#ccc';
-    
-    const navBack = false;
-    const navForward = true;
-
-    const navBackFill = navBack ? iconFill : disabledIconFill;
-    const navForwardFill = navForward ? iconFill : disabledIconFill;
-
-    const navBackStyle = navBack ? classes.icon : classes.disabledIcon;
-    const navForwardStyle = navForward ? classes.icon : classes.disabledIcon;
     
     return <div>
         <Grid container spacing={1}>
@@ -121,18 +163,14 @@ export default function GameView(): ReactElement {
                 <Grid item xs={12}>
                     <Paper className={`${classes.paper} ${classes.boardActionPanel}`}>
                         <Grid container spacing={0}>
-                            <Grid item xs={8} spacing={0}>
-                                <ToLeft theme="outline" size="24" fill={navBackFill} className={navBackStyle} onClick={() => console.log('')} />
-                                <DoubleLeft theme="outline" size="24" fill={navBackFill} className={navBackStyle} onClick={() => console.log(10)} />
-                                <Left theme="outline" size="24" fill={navBackFill} className={navBackStyle} onClick={() => console.log(1)} />
-                                <Right theme="outline" size="24" fill={navForwardFill} className={navForwardStyle} onClick={() => console.log(1)} />
-                                <DoubleRight theme="outline" size="24" fill={navForwardFill} className={navForwardStyle} onClick={() => console.log(10)} />
-                                <ToRight theme="outline" size="24" fill={navForwardFill} className={navForwardStyle} onClick={() => console.log(1)} />
+                            <Grid item xs={6} spacing={0}>
+                                <RightOne theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleStartClick()}/>
+                                <Undo theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleUndoClick()}/>
+                                <CloseOne theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleStopClick()}/>
                             </Grid>
-                            <Grid item xs={4} spacing={0} className={classes.graphButtons}>
-                                <ChartHistogram theme="outline" size="24" fill={iconFill} className={classes.icon}/>
-                                <Analysis theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => console.log(true)}/>
-                                <Download theme="outline" size="24" fill={iconFill} className={classes.icon}/>
+                            <Grid item xs={6} spacing={0} className={classes.graphButtons}>
+                                <ChartHistogram theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleChartClick()}/>
+                                <Analysis theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleAnalysisClick()}/>
                             </Grid>
                         </Grid>
                     </Paper>

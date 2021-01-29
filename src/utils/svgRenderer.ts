@@ -53,7 +53,7 @@ export default class SvgRenderer {
     }
 
     dim(index: number): Point {
-        return [this.dimension - index % this.dimension - 1, Math.floor(index / this.dimension)];
+        return [this.dimension - 1 - index % this.dimension, Math.floor(index / this.dimension)];
     }
 
     loc(dim: [number, number]): Point {
@@ -71,8 +71,13 @@ export default class SvgRenderer {
         return coordinate <= 0 ? 0 : coordinate >= 19 ? 19 : coordinate;
     }
 
-    ownershipColor(ownership: number): string {
-        return ownership < 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
+    ownershipColor(ownership: number, blackTurn: boolean): string {
+        if (blackTurn) {
+            return ownership < 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
+        } else {
+            return ownership > 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
+        }
+        
     }
 
     color(color: string): string {

@@ -1,7 +1,7 @@
 import {User} from 'models/User';
 import {AnalysisProgress, AnalyzedSGF, SGFProperties} from 'models/SGF';
-import {Game, GameProperties} from 'models/Game';
-import { KatagoResult } from './Katago';
+import {Game, GameActionState, GameProperties} from 'models/Game';
+import { KatagoLog, KatagoResult } from './Katago';
 
 export type Nullable<T> = T | null;
 export type NullableString = Nullable<string>;
@@ -27,6 +27,8 @@ export interface StoreState {
 
 export interface GameState {
     game: Game
+    logs: Array<KatagoLog>
+    actionState: GameActionState
     currentResult: KatagoResult
     gameProperties: GameProperties
 }

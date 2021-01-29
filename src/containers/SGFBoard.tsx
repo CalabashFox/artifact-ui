@@ -6,6 +6,7 @@ import SgfUtils from 'utils/sgfUtils';
 import SvgRenderer from 'utils/svgRenderer';
 import { SGFStone } from "models/SGF";
 import { KatagoMoveInfo } from "models/Katago";
+import { ClassNameMap } from "@material-ui/core/styles/withStyles";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -40,6 +41,11 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 100,
         fontFamily: 'Courier New, monospace',
         textAnchor: 'middle'
+    },
+    stoneHolder: {
+        '&:hover': {
+            cursor: 'not-allowed'
+        }
     }
 }));
 
@@ -85,13 +91,16 @@ interface SGFBoardProperties {
     hoverEffect: boolean
 }
 
-const createHoverStone = (svgRenderer: SvgRenderer, stone: HoverStone, hoverEffect: boolean): Array<React.SVGProps<SVGRectElement>> => {
+const createHoverStone = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], stone: HoverStone, hoverEffect: boolean): Array<React.SVGProps<SVGRectElement>> => {
     const hoverStones = new Array<React.SVGProps<SVGRectElement>>();
     if (!hoverEffect || stone.x === -1 || stone.y === -1 || stone.x === 19 || stone.y === 19) {
         return hoverStones;
     }
     const i = stone.x;
     const j = stone.y;
+    if (occupiedCoordinates[i][j]) {
+        return hoverStones;
+    }
     const color = svgRenderer.color(stone.color);
     const [x, y] = svgRenderer.loc([i, j]);
     hoverStones.push(<circle key={`stone-hover`} cx={x} cy={y} r={svgProps.stoneDim} fill={color} fillOpacity={0.75}/>);
@@ -99,13 +108,13 @@ const createHoverStone = (svgRenderer: SvgRenderer, stone: HoverStone, hoverEffe
     return hoverStones;
 }
 
-const createSVGStones = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], stones: Array<SGFStone>): Array<React.SVGProps<SVGRectElement>> => {
+const createSVGStones = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], stones: Array<SGFStone>, classes: ClassNameMap<string>): Array<React.SVGProps<SVGRectElement>> => {
     const svgStones = new Array<React.SVGProps<SVGRectElement>>();
     stones.forEach((stone, index) => {
         const [i, j] = SgfUtils.translateToCoordinate(stone[1]);
         const [x, y] = svgRenderer.loc([i, j]);
         const color = svgRenderer.color(stone[0]);
-        svgStones.push(<rect key={`stone-holder-${stone[1]}`} x={x - svgProps.stoneHolderOffset} y={y - svgProps.stoneHolderOffset} width={svgProps.stoneHolderDim} height={svgProps.stoneHolderDim} fill={svgProps.boardColor}/>);
+        svgStones.push(<rect key={`stone-holder-${stone[1]}`} x={x - svgProps.stoneHolderOffset} y={y - svgProps.stoneHolderOffset} width={svgProps.stoneHolderDim} height={svgProps.stoneHolderDim} fill={svgProps.boardColor} className={classes.stoneHolder}/>);
         if (stone[0] === 'W') {
             //stones.push(<circle key={`white-stone-boarder-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} strokeWidth={2} stroke={svgRenderer.oppositeColor(stone[0])} />);
         }
@@ -149,7 +158,7 @@ const createSVGPoliy = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[]
     return svgPolicy;
 }
 
-const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], ownership: Array<number>): Array<React.SVGProps<SVGRectElement>> => {
+const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], ownership: Array<number>, blackTurn: boolean): Array<React.SVGProps<SVGRectElement>> => {
     const svgOwnership = new Array<React.SVGProps<SVGRectElement>>();
     if (!svgRenderer.getSgfProperties().displayOwnership)  {
         return svgOwnership;
@@ -165,7 +174,7 @@ const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: boole
             return;
         }
         const [x, y] = svgRenderer.loc([i, j]);
-        const color = svgRenderer.ownershipColor(value);
+        const color = svgRenderer.ownershipColor(value, blackTurn);
         svgOwnership.push(<rect key={`ownership-${index}`} x={x - svgProps.ownershipOffset} y={y - svgProps.ownershipOffset}
                             width={svgProps.ownershipDim} height={svgProps.ownershipDim} fillOpacity={opacity} fill={color}/>);
         occupiedCoordinates[i][j] = true;
@@ -287,11 +296,11 @@ export default function SGFBoard(props: SGFBoardProperties): ReactElement {
 
     const occupiedCoordinates: boolean[][] = [];
     const svgBoardDecorations = createSVGBoard(svgRenderer, occupiedCoordinates);
-    const svgStones = createSVGStones(svgRenderer, occupiedCoordinates, stones);
+    const svgStones = createSVGStones(svgRenderer, occupiedCoordinates, stones, classes);
+    const svgHoverStones = createHoverStone(svgRenderer, occupiedCoordinates, hoverStone, hoverEffect);
     const svgMoves = createSVGMoves(svgRenderer, occupiedCoordinates, moveInfos);
-    const svgOwnership = createSVGOwnership(svgRenderer, occupiedCoordinates, ownership);
+    const svgOwnership = createSVGOwnership(svgRenderer, occupiedCoordinates, ownership, blackTurn);
     const svgPolicy = createSVGPoliy(svgRenderer, occupiedCoordinates, policy);
-    const svgHoverStones = createHoverStone(svgRenderer, hoverStone, hoverEffect);
 
     return <svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" className={classes.font}
         pointerEvents={'none'}

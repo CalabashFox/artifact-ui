@@ -70,7 +70,7 @@ export interface SnapshotAnalysisData {
 }
 
 export enum SGFColor {
-    BLACK, WHITE
+    BLACK, WHITE, NONE
 }
 
 export interface AnalysisProgress {
