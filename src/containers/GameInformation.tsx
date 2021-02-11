@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {GameState, StoreState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -11,6 +11,8 @@ import whiteIcon from 'assets/images/white.svg';
 import whiteTurnIcon from 'assets/images/white-turn.svg';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
+import {Undo, CloseOne, RightOne} from '@icon-park/react'
+import { startGame, stopGame, undo } from 'actions/game';
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -75,12 +77,42 @@ const useStyles = makeStyles((theme) => ({
     },
     info: {
         color: '#fff'
+    },
+    icon: {
+        color: '#fff',
+        verticalAlign: 'middle',
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+    },
+    disabledIcon: {
+        color: '#ccc',
+        verticalAlign: 'middle',
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1)
+    },
+    iconText: {
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        lineHeight: '24px'
+    },
+    iconButton: {
+        display: 'inline-flex',
+        '&:hover': {
+            cursor: 'pointer'
+        }
+    },
+    disabledIconButton: {
+        display: 'inline-flex',
+        '&:hover': {
+            cursor: 'not-allowed'
+        }
     }
 }));
 
 const GameInformation: React.FC = () => {
     const gameState = useSelector<StoreState, GameState>(state => state.gameState);
     const classes = useStyles();
+    const dispatch = useDispatch();
     
     const game = gameState.game;
     const black = game.black;
@@ -98,12 +130,35 @@ const GameInformation: React.FC = () => {
         const elem = logElement.current ?? new HTMLInputElement();
         elem.scrollTop = elem.scrollHeight ?? 0;
     }, [logs]);
+
+    const handleStartClick = () => {
+        dispatch(startGame());
+    };
+
+    const handleUndoClick = () => {
+        dispatch(undo());
+    };
+
+    const handleStopClick = () => {
+        dispatch(stopGame());
+    };
     
     return <div>
         <Paper className={classes.paper}>
             <Grid container spacing={1} className={classes.info}>
                 <Grid item xs={12}>
-                    buttons....
+                    <Typography variant="body1" className={classes.iconButton} onClick={() => handleStartClick()}>
+                        <RightOne theme="outline" size="24" fill={'#fff'} className={classes.icon}/>
+                        <span className={classes.iconText}>Start</span>
+                    </Typography>
+                    <Typography variant="body1" className={classes.iconButton} onClick={() => handleUndoClick()}>
+                    <Undo theme="outline" size="24" fill={'#fff'} className={classes.icon}/>
+                        <span className={classes.iconText}>Undo</span>
+                    </Typography>
+                    <Typography variant="body1" className={classes.iconButton} onClick={() => handleStopClick()}>
+                    <CloseOne theme="outline" size="24" fill={'#fff'} className={classes.icon}/>
+                        <span className={classes.iconText}>Stop</span>
+                    </Typography>
                 </Grid>
             </Grid>
             <Divider className={classes.divider}/>

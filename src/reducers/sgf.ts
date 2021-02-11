@@ -8,7 +8,8 @@ import {
     SGFAction,
     UPLOAD_FAIL,
     UPLOAD_SUCCESS,
-    UPLOADING
+    UPLOADING,
+    SET_IMAGE
 } from 'actions/sgf';
 import { InitialSGFState } from 'models/SGF';
 import {SGFState} from 'models/StoreState';
@@ -53,16 +54,22 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
         case UPLOADING: {
             return {
                 ...state, uploading: action.payload.uploading
-            }
+            };
         }
         case RECEIVE_PROGRESS:
             return {
                 ...state, analysisProgress: action.payload.analysisProgress
-            }
+            };
         case RECEIVE_PROGRESS_FAIL:
             return {
                 ...state, analysisProgress: {analyzed: 0, total: 0}, error: action.payload.message
-            }
+            };
+        case SET_IMAGE:
+            return {
+                ...state, sgfImage: {
+                    stones: action.payload.stones
+                }
+            };
         default:
             return state;
     }

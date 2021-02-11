@@ -1,8 +1,8 @@
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 import {SGFState} from 'models/StoreState';
-import {ApiResponse, post} from '../api/api';
+import {ApiResponse, post, get} from '../api/api';
 import {AxiosError, AxiosResponse} from 'axios';
-import {AnalysisProgress, AnalyzedSGF} from 'models/SGF';
+import {AnalysisProgress, AnalyzedSGF, SGFStone} from 'models/SGF';
 
 export const UPLOAD_SGF_FILE = 'UPLOAD_SGF_FILE'
 export type UPLOAD_SGF_FILE = typeof UPLOAD_SGF_FILE
@@ -36,6 +36,26 @@ export type BROWSE_MOVE = typeof BROWSE_MOVE;
 
 export const RECALCULATE_ANALYSIS_DATA = 'RECALCULATE_ANALYSIS_DATA';
 export type RECALCULATE_ANALYSIS_DATA = typeof RECALCULATE_ANALYSIS_DATA;
+
+export const READ_IMAGE = "READ_IMAGE"
+export type READ_IMAGE = typeof READ_IMAGE
+
+export const SET_IMAGE = "SET_IMAGE"
+export type SET_IMAGE = typeof SET_IMAGE
+
+export interface ReadImage {
+    type: READ_IMAGE
+    payload: {
+
+    }
+}
+
+export interface SetImage {
+    type: SET_IMAGE
+    payload: {
+        stones: Array<SGFStone>
+    }
+}
 
 export interface RecalculateAnalysisDataAction {
     type: RECALCULATE_ANALYSIS_DATA,
@@ -114,8 +134,24 @@ export interface UploadingAction {
     }
 }
 
-export type SGFAction = RecalculateAnalysisDataAction | LoadProgressAction | UploadSGFFileAction | UploadingAction | UploadSuccess | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction | SetMoveAction | BrowseMoveAction
+export type SGFAction = RecalculateAnalysisDataAction | LoadProgressAction 
+    | UploadSGFFileAction | UploadingAction | UploadSuccess 
+    | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction 
+    | SetMoveAction | BrowseMoveAction | ReadImage | SetImage
 
+export const readImage = ()
+    : ThunkAction<Promise<SGFAction>, SGFState, null, SGFAction> => {
+    return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
+        return get<Array<SGFStone>>('sgf/readImage', {})
+            .then((res: AxiosResponse<ApiResponse<Array<SGFStone>>>) => {
+                dispatch(setImage(res.data.content));
+            })
+            .catch((err: AxiosError<ApiResponse<Array<SGFStone>>>) => {
+                console.log(err);
+            })
+            .then();
+    };
+};    
 
 export const uploadSGFFile = (file: string)
     : ThunkAction<Promise<void>, SGFState, null, SGFAction> => {
@@ -240,4 +276,13 @@ export const receiveProgressFail = (message: string): SGFAction => {
             message
         }
     };
+}
+
+export const setImage = (stones: Array<SGFStone>): SGFAction => {
+    return {
+        type: SET_IMAGE,
+        payload: {
+            stones: stones
+        }
+    }; 
 }

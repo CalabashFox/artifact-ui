@@ -20,29 +20,48 @@ export type ACTION_FAILED = typeof ACTION_FAILED
 export const ACTION_PENDING = "ACTION_PENDING"
 export type ACTION_PENDING = typeof ACTION_PENDING
 
-export const PLACE_STONE_SUCCESS =  "PLACE_STONE_SUCCESS"
+export const PLACE_STONE_SUCCESS = "PLACE_STONE_SUCCESS"
 export type PLACE_STONE_SUCCESS = typeof PLACE_STONE_SUCCESS
 
-export const START_GAME_SUCCESS =  "START_GAME_SUCCESS"
-export type START_GAME_SUCCESS = typeof START_GAME_SUCCESS
+export const SET_GAME_STATE = "SET_GAME_STATE"
+export type SET_GAME_STATE = typeof SET_GAME_STATE
 
-export const ACTION_STATE_UPDATE =  "ACTION_STATE_UPDATE"
+export const ACTION_STATE_UPDATE = "ACTION_STATE_UPDATE"
 export type ACTION_STATE_UPDATE = typeof ACTION_STATE_UPDATE
 
-export const APPEND_LOG =  "APPEND_LOG"
+export const APPEND_LOG = "APPEND_LOG"
 export type APPEND_LOG = typeof APPEND_LOG
 
-export const SET_KATAGO_ANALYSIS =  "SET_KATAGO_ANALYSIS"
+export const SET_KATAGO_ANALYSIS = "SET_KATAGO_ANALYSIS"
 export type SET_KATAGO_ANALYSIS = typeof SET_KATAGO_ANALYSIS
 
-export const STOP_GAME =  "STOP_GAME"
+export const STOP_GAME = "STOP_GAME"
 export type STOP_GAME = typeof STOP_GAME
 
-export const UNDO =  "UNDO"
+export const UNDO = "UNDO"
 export type UNDO = typeof UNDO
 
-export const STOP_GAME_SUCCESS =  "STOP_GAME_SUCCESS"
+export const STOP_GAME_SUCCESS = "STOP_GAME_SUCCESS"
 export type STOP_GAME_SUCCESS = typeof STOP_GAME_SUCCESS
+
+export const RECONNECT = "RECONNECT"
+export type RECONNECT = typeof RECONNECT
+
+export const KATAGO_TURN = "KATAGO_TURN"
+export type KATAGO_TURN = typeof KATAGO_TURN
+
+
+export interface SetKatagoTurn {
+    type: KATAGO_TURN,
+    payload: {
+        state: GameActionState
+    }
+}
+
+export interface Reconnect {
+    type: RECONNECT,
+    payload: {}
+}
 
 export interface Undo {
     type: UNDO,
@@ -106,8 +125,8 @@ export interface PlaceStoneAction {
     }
 }
 
-export interface StartGameSuccess {
-    type: START_GAME_SUCCESS,
+export interface SetGameState {
+    type: SET_GAME_STATE,
     payload: {
         game: Game
     }
@@ -127,8 +146,10 @@ export interface AppendLogAction {
 
 export type GameAction = StartGameAction | PlaceStoneAction 
     | ActionCompleted | ActionFailed | PlaceStoneSuccess | ActionPending
-    | StartGameSuccess | ActionStateUpdate | AppendLogAction
-    | SetKatagoAnalysis | Undo | StopGame | StopGameSuccess
+    | SetGameState | ActionStateUpdate | AppendLogAction
+    | SetKatagoAnalysis | Undo | StopGame | StopGameSuccess | Reconnect
+    | SetKatagoTurn
+
 
 export const stopGame = ()
     : ThunkAction<Promise<GameAction>, GameState, null, GameAction> => {
@@ -164,7 +185,27 @@ export const startGame = ()
             })
             .then((res: AxiosResponse<ApiResponse<Game>>) => {
                 //dispatch(actionStateUpdate(GameActionState.SUCCESS));
-                dispatch(startGameSuccess(res.data.content));
+                dispatch(setGameState(res.data.content));
+            })
+            .catch((err: AxiosError<ApiResponse<Game>>) => {
+                if (err.response?.data.message) {
+                    dispatch(actionFailed(err.response?.data.message));
+                } else {
+                    dispatch(actionFailed('Login failed'));
+                }
+                dispatch(actionStateUpdate(GameActionState.FAIL));
+            })
+            .then(() => actionCompleted());
+    };
+};
+
+export const reconnect = ()
+    : ThunkAction<Promise<GameAction>, GameState, null, GameAction> => {
+    return (dispatch: ThunkDispatch<GameState, null, GameAction>) => {
+        return post<Game>('game/reconnect', {})
+            .then((res: AxiosResponse<ApiResponse<Game>>) => {
+                //dispatch(actionStateUpdate(GameActionState.SUCCESS));
+                dispatch(setGameState(res.data.content));
             })
             .catch((err: AxiosError<ApiResponse<Game>>) => {
                 if (err.response?.data.message) {
@@ -189,14 +230,15 @@ export const placeStone = (c: string, x: number, y: number)
             })
             .then((res: AxiosResponse<ApiResponse<Game>>) => {
                 const response = res.data;
+                const game = response.content;
                 if (response.status !== 200) {
                     dispatch(actionStateUpdate(GameActionState.FAIL));
-                } else if (response.content.removedStones.length > 0) {
+                } else if (game.removedStones.length > 0) {
                     dispatch(actionStateUpdate(GameActionState.SUCCESS_REMOVE_STONE));
                 } else {
                     dispatch(actionStateUpdate(GameActionState.SUCCESS));
                 }
-                dispatch(placeStoneSuccess(response.content));
+                dispatch(placeStoneSuccess(game));
             })
             .catch((err: AxiosError<ApiResponse<Game>>) => {
                 if (err.response?.data.message) {
@@ -236,9 +278,9 @@ export const undo = (): ThunkAction<Promise<GameAction>, GameState, null, GameAc
     };
 };
 
-export const startGameSuccess = (game: Game): GameAction => {
+export const setGameState = (game: Game): GameAction => {
     return {
-        type: START_GAME_SUCCESS,
+        type: SET_GAME_STATE,
         payload: {
             game: game
         }
@@ -309,4 +351,13 @@ export const stopGameSuccess = (): GameAction => {
         type: STOP_GAME_SUCCESS,
         payload: {}
     };
+}
+
+export const setKatagoTurn = (state: GameActionState): GameAction => {
+    return {
+        type: KATAGO_TURN,
+        payload: {
+            state: state
+        }
+    }
 }

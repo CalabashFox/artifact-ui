@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect} from 'react';
 //import SGFView from './SGFView';
-import GameView from './GameView';
+//import GameView from './GameView';
+import ImageView from './ImageView';
 import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
@@ -71,7 +72,8 @@ const Dashboard: React.FC = () => {
         return <div>1</div>
     }
     return <div className={classes.dashboard}>
-        <GameView/>
+        <ImageView/>
+        {/*<GameView/>*/}
         {/*<SGFView/>*/}
     </div>;
 };

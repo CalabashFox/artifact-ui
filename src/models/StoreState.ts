@@ -1,5 +1,5 @@
 import {User} from 'models/User';
-import {AnalysisProgress, AnalyzedSGF, SGFProperties} from 'models/SGF';
+import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFProperties} from 'models/SGF';
 import {Game, GameActionState, GameProperties} from 'models/Game';
 import { KatagoLog, KatagoResult } from './Katago';
 
@@ -39,4 +39,5 @@ export interface SGFState {
     error: string
     sgfProperties: SGFProperties
     uploading: boolean
+    sgfImage: SGFImage
 }

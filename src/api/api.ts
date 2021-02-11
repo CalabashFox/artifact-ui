@@ -19,6 +19,16 @@ export function post<T>(api: string, data: Record<string,unknown>): AxiosPromise
     });
 }
 
+export function get<T>(api: string, data: Record<string,unknown>): AxiosPromise<ApiResponse<T>> {
+    return axios({
+        baseURL: BASE_URL,
+        url: api,
+        method: 'GET',
+        data: data || {},
+        headers: getHeaders()
+    });
+}
+
 function getHeaders(): Record<string, string> {
     const headers = {
         'Content-Type': 'application/json'

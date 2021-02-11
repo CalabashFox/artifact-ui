@@ -97,11 +97,18 @@ export interface SGFProperties {
     topMatch: number
 }
 
+export interface SGFImage {
+    stones: Array<SGFStone>
+}
+
 export enum MovePriority {
     WINRATE, MEAN, LEAD, PRIOR, ORDER
 }
 
 export const InitialSGFState: SGFState = {
+    sgfImage: {
+        stones: new Array<SGFStone>()
+    },
     analyzedSGF: {
         isValid: false,
         snapShotsAnalyzed: 0,

@@ -1,3 +1,4 @@
+import { Game } from "./Game";
 
 export interface KatagoResult {
     id: string
@@ -42,4 +43,8 @@ export interface KatagoLog {
 
 export interface KatagoMessage {
     type: string
+}
+
+export interface ReconnectMessage extends KatagoMessage {
+    gameState: Game
 }

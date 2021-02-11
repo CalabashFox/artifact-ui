@@ -5,8 +5,8 @@ import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import SGFBoard from './SGFBoard';
-import {Undo, CloseOne, RightOne, ChartHistogram, Analysis} from '@icon-park/react'
-import { placeStone, startGame, stopGame, undo } from "actions/game";
+import {ChartHistogram, Analysis} from '@icon-park/react'
+import { placeStone, setKatagoTurn } from "actions/game";
 import SocketHandler from "utils/socketHandler";
 import GameInformation from "./GameInformation";
 import * as placeStoneSound from 'assets/audio/placestone.mp3';
@@ -89,10 +89,23 @@ export default function GameView(): ReactElement {
     const [removeStoneAudio] = useState(new Audio(removeStoneSound.default));
 
     const blackTurn = game.black.turn;
+    const whiteTurn = game.white.turn;
+    const blackHuman = game.black.isHuman;
+    const whiteHuman = game.white.isHuman;
+
+    const hoverEffect = (blackHuman && blackTurn) || (whiteHuman && whiteTurn);
 
     const initConnection = useCallback(() => {
         socket.connect(dispatch);
     }, [dispatch, socket]);
+
+    useEffect(() => {
+        if ((!blackHuman && blackTurn) || (!whiteHuman && whiteTurn)) {
+            setTimeout(() => {
+                dispatch(setKatagoTurn(GameActionState.PENDING));
+            }, 1000);
+        }
+    }, [dispatch, blackTurn, whiteTurn, blackHuman, whiteHuman]);
 
     useEffect(() => {
         invalidActionAudio.currentTime = 0;
@@ -128,23 +141,11 @@ export default function GameView(): ReactElement {
     }, [initConnection, socket]);
 
     const handleClick = (x: number, y: number) => {
-        if (!gameState.game.inGame) {
+        if (!gameState.game.inGame || (blackTurn && blackHuman) || (whiteTurn && whiteHuman)) {
             return;
         }
         const color = blackTurn ? 'B' : 'W';
         dispatch(placeStone(color, x, y));  
-    };
-
-    const handleStartClick = () => {
-        dispatch(startGame());
-    };
-
-    const handleUndoClick = () => {
-        dispatch(undo());
-    };
-
-    const handleStopClick = () => {
-        dispatch(stopGame());
     };
 
     const handleChartClick = () => {
@@ -164,9 +165,7 @@ export default function GameView(): ReactElement {
                     <Paper className={`${classes.paper} ${classes.boardActionPanel}`}>
                         <Grid container spacing={0}>
                             <Grid item xs={6} spacing={0}>
-                                <RightOne theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleStartClick()}/>
-                                <Undo theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleUndoClick()}/>
-                                <CloseOne theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleStopClick()}/>
+                                
                             </Grid>
                             <Grid item xs={6} spacing={0} className={classes.graphButtons}>
                                 <ChartHistogram theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleChartClick()}/>
@@ -183,7 +182,7 @@ export default function GameView(): ReactElement {
                             moveInfos={moveInfos} 
                             stones={stones}
                             ownership={ownership}
-                            hoverEffect={true}/>
+                            hoverEffect={hoverEffect}/>
                     </Paper>
                 </Grid>
             </Grid>

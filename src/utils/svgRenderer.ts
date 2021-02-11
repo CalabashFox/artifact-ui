@@ -53,7 +53,8 @@ export default class SvgRenderer {
     }
 
     dim(index: number): Point {
-        return [this.dimension - 1 - index % this.dimension, Math.floor(index / this.dimension)];
+        //return [this.dimension - 1 - index % this.dimension, Math.floor(index / this.dimension)]; sgf board view
+        return [index % this.dimension, this.dimension - 1 - Math.floor(index / this.dimension)];
     }
 
     loc(dim: [number, number]): Point {
@@ -73,9 +74,9 @@ export default class SvgRenderer {
 
     ownershipColor(ownership: number, blackTurn: boolean): string {
         if (blackTurn) {
-            return ownership < 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
-        } else {
             return ownership > 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
+        } else {
+            return ownership < 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
         }
         
     }

@@ -1,5 +1,6 @@
-import { appendLog, GameAction, setKatagoAnalysis } from "actions/game";
-import { KatagoLog, KatagoMessage, KatagoResult } from "models/Katago";
+import { appendLog, GameAction, reconnect, setGameState, setKatagoAnalysis, setKatagoTurn } from "actions/game";
+import { GameActionState } from "models/Game";
+import { KatagoMessage, KatagoResult, ReconnectMessage } from "models/Katago";
 import { Dispatch } from "react";
 
 export default class SocketHandler {
@@ -27,11 +28,15 @@ export default class SocketHandler {
         } else if (message.type === 'QUERY') {
             const result: KatagoResult = JSON.parse(e.data);
             dispatch(setKatagoAnalysis(result));
-        }    
+        } else if (message.type === 'RECONNECT') {
+            const result: ReconnectMessage = JSON.parse(e.data);
+            dispatch(setGameState(result.gameState));
+            dispatch(setKatagoTurn(GameActionState.SUCCESS));
+        }
     }
 
     disconnect() {
-
+        this.connected = false;
     }
 
 
