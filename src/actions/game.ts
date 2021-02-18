@@ -1,9 +1,9 @@
 import { ApiResponse, post } from "../api/api"
 import { AxiosError, AxiosResponse } from "axios"
-import { Color, EmptyResult, Game, GameActionState } from "models/Game"
+import { Color, Game, GameActionState } from "models/Game"
 import { GameState } from "models/StoreState"
 import { ThunkAction, ThunkDispatch } from "redux-thunk"
-import { KatagoLog, KatagoResult } from "models/Katago"
+import { EmptyResult, KatagoLog, KatagoResult } from "models/Katago"
 
 export const START_GAME = "START_GAME"
 export type START_GAME = typeof START_GAME
@@ -178,7 +178,7 @@ export const startGame = ()
         return post<Game>('game/startGame',
             {
                 blackHumanPlayer: true,
-                whiteHumanPlayer: false,
+                whiteHumanPlayer: true,
                 komi: 7.5,
                 dimension: 19,
                 handicap: 0

@@ -1,4 +1,4 @@
-import React, {ReactElement,useCallback,useEffect, useState} from "react";
+import React, {ReactElement,useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {GameState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
@@ -7,12 +7,12 @@ import Paper from '@material-ui/core/Paper';
 import SGFBoard from './SGFBoard';
 import {ChartHistogram, Analysis} from '@icon-park/react'
 import { placeStone, setKatagoTurn } from "actions/game";
-import SocketHandler from "utils/socketHandler";
 import GameInformation from "./GameInformation";
 import * as placeStoneSound from 'assets/audio/placestone.mp3';
 import * as invalidMoveSound from 'assets/audio/invalidmove.mp3';
 import * as removeStoneSound from 'assets/audio/removestone.mp3';
 import { GameActionState } from "models/Game";
+import useIcon from "components/icon";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -23,10 +23,10 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(1),
         textAlign: 'center',
-        color: theme.palette.text.secondary,
+        color: theme.palette.text.primary,
         whiteSpace: 'nowrap',
         marginBottom: theme.spacing(1),
-        backgroundColor: theme.palette.primary.light
+        backgroundColor: theme.palette.primary.main
     },
     disabled: {
         color: theme.palette.text.disabled
@@ -40,10 +40,10 @@ const useStyles = makeStyles((theme) => ({
     boardActionPanel: {
     },
     inputField: {
-        color: '#fff'
+        color: theme.palette.text.primary,
     },
     icon: {
-        color: '#fff',
+        color: theme.palette.text.primary,
         marginLeft: theme.spacing(1),
         marginRight: theme.spacing(1),
         '&:hover': {
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     disabledIcon: {
-        color: '#ccc',
+        color: theme.palette.text.disabled,
         marginLeft: theme.spacing(1),
         marginRight: theme.spacing(1),
         '&:hover': {
@@ -83,7 +83,6 @@ export default function GameView(): ReactElement {
     const currentMove = game.currentMove;
     const {policy, ownership, moveInfos} = gameState.currentResult;
 
-    const [socket] = useState(new SocketHandler());
     const [placeStoneAudio] = useState(new Audio(placeStoneSound.default));
     const [invalidActionAudio] = useState(new Audio(invalidMoveSound.default));
     const [removeStoneAudio] = useState(new Audio(removeStoneSound.default));
@@ -94,10 +93,6 @@ export default function GameView(): ReactElement {
     const whiteHuman = game.white.isHuman;
 
     const hoverEffect = (blackHuman && blackTurn) || (whiteHuman && whiteTurn);
-
-    const initConnection = useCallback(() => {
-        socket.connect(dispatch);
-    }, [dispatch, socket]);
 
     useEffect(() => {
         if ((!blackHuman && blackTurn) || (!whiteHuman && whiteTurn)) {
@@ -132,16 +127,14 @@ export default function GameView(): ReactElement {
         }
     }, [actionState, placeStoneAudio, invalidActionAudio, removeStoneAudio]);
 
-
-    useEffect(() => {
-        initConnection();
-        return () => {
-            socket.disconnect();
-        };
-    }, [initConnection, socket]);
-
     const handleClick = (x: number, y: number) => {
+        /*
+         * 
         if (!gameState.game.inGame || (blackTurn && blackHuman) || (whiteTurn && whiteHuman)) {
+            return;
+        }
+         */
+        if (!gameState.game.inGame) {
             return;
         }
         const color = blackTurn ? 'B' : 'W';
@@ -156,7 +149,8 @@ export default function GameView(): ReactElement {
         console.log('analysis');
     };
     
-    const iconFill = '#fff';
+    const chartIcon = useIcon(<ChartHistogram onClick={() => handleChartClick()}/>, false);
+    const analysisIcon = useIcon(<Analysis onClick={() => handleAnalysisClick()}/>, false);
     
     return <div>
         <Grid container spacing={1}>
@@ -168,8 +162,8 @@ export default function GameView(): ReactElement {
                                 
                             </Grid>
                             <Grid item xs={6} spacing={0} className={classes.graphButtons}>
-                                <ChartHistogram theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleChartClick()}/>
-                                <Analysis theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => handleAnalysisClick()}/>
+                                {chartIcon}
+                                {analysisIcon}
                             </Grid>
                         </Grid>
                     </Paper>

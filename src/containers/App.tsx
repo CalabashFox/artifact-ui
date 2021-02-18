@@ -9,21 +9,28 @@ import {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import {authorize} from 'actions/auth';
 import TokenUtils from 'utils/tokenUtils';
+import { IconProvider, DEFAULT_ICON_CONFIGS } from '@icon-park/react';
+import { IIconConfig } from '@icon-park/react/lib/runtime';
 
 let theme = createMuiTheme({
     palette: {
         primary: {
-            light: '#78909c',
-            main: '#455a64',
-            dark: '#263238',
-            contrastText: '#fff',
+            light: '#6E7783',
+            main: '#566971',
+            dark: '#383A3F',
+            contrastText: '#FFFFFF',
         },
         secondary: {
-            light: '#e57373',
-            main: '#e53935',
-            dark: '#b71c1c',
-            contrastText: '#fff',
+            light: '#EC6A5C',
+            main: '#C65146',
+            dark: '#AF4034',
+            contrastText: '#FFFFFF',
         },
+        text: {
+            primary: '#000000',
+            secondary: '#FFFFF3',
+            disabled: '#CCCCCC'
+        }
     },
     typography: {
         fontSize: 12,
@@ -43,13 +50,21 @@ const App: React.FC = () => {
         }
     });
 
+    const iconConfig: IIconConfig = {
+        ...DEFAULT_ICON_CONFIGS,
+        theme: 'outline',
+        size: 24
+    };
+
     return (
         <MuiThemeProvider theme={theme}>
-            <CssBaseline />
-            {/*<Navigation/>*/}
-            <Switch>
-                <Dashboard/>
-            </Switch>
+            <IconProvider value={iconConfig}>
+                <CssBaseline />
+                {/*<Navigation/>*/}
+                <Switch>
+                    <Dashboard/>
+                </Switch>
+            </IconProvider>
         </MuiThemeProvider>
     );
 };

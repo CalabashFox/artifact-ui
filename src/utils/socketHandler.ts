@@ -1,7 +1,10 @@
-import { appendLog, GameAction, reconnect, setGameState, setKatagoAnalysis, setKatagoTurn } from "actions/game";
+import { appendLog, GameAction, setGameState, setKatagoAnalysis, setKatagoTurn } from "actions/game";
+import { SGFAction, updateImageResult } from "actions/sgf";
 import { GameActionState } from "models/Game";
-import { KatagoMessage, KatagoResult, ReconnectMessage } from "models/Katago";
+import { KatagoMessage, KatagoResult, GameStateMessage, SGFImageMessage } from "models/Katago";
 import { Dispatch } from "react";
+
+type DispatchAction =  GameAction | SGFAction
 
 export default class SocketHandler {
     
@@ -11,8 +14,11 @@ export default class SocketHandler {
         this.connected = false;
     }
 
-    connect(dispatch: Dispatch<GameAction>) {
-        const socket = new WebSocket('ws://localhost:8080');
+    connect(dispatch: Dispatch<DispatchAction>) {
+        if (this.connected) {
+            return;
+        }
+        const socket = new WebSocket('wss://localhost:8080');
         socket.onopen = () => {
             this.connected = true;
         };
@@ -21,17 +27,20 @@ export default class SocketHandler {
         }
     }
 
-    onMessage(dispatch: Dispatch<GameAction>, e: MessageEvent) {
+    onMessage(dispatch: Dispatch<DispatchAction>, e: MessageEvent) {
         const message: KatagoMessage = JSON.parse(e.data);
         if (message.type === 'LOG') {
             dispatch(appendLog(JSON.parse(e.data)));
         } else if (message.type === 'QUERY') {
             const result: KatagoResult = JSON.parse(e.data);
             dispatch(setKatagoAnalysis(result));
-        } else if (message.type === 'RECONNECT') {
-            const result: ReconnectMessage = JSON.parse(e.data);
+        } else if (message.type === 'GAME_STATE') {
+            const result: GameStateMessage = JSON.parse(e.data);
             dispatch(setGameState(result.gameState));
             dispatch(setKatagoTurn(GameActionState.SUCCESS));
+        } else if (message.type === 'IMAGE') {
+            const result: SGFImageMessage = JSON.parse(e.data);
+            dispatch(updateImageResult(result.katagoResult));
         }
     }
 

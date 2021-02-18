@@ -23,25 +23,25 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(1),
         textAlign: 'center',
-        color: theme.palette.text.secondary,
+        color: theme.palette.text.primary,
         whiteSpace: 'nowrap',
         marginBottom: theme.spacing(1),
-        backgroundColor: theme.palette.primary.light
+        backgroundColor: theme.palette.primary.main
     },
     logContainer: {
         padding: theme.spacing(2),
-        backgroundColor: theme.palette.primary.light,
+        backgroundColor: theme.palette.primary.main,
         fontSize: 12
     },
     logField: {
-        backgroundColor: '#fff',
+        backgroundColor: theme.palette.primary.main,
         width: '100%'
     },
     whitePlayer: {
-        color: '#fff'
+        color: '#ffffff'
     },
     blackPlayer: {
-        color: '#0'
+        color: '#000000'
     },
     playerTitle: {
         fontSize: 20,

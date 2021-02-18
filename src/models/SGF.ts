@@ -1,4 +1,4 @@
-import {KatagoMoveInfo, KatagoResult} from 'models/Katago';
+import {EmptyResult, KatagoMoveInfo, KatagoResult} from 'models/Katago';
 import { SGFState } from './StoreState';
 
 export interface AnalyzedSGF {
@@ -99,6 +99,7 @@ export interface SGFProperties {
 
 export interface SGFImage {
     stones: Array<SGFStone>
+    katagoResult: KatagoResult
 }
 
 export enum MovePriority {
@@ -107,7 +108,8 @@ export enum MovePriority {
 
 export const InitialSGFState: SGFState = {
     sgfImage: {
-        stones: new Array<SGFStone>()
+        stones: new Array<SGFStone>(),
+        katagoResult: EmptyResult
     },
     analyzedSGF: {
         isValid: false,

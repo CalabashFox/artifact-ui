@@ -1,6 +1,6 @@
-import React, {useCallback, useEffect} from 'react';
-//import SGFView from './SGFView';
-//import GameView from './GameView';
+import React, {ChangeEvent, useCallback, useEffect, useState} from 'react';
+import SGFView from './SGFView';
+import GameView from './GameView';
 import ImageView from './ImageView';
 import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
@@ -9,11 +9,19 @@ import {AnalyzedSGF} from 'models/SGF';
 import * as mock from 'assets/sample.json'
 import {set} from 'actions/sgf';
 import { setView } from 'actions/view';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Box from '@material-ui/core/Box';
+import SocketHandler from "utils/socketHandler";
 
 const useStyles = makeStyles((theme) => ({
-    dashboard: {
+    container: {
         padding: theme.spacing(1),
         boxSizing: 'border-box'
+    },
+    tab: {
+        fontSize: '1.2em'
     }
 }));
 
@@ -38,6 +46,25 @@ const Dashboard: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const dispatch = useDispatch();
+
+    const [tabIndex, setTabIndex] = useState<number>(0);
+    const [socket] = useState(new SocketHandler());
+
+    const initConnection = useCallback(() => {
+        socket.connect(dispatch);
+    }, [dispatch, socket]);
+
+    useEffect(() => {
+        initConnection();
+        return () => {
+            socket.disconnect();
+        };
+    }, [initConnection, socket]);
+
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    const handleTabChange = (event: ChangeEvent<{}>, index: number) => {
+        setTabIndex(index);
+    };
 
     const handleKeyPress = (event: KeyboardEvent) => {
         switch (parseInt(event.code)) {
@@ -71,11 +98,18 @@ const Dashboard: React.FC = () => {
     if (sgfState.analyzedSGF === undefined) {
         return <div>1</div>
     }
-    return <div className={classes.dashboard}>
-        <ImageView/>
-        {/*<GameView/>*/}
-        {/*<SGFView/>*/}
-    </div>;
+    return <Box>
+        <AppBar position="static">
+        <Tabs value={tabIndex} onChange={(e, v) => handleTabChange(e, v)}>
+          <Tab label="Game" className={classes.tab}/>
+          <Tab label="Scanner" className={classes.tab}/>
+          <Tab label="SGF" className={classes.tab}/>
+        </Tabs>
+      </AppBar>
+      {tabIndex === 0 && <Box className={classes.container}><GameView/></Box>}
+      {tabIndex === 1 && <Box className={classes.container}><ImageView/></Box>}
+      {tabIndex === 2 && <Box className={classes.container}><SGFView/></Box>}
+    </Box>;
 };
 
 

@@ -1,8 +1,9 @@
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 import {SGFState} from 'models/StoreState';
-import {ApiResponse, post, get} from '../api/api';
+import {ApiResponse, post, upload} from '../api/api';
 import {AxiosError, AxiosResponse} from 'axios';
-import {AnalysisProgress, AnalyzedSGF, SGFStone} from 'models/SGF';
+import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFStone} from 'models/SGF';
+import { KatagoResult } from 'models/Katago';
 
 export const UPLOAD_SGF_FILE = 'UPLOAD_SGF_FILE'
 export type UPLOAD_SGF_FILE = typeof UPLOAD_SGF_FILE
@@ -43,17 +44,20 @@ export type READ_IMAGE = typeof READ_IMAGE
 export const SET_IMAGE = "SET_IMAGE"
 export type SET_IMAGE = typeof SET_IMAGE
 
-export interface ReadImage {
-    type: READ_IMAGE
-    payload: {
+export const UPDATE_IMAGE_RESULT = "UPDATE_IMAGE_RESULT"
+export type UPDATE_IMAGE_RESULT = typeof UPDATE_IMAGE_RESULT
 
+export interface UpdateImageResult {
+    type: UPDATE_IMAGE_RESULT,
+    payload: {
+        katagoResult: KatagoResult
     }
 }
 
 export interface SetImage {
     type: SET_IMAGE
     payload: {
-        stones: Array<SGFStone>
+        sgfImage: SGFImage
     }
 }
 
@@ -137,21 +141,37 @@ export interface UploadingAction {
 export type SGFAction = RecalculateAnalysisDataAction | LoadProgressAction 
     | UploadSGFFileAction | UploadingAction | UploadSuccess 
     | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction 
-    | SetMoveAction | BrowseMoveAction | ReadImage | SetImage
+    | SetMoveAction | BrowseMoveAction | SetImage | UpdateImageResult
 
-export const readImage = ()
+export const screenShot = (dataUrl: string)
     : ThunkAction<Promise<SGFAction>, SGFState, null, SGFAction> => {
     return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
-        return get<Array<SGFStone>>('sgf/readImage', {})
-            .then((res: AxiosResponse<ApiResponse<Array<SGFStone>>>) => {
+        return post<SGFImage>('sgf/screenShot', {
+                dataUrl: dataUrl
+            })
+            .then((res: AxiosResponse<ApiResponse<SGFImage>>) => {
                 dispatch(setImage(res.data.content));
             })
-            .catch((err: AxiosError<ApiResponse<Array<SGFStone>>>) => {
+            .catch((err: AxiosError<ApiResponse<SGFImage>>) => {
                 console.log(err);
             })
             .then();
     };
 };    
+
+export const uploadImage = (image: File)
+    : ThunkAction<Promise<SGFAction>, SGFState, null, SGFAction> => {
+    return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
+        return upload<SGFImage>('sgf/uploadImage', image)
+            .then((res: AxiosResponse<ApiResponse<SGFImage>>) => {
+                dispatch(setImage(res.data.content));
+            })
+            .catch((err: AxiosError<ApiResponse<SGFImage>>) => {
+                console.log(err);
+            })
+            .then();
+    };
+};  
 
 export const uploadSGFFile = (file: string)
     : ThunkAction<Promise<void>, SGFState, null, SGFAction> => {
@@ -278,11 +298,21 @@ export const receiveProgressFail = (message: string): SGFAction => {
     };
 }
 
-export const setImage = (stones: Array<SGFStone>): SGFAction => {
+export const setImage = (sgfImage: SGFImage): SGFAction => {
     return {
         type: SET_IMAGE,
         payload: {
-            stones: stones
+            sgfImage: sgfImage
         }
     }; 
 }
+
+export const updateImageResult = (katagoResult: KatagoResult): SGFAction => {
+    return {
+        type: UPDATE_IMAGE_RESULT,
+        payload: {
+            katagoResult: katagoResult
+        }
+    }; 
+}
+
