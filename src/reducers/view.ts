@@ -1,4 +1,4 @@
-import {ViewAction, SET_VIEW} from 'actions/view';
+import {ViewAction, SET_VIEW, SET_TAB} from 'actions/view';
 import {ViewState} from 'models/StoreState';
 import { InitialViewState } from 'models/view';
 
@@ -8,9 +8,14 @@ export function viewReducer(state: ViewState = initialState, action: ViewAction)
     switch (action.type) {
         case SET_VIEW:        
             return {
+                ...state,
                 infoWidth: action.payload.infoWidth,
                 screenWidth: action.payload.screenWidth
             };
+        case SET_TAB:
+            return {
+                ...state, tab: action.payload.tab
+            }
         default:
             return state;
     }

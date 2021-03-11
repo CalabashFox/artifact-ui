@@ -1,16 +1,18 @@
 import * as React from 'react';
 
-import {Switch} from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import {createMuiTheme, MuiThemeProvider, responsiveFontSizes} from '@material-ui/core/styles';
-import {useEffect} from 'react';
-import {useDispatch} from 'react-redux';
-import {authorize} from 'actions/auth';
+import { createMuiTheme, MuiThemeProvider, responsiveFontSizes } from '@material-ui/core/styles';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { authorize } from 'actions/auth';
 import TokenUtils from 'utils/tokenUtils';
 import { IconProvider, DEFAULT_ICON_CONFIGS } from '@icon-park/react';
 import { IIconConfig } from '@icon-park/react/lib/runtime';
+
+import '../styles/artifact.less'
 
 let theme = createMuiTheme({
     palette: {
@@ -27,7 +29,7 @@ let theme = createMuiTheme({
             contrastText: '#FFFFFF',
         },
         text: {
-            primary: '#000000',
+            primary: '#FFFFF3',
             secondary: '#FFFFF3',
             disabled: '#CCCCCC'
         }
@@ -35,7 +37,61 @@ let theme = createMuiTheme({
     typography: {
         fontSize: 12,
         fontFamily: ["Lucida Grande", "Tahoma", "Verdana", "Arial", "sans-serif"].join(','),
-    }
+    },
+    overrides: {
+        MuiInputBase: {
+            input: {
+                borderColor: '#FFFFF3',
+                "&$focused": {
+                    borderColor: '#FFFFF3'
+                }
+            }
+        },
+        MuiFormLabel: {
+            root: {
+                "&$focused": {
+                    color: '#FFFFF3'
+                }
+            },
+            focused: {}
+        },
+        MuiTabs: {
+            indicator: {
+                backgroundColor: 'transparent'
+            },
+            root: {
+                height: '30px',
+                minHeight: '30px'
+            }
+        },
+        MuiTab: {
+            root: {
+                height: '30px',
+                minHeight: '30px',
+                "&:hover": {
+                    backgroundColor: '#FFFFF3',
+                    color: '#566971'
+                }
+            },
+            selected: {
+                backgroundColor: '#FFFFF3',
+                color: '#566971'
+            }
+        },
+        MuiBottomNavigationAction: {
+            root: {
+                color: '#FFFFF3',
+                "&:hover": {
+                    backgroundColor: '#FFFFF3',
+                    color: '#566971'
+                }
+            },
+            selected: {
+                backgroundColor: '#FFFFF3',
+                color: '#566971'
+            }
+        }
+    },
 });
 
 theme = responsiveFontSizes(theme);
@@ -62,7 +118,7 @@ const App: React.FC = () => {
                 <CssBaseline />
                 {/*<Navigation/>*/}
                 <Switch>
-                    <Dashboard/>
+                    <Dashboard />
                 </Switch>
             </IconProvider>
         </MuiThemeProvider>

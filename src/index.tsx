@@ -15,6 +15,7 @@ import {InitialSGFState} from 'models/SGF';
 import { InitialGameState } from 'models/Game';
 import { InitialAuthState } from 'models/User';
 import { InitialViewState } from 'models/view';
+import { InitialKatagoState } from 'models/Katago';
 
 const history: History = createBrowserHistory();
 export const routerMiddleware = createRouterMiddleware(history);
@@ -30,7 +31,8 @@ const store = configureStore({
     sgfState: InitialSGFState,
     gameState: InitialGameState,
     viewState: InitialViewState,
-    authState: InitialAuthState
+    authState: InitialAuthState,
+    katagoState: InitialKatagoState
 });
 
 

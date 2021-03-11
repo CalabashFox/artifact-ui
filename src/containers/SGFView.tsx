@@ -11,12 +11,29 @@ import SGFInformation from './SGFInformation';
 import Drawer from '@material-ui/core/Drawer';
 import SGFStackGraph from 'components/SGFStackGraph';
 import {Left, DoubleLeft, ToLeft, Right, DoubleRight, ToRight, ChartHistogram, Analysis, Download} from '@icon-park/react'
+import withWidth, {WithWidth} from '@material-ui/core/withWidth';
+import useIcon from "components/icon";
+import Divider from '@material-ui/core/Divider';
+import Hidden from '@material-ui/core/Hidden';
 
 const useStyles = makeStyles((theme) => ({
     container: {
         display: 'grid',
         gridTemplateColumns: 'repeat(12, 1fr)',
         gridGap: theme.spacing(1),
+        [theme.breakpoints.down('xs')]: {
+            gridGap: 0
+        }
+    },
+    boardContainer: {
+        alignContent: 'baseline',
+        order: 1
+    },
+    infoContainer: {
+        order: 2,
+        [theme.breakpoints.down('xs')]: {
+            order: 0
+        },
     },
     paper: {
         padding: theme.spacing(1),
@@ -24,7 +41,11 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.text.primary,
         whiteSpace: 'nowrap',
         marginBottom: theme.spacing(1),
-        backgroundColor: theme.palette.primary.main
+        backgroundColor: theme.palette.primary.main,
+        [theme.breakpoints.down('xs')]: {
+            marginBottom: 0,
+            borderRadius: 0
+        }
     },
     disabled: {
         color: theme.palette.text.disabled
@@ -59,9 +80,6 @@ const useStyles = makeStyles((theme) => ({
     analsysiDrawer: {
         padding: theme.spacing(2)
     },
-    leftContainer: {
-        alignContent: 'baseline'
-    },
     boardGrid: {
         marginBottom: theme.spacing(1)
     },
@@ -95,10 +113,12 @@ const InputField = withStyles({
     }
 })(TextField);
 
-export default function SGFView(): ReactElement {
+function SGFView(props: WithWidth): ReactElement {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const dispatch = useDispatch();
+
+    const {width} = props;
 
     const totalMoves = sgfState.analyzedSGF.moves.length - 1;
     const currentMove = sgfState.sgfProperties.currentMove;
@@ -147,6 +167,9 @@ export default function SGFView(): ReactElement {
         }
     };
     const scroll = (event: React.WheelEvent) => {
+        if (width === 'xs') {
+            return;
+        }
         const delta = event.deltaY;
         const steps = Math.abs(Math.floor(delta / 2));
         if (delta < 0) {
@@ -159,24 +182,26 @@ export default function SGFView(): ReactElement {
     useEffect(() => {
         setMoveText(currentMove);
     }, [currentMove]);
-
-    const iconFill = '#fff';
-    const disabledIconFill = '#ccc';
     
-    const navBack = currentMove !== 0;
-    const navForward = currentMove !== totalMoves;
-
-    const navBackFill = navBack ? iconFill : disabledIconFill;
-    const navForwardFill = navForward ? iconFill : disabledIconFill;
-
-    const navBackStyle = navBack ? classes.icon : classes.disabledIcon;
-    const navForwardStyle = navForward ? classes.icon : classes.disabledIcon;
+    const backwardDisabled = currentMove === 0;
+    const forwardDisabled = currentMove === totalMoves;
 
     const snapshot = sgfState.analyzedSGF.snapshotList[sgfState.sgfProperties.currentMove];
-    const stones = snapshot.stones;
-    const ownership = snapshot.katagoResults[0].ownership;
-    const policy = snapshot.katagoResults[0].policy;
-    const moveInfos = snapshot.katagoResults[0].moveInfos;
+
+    const stones = sgfState.hasSGF ? snapshot.stones : [];
+    const ownership = sgfState.hasSGF ? snapshot.katagoResults[0].ownership : [];
+    const policy = sgfState.hasSGF ? snapshot.katagoResults[0].policy : [];
+    const moveInfos = sgfState.hasSGF ? snapshot.katagoResults[0].moveInfos : [];
+
+    const toStartIcon = useIcon(<ToLeft onClick={() => updateMove(0)}/>, backwardDisabled);
+    const fastBackwardIcon = useIcon(<DoubleLeft onClick={() => navigateBackward(10)}/>, backwardDisabled);
+    const backwardIcon = useIcon(<Left onClick={() => navigateBackward(1)}/>, backwardDisabled);
+    const forwardIcon = useIcon(<Right onClick={() => navigateForward(1)}/>, forwardDisabled);
+    const fastForwardIcon = useIcon(<DoubleRight onClick={() => navigateForward(10)}/>, forwardDisabled);
+    const toEndIcon = useIcon(<ToRight onClick={() => updateMove(totalMoves)}/>, forwardDisabled);
+    const chartIcon = useIcon(<ChartHistogram onClick={() => setAnalysisDrawer(true)}/>);
+    const analysisIcon = useIcon(<Analysis onClick={() => setAnalysisDrawer(true)}/>);
+    const downloadIcon = useIcon(<Download onClick={() => setAnalysisDrawer(true)}/>);
     
     return <div>
         <React.Fragment key={'anchor'}>
@@ -192,7 +217,7 @@ export default function SGFView(): ReactElement {
             </Drawer>
         </React.Fragment>
         <Grid container spacing={1}>
-            <Grid container item xs={7} spacing={0} className={classes.leftContainer}>
+            <Grid container item sm={7} xs={12} spacing={0} className={classes.boardContainer}>
                 <Grid item xs={12} className={classes.boardGrid}>
                     <Paper className={`${classes.paper} ${classes.board}`} onWheel={(e) => scroll(e)}>
                     <SGFBoard click={(x, y) => handleClick(x, y)}
@@ -207,10 +232,10 @@ export default function SGFView(): ReactElement {
                 <Grid item xs={12}>
                     <Paper className={`${classes.paper} ${classes.boardActionPanel}`}>
                         <Grid container spacing={0}>
-                            <Grid item xs={8} spacing={0}>
-                                <ToLeft theme="outline" size="24" fill={navBackFill} className={navBackStyle} onClick={() => updateMove(0)} />
-                                <DoubleLeft theme="outline" size="24" fill={navBackFill} className={navBackStyle} onClick={() => navigateBackward(10)} />
-                                <Left theme="outline" size="24" fill={navBackFill} className={navBackStyle} onClick={() => navigateBackward(1)} />
+                            <Grid item sm={8} xs={12} spacing={0}>
+                                {toStartIcon}
+                                {fastBackwardIcon}
+                                {backwardIcon}
                                 <InputField label="move"
                                             value={moveText}
                                             size="small"
@@ -220,20 +245,23 @@ export default function SGFView(): ReactElement {
                                             InputLabelProps={{
                                                 shrink: true
                                             }}/>
-                                <Right theme="outline" size="24" fill={navForwardFill} className={navForwardStyle} onClick={() => navigateForward(1)} />
-                                <DoubleRight theme="outline" size="24" fill={navForwardFill} className={navForwardStyle} onClick={() => navigateForward(10)} />
-                                <ToRight theme="outline" size="24" fill={navForwardFill} className={navForwardStyle} onClick={() => updateMove(totalMoves)} />
+                                {forwardIcon}
+                                {fastForwardIcon}
+                                {toEndIcon}
                             </Grid>
-                            <Grid item xs={4} spacing={0} className={classes.graphButtons}>
-                                <ChartHistogram theme="outline" size="24" fill={iconFill} className={classes.icon}/>
-                                <Analysis theme="outline" size="24" fill={iconFill} className={classes.icon} onClick={() => setAnalysisDrawer(true)}/>
-                                <Download theme="outline" size="24" fill={iconFill} className={classes.icon}/>
+                            <Grid item sm={4} xs={12} spacing={0} className={classes.graphButtons}>
+                                <Hidden smUp>
+                                    <Divider className={classes.divider}/>  
+                                </Hidden>   
+                                {chartIcon}
+                                {analysisIcon}
+                                {downloadIcon}
                             </Grid>
                         </Grid>
                     </Paper>
                 </Grid>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item sm={5} xs={12} className={classes.infoContainer}>
                 <SGFInformation/>
             </Grid>
         </Grid>
@@ -249,3 +277,5 @@ export default function SGFView(): ReactElement {
         return <Route {...props} />;
     }*/
 }
+
+export default withWidth()(SGFView);

@@ -1,4 +1,5 @@
 import { Game } from "./Game";
+import { KatagoState } from "./StoreState";
 
 export interface KatagoResult {
     id: string
@@ -69,3 +70,8 @@ export const EmptyResult: KatagoResult = {
         ownership: new Array<number>(),
         policy: new Array<number>()
 }
+
+export const InitialKatagoState: KatagoState = {
+    katagoResult: EmptyResult,
+    hasResult: false
+};

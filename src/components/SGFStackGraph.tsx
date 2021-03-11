@@ -48,8 +48,7 @@ export default function SGFStackGraph(props: SGFStackGraphProps): ReactElement {
             data={data}
             margin={{
                 top: margin, right: margin, bottom: margin, left: margin
-            }}
-        >
+            }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis stroke={'#78909c'} dataKey="label" minTickGap={50}/>
             <YAxis stroke={'#78909c'}/>

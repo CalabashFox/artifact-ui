@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, ReactElement} from 'react';
 import {useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
@@ -14,12 +14,23 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Divider from '@material-ui/core/Divider';
 import { SGFGraphValue } from 'models/SGF';
-
+import Box from '@material-ui/core/Box';
+import useIconText from 'components/iconText';
+import useIcon from "components/icon";
+import {Upload, Info, Config, Up, Down} from '@icon-park/react'
+import Popover from '@material-ui/core/Popover';
+import Collapse from '@material-ui/core/Collapse';
 const useStyles = makeStyles((theme) => ({
     container: {
         display: 'grid',
         gridTemplateColumns: 'repeat(12, 1fr)',
         gridGap: theme.spacing(1)
+    },
+    leftContainer: {
+        textAlign: 'left'
+    },
+    rightContainer: {
+        textAlign: 'right'
     },
     paper: {
         padding: theme.spacing(1),
@@ -27,7 +38,14 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.text.primary,
         whiteSpace: 'nowrap',
         marginBottom: theme.spacing(1),
-        backgroundColor: theme.palette.primary.main
+        backgroundColor: theme.palette.primary.main,
+        [theme.breakpoints.down('xs')]: {
+            marginBottom: theme.spacing(0.5),
+            borderRadius: 0
+        }
+    },
+    gameInfo: {
+
     },
     whitePlayer: {
         color: '#fff'
@@ -69,21 +87,54 @@ const useStyles = makeStyles((theme) => ({
     },
     info: {
         color: '#fff'
-    }
+    },
+    popover: {
+        pointerEvents: 'none'
+    },
 }));
 
-const SGFInformation: React.FC = () => {
+function SGFInformation(): ReactElement {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const [graphTabValue, setGraphTabValue] = useState(0);
+    const [graphExpanded, setGraphExpanded] = useState(true);
 
     // eslint-disable-next-line @typescript-eslint/ban-types
     const toggleGraphTab = (event: React.ChangeEvent<{ }>, newValue: number) => {
         setGraphTabValue(newValue);
     };
 
-    if (sgfState.analyzedSGF === undefined || sgfState.analyzedSGF.analysisData === undefined) {
-        return <div>1</div>;
+    const handleUploadClick = () => {
+        console.log('c');
+    };
+    
+    const [gameInfoAnchorElement, setGameInfoAnchorElement] = React.useState<HTMLElement | null>(null);
+    const gameInfoOpen = Boolean(gameInfoAnchorElement);
+
+    const handleOpenGameInfo = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        setGameInfoAnchorElement(event.currentTarget);
+    };
+
+    const handleCloseGameInfo = () => {
+        setGameInfoAnchorElement(null);
+    };
+
+    const handleGraphExpandClick = () => {
+        setGraphExpanded(!graphExpanded);
+    };
+
+    const uploadButton = useIconText(<Upload/>, () => handleUploadClick(), 'Upload');
+    
+    const infoIcon = useIcon(<Info onClick={handleUploadClick} onMouseEnter={handleOpenGameInfo} onMouseLeave={handleCloseGameInfo}/>);
+    const settingsIcon = useIcon(<Config onClick={handleUploadClick}/>);
+    const expandIcon = useIcon(<Down onClick={handleGraphExpandClick}/>);
+    const collapseIcon = useIcon(<Up onClick={handleGraphExpandClick}/>);
+    if (!sgfState.hasSGF) {
+        return <Box>
+            <Paper className={classes.paper}>
+                {uploadButton}
+            </Paper>
+            </Box>;
     }
 
     const index = sgfState.sgfProperties.currentMove;
@@ -106,22 +157,28 @@ const SGFInformation: React.FC = () => {
         blackWinrateDiff = -whiteWinrateDiff;
     }
 
+    const playerProps = {
+        playerBlack: sgfState.analyzedSGF.playerBlack,
+        playerWhite: sgfState.analyzedSGF.playerWhite,
+    };
+
     let graph;
     switch(graphTabValue) {
         case 0:
-            graph = <SGFGraph identifier={`score-lead-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackScoreLead} color={'#fff'}/>;
+            graph = <SGFGraph player={playerProps} identifier={`score-lead-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackScoreLead} color={'#fff'}/>;
             break;
         case 1:
-            graph = <SGFGraph identifier={`winrate-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackWinrate} color={'#fff'}/>;
+            graph = <SGFGraph player={playerProps} identifier={`winrate-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackWinrate} color={'#fff'}/>;
             break;
         case 2:
-            graph = <SGFGraph identifier={`score-selfplay-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackSelfplay} color={'#fff'}/>;
+            graph = <SGFGraph player={playerProps} identifier={`score-selfplay-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackSelfplay} color={'#fff'}/>;
             break;
     }
 
     const gameInfo = sgfState.analyzedSGF;
     const headers = [];
     const info = [];
+
     if (gameInfo.event) {
         headers.push(<Typography noWrap>Event: </Typography>);
         info.push(<Typography noWrap>{gameInfo.event} (Round {gameInfo.round})</Typography>);
@@ -176,14 +233,41 @@ const SGFInformation: React.FC = () => {
         })
     });
 
-    return <div>
+    return <Box>
         <Paper className={classes.paper}>
-            <Grid container spacing={1} className={classes.info}>
-                <Grid item xs={3}>
-                    {headers}
+            <Grid container spacing={1}>
+                <Grid item xs={6} className={classes.leftContainer}>
+                    {uploadButton}
                 </Grid>
-                <Grid item xs={9}>
-                    {info}
+                <Grid item xs={6} className={classes.rightContainer}>
+                    {infoIcon}
+                    {settingsIcon}
+                    <Popover
+                        className={classes.popover}
+                        classes={{
+                            paper: classes.paper,
+                        }}
+                        open={gameInfoOpen}
+                        anchorEl={gameInfoAnchorElement}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                        onClose={handleCloseGameInfo}
+                        disableRestoreFocus>
+                        <Grid container spacing={1} className={classes.info}>
+                            <Grid item xs={3}>
+                                {headers}
+                            </Grid>
+                            <Grid item xs={9}>
+                                {info}
+                            </Grid>
+                        </Grid>
+                    </Popover>
                 </Grid>
             </Grid>
             <Divider className={classes.divider}/>
@@ -209,36 +293,46 @@ const SGFInformation: React.FC = () => {
                 </Grid>
             </Grid>
             <div className={classes.statusContainer}>
-                <div className={[classes.blackStatus, classes.status].join(' ')} style={{width: blackWinrate + '%'}}>
+                <div className={[classes.blackStatus, classes.status].join(' ')} style={{width: blackWinrate + '%', minWidth: '10%'}}>
                     {blackWinrate.toFixed(1) + '%'} {showDiff && blackWinrateDiff > 0 ? '(+' + blackWinrateDiff.toFixed(1) + '%)' : ''}
                 </div>
-                <div className={[classes.whiteStatus, classes.status].join(' ')} style={{width: whiteWinrate + '%'}}>
+                <div className={[classes.whiteStatus, classes.status].join(' ')} style={{width: whiteWinrate + '%', minWidth: '10%'}}>
                     {whiteWinrate.toFixed(1) + '%'} {showDiff && whiteWinrateDiff > 0 ? '(+' + whiteWinrateDiff.toFixed(1) + '%)' : ''}
                 </div>
             </div>
         </Paper>
         <Paper className={classes.paper}>
-            <Tabs
-                value={graphTabValue}
-                indicatorColor="primary"
-                textColor="primary"
-                onChange={toggleGraphTab}>
-                <Tab label="Lead" />
-                <Tab label="Winrate" />
-                <Tab label="Selfplay" />
-            </Tabs>
-            <div className={classes.graphContainer}>
-                {graph}
-            </div>
+            <Grid container>
+                <Grid item xs={11}>
+                    <Tabs
+                        value={graphTabValue}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        onChange={toggleGraphTab}>
+                        <Tab label="Lead" />
+                        <Tab label="Winrate" />
+                        <Tab label="Selfplay" />
+                    </Tabs>
+                </Grid>
+                <Grid item xs={1}>
+                    {graphExpanded && collapseIcon}
+                    {!graphExpanded && expandIcon}
+                </Grid>
+            </Grid>
+            <Collapse in={graphExpanded} timeout="auto" unmountOnExit>
+                <div className={classes.graphContainer}>
+                    {graph}
+                </div>
+            </Collapse>
         </Paper>
         <Paper className={classes.paper}>
-            <SGFGraph identifier={`winrate-analysis-black`} name={sgfState.analyzedSGF.playerBlack} data={blackMatchAnalysis} color={'#fff'}/>
+            <SGFGraph player={null} identifier={`winrate-analysis-black`} name={sgfState.analyzedSGF.playerBlack} data={blackMatchAnalysis} color={'#fff'}/>
         </Paper>
 
         <Paper className={classes.paper}>
-            <SGFGraph identifier={`winrate-analysis-white`} name={sgfState.analyzedSGF.playerWhite} data={whiteMatchAnalysis} color={'#fff'}/>
+            <SGFGraph player={null} identifier={`winrate-analysis-white`} name={sgfState.analyzedSGF.playerWhite} data={whiteMatchAnalysis} color={'#fff'}/>
         </Paper>
-    </div>;
-};
+    </Box>;
+}
 
 export default SGFInformation;

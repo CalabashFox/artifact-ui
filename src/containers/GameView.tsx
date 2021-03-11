@@ -1,6 +1,6 @@
 import React, {ReactElement,useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {GameState, StoreState} from "models/StoreState";
+import {GameState, KatagoState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -74,6 +74,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function GameView(): ReactElement {
     const gameState = useSelector<StoreState, GameState>(state => state.gameState);
+    const katagoState = useSelector<StoreState, KatagoState>(state => state.katagoState);
     const actionState = gameState.actionState;
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -81,7 +82,7 @@ export default function GameView(): ReactElement {
     
     const stones = game.stones;
     const currentMove = game.currentMove;
-    const {policy, ownership, moveInfos} = gameState.currentResult;
+    const {policy, ownership, moveInfos} = katagoState.katagoResult;
 
     const [placeStoneAudio] = useState(new Audio(placeStoneSound.default));
     const [invalidActionAudio] = useState(new Audio(invalidMoveSound.default));
@@ -149,8 +150,8 @@ export default function GameView(): ReactElement {
         console.log('analysis');
     };
     
-    const chartIcon = useIcon(<ChartHistogram onClick={() => handleChartClick()}/>, false);
-    const analysisIcon = useIcon(<Analysis onClick={() => handleAnalysisClick()}/>, false);
+    const chartIcon = useIcon(<ChartHistogram onClick={() => handleChartClick()}/>);
+    const analysisIcon = useIcon(<Analysis onClick={() => handleAnalysisClick()}/>);
     
     return <div>
         <Grid container spacing={1}>
@@ -159,7 +160,6 @@ export default function GameView(): ReactElement {
                     <Paper className={`${classes.paper} ${classes.boardActionPanel}`}>
                         <Grid container spacing={0}>
                             <Grid item xs={6} spacing={0}>
-                                
                             </Grid>
                             <Grid item xs={6} spacing={0} className={classes.graphButtons}>
                                 {chartIcon}

@@ -16,6 +16,7 @@ export interface AuthState {
 export interface ViewState {
     infoWidth: number
     screenWidth: number
+    tab: number
 }
 
 export interface StoreState {
@@ -23,6 +24,12 @@ export interface StoreState {
     authState: AuthState
     viewState: ViewState
     gameState: GameState
+    katagoState: KatagoState
+}
+
+export interface KatagoState {
+    katagoResult: KatagoResult
+    hasResult: boolean
 }
 
 export interface GameState {
@@ -36,6 +43,7 @@ export interface GameState {
 export interface SGFState {
     analyzedSGF: AnalyzedSGF
     analysisProgress: AnalysisProgress
+    hasSGF: boolean
     error: string
     sgfProperties: SGFProperties
     uploading: boolean

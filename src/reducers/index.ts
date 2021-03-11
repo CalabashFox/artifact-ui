@@ -4,10 +4,12 @@ import {viewReducer} from 'reducers/view';
 import {combineReducers} from 'redux';
 import {authReducer} from 'reducers/auth';
 import { gameReducer } from 'reducers/game';
+import { katagoReducer } from 'reducers/katago';
 
 export const rootReducer = combineReducers<StoreState>({
     sgfState: sgfReducer,
     authState: authReducer,
     viewState: viewReducer,
-    gameState: gameReducer
+    gameState: gameReducer,
+    katagoState: katagoReducer
 });

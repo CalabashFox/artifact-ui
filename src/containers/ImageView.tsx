@@ -1,18 +1,22 @@
 import React, {ChangeEvent, ReactElement, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {SGFState, StoreState} from "models/StoreState";
+import {KatagoState, SGFState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import SGFBoard from './SGFBoard';
-import {ScreenshotTwo, Camera, ImageFiles, Power} from '@icon-park/react'
+import {ScreenshotTwo, Camera, ImageFiles, Power, Checkerboard} from '@icon-park/react'
 import { screenShot, uploadImage } from "actions/sgf";
+import useIcon from "components/icon";
 
 const useStyles = makeStyles((theme) => ({
     container: {
         display: 'grid',
         gridTemplateColumns: 'repeat(12, 1fr)',
         gridGap: theme.spacing(1),
+        [theme.breakpoints.down('xs')]: {
+            gridGap: 0
+        }
     },
     paper: {
         padding: theme.spacing(1),
@@ -20,13 +24,24 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.text.primary,
         whiteSpace: 'nowrap',
         marginBottom: theme.spacing(1),
-        backgroundColor: theme.palette.primary.main
+        backgroundColor: theme.palette.primary.main,
+        [theme.breakpoints.down('xs')]: {
+            borderRadius: 0,
+            marginBottom: 0
+        },
     },
     board: {
         marginBottom: 0
     },
-    leftContainer: {
-        alignContent: 'baseline'
+    boardContainer: {
+        alignContent: 'baseline',
+        order: 1
+    },
+    infoContainer: {
+        order: 2,
+        [theme.breakpoints.down('xs')]: {
+            order: 0
+        },
     },
     boardGrid: {
         marginBottom: theme.spacing(1)
@@ -51,10 +66,14 @@ const useStyles = makeStyles((theme) => ({
     input: {
         display: 'none',
     },
+    hidden: {
+        display: 'none'
+    }
 }));
 
 export default function ImageView(): ReactElement {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
+    const katagoState = useSelector<StoreState, KatagoState>(state => state.katagoState);
     const classes = useStyles();
     const dispatch = useDispatch();
     
@@ -69,9 +88,9 @@ export default function ImageView(): ReactElement {
     };
 
     const stones = sgfState.sgfImage.stones;
-    const {policy, ownership, moveInfos} = sgfState.sgfImage.katagoResult;
+    const {policy, ownership, moveInfos} = katagoState.katagoResult;
     
-    const blackWinrate = sgfState.sgfImage.katagoResult.rootInfo.winrate;
+    const blackWinrate = katagoState.katagoResult.rootInfo.winrate;
     const whiteWinrate = 100 - blackWinrate;
 
     const handleScreenshot = () => {
@@ -134,6 +153,10 @@ export default function ImageView(): ReactElement {
         setCapturing(false);
     };
 
+    const handleConvertToSGF = () => {
+        console.log('convert');
+    }
+
     const captureSuccess = (stream: MediaStream) => {
         video.current.srcObject = stream;
         setCapturing(true);
@@ -143,11 +166,15 @@ export default function ImageView(): ReactElement {
         console.error("Error: ", error);
     }
 
-    const iconColor = '#fff';
+    const uploadIcon = useIcon(<ImageFiles title={'upload file'} />);
+    const screenshotIcon = useIcon(<ScreenshotTwo title={'screenshot'} onClick={() => handleScreenshot()}/>);
+    const captureIcon = useIcon(<Camera title={'capture'} onClick={() => handleCaptureVideo()}/>);
+    const stopIcon = useIcon(<Power title={'stop capture'} onClick={() => handleStopCapture()}/>);
+    const convertIcon = useIcon(<Checkerboard title={'convert to SGF'} onClick={() => handleConvertToSGF()}/>);
 
     return <div>
         <Grid container spacing={1}>
-            <Grid container item xs={7} spacing={0} className={classes.leftContainer}>
+            <Grid container item sm={7} xs={12} spacing={0} className={classes.boardContainer} >
                 <Grid item xs={12} className={classes.boardGrid}>
                     <Paper className={`${classes.paper} ${classes.board}`} >
                     <SGFBoard click={(x, y) => handleClick(x, y)}
@@ -160,21 +187,26 @@ export default function ImageView(): ReactElement {
                     </Paper>
                 </Grid>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item sm={5} xs={12} className={classes.infoContainer}>
                 <Paper className={classes.paper}>
                     <input accept="image/*" className={classes.input} id="icon-button-file" type="file" onChange={e => handleImageUpload(e)} />
                     <label htmlFor="icon-button-file">
-                        {!capturing && <ImageFiles theme="outline" size="24" fill={iconColor} className={classes.icon}/>}
+                        {!capturing && uploadIcon}
                     </label>
-                    {!capturing && <Camera theme="outline" size="24" fill={iconColor} className={classes.icon} onClick={() => handleCaptureVideo()}/>}
-                    {capturing && <ScreenshotTwo theme="outline" size="24" fill={iconColor} className={classes.icon} onClick={() => handleScreenshot()}/>}
-                    {capturing && <Power theme="outline" size="24" fill={iconColor} className={classes.icon} onClick={() => handleStopCapture()}/>}
-                </Paper>            
-                black: {blackWinrate.toFixed(2)}%
-                white: {whiteWinrate.toFixed(2)}%
-                <video autoPlay={true} playsInline={true} ref={video} className={classes.video}></video>
-                <img src={screenshotImage} className={classes.screenshot}/>
-                <canvas className={classes.canvas} ref={canvas}></canvas>
+                    {!capturing && captureIcon}
+                    {capturing && screenshotIcon}
+                    {capturing && stopIcon}
+                    {convertIcon}
+                </Paper>
+                <Paper className={classes.paper + ' ' + (capturing ? '' : classes.hidden)}>
+                    <video autoPlay={true} playsInline={true} ref={video} className={classes.video}></video>
+                    <img src={screenshotImage} className={classes.screenshot}/>
+                    <canvas className={classes.canvas} ref={canvas}></canvas>
+                </Paper>
+                <Paper className={classes.paper}>
+                    black: {blackWinrate.toFixed(2)}%
+                    white: {whiteWinrate.toFixed(2)}%
+                </Paper>
             </Grid>
             
         </Grid>

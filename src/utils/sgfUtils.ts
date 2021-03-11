@@ -47,12 +47,9 @@ export default class SgfUtils {
         }
         for (let i = 0; i < analyzedSGF.snapshotList.length; i++) {
             const info = analyzedSGF.snapshotList[i].katagoResults[0].rootInfo;
+            const blackTurn = analyzedSGF.snapshotList[i].stones[analyzedSGF.snapshotList[i].stones.length - 1][0] === 'B';
             const label = i.toString();
-            const nullValue = {
-                label: label,
-                value: null
-            };
-            if (i % 2 === 0) {
+            if (blackTurn) {
                 analyzedSGF.analysisData.blackWinrate.push({
                     label: label,
                     value: info.winrate * 100
@@ -65,22 +62,40 @@ export default class SgfUtils {
                     label: label,
                     value: info.scoreSelfplay
                 });
-                analyzedSGF.analysisData.whiteWinrate.push(nullValue);
-                analyzedSGF.analysisData.whiteScoreLead.push(nullValue);
-                analyzedSGF.analysisData.whiteScoreLead.push(nullValue);
-            } else {
-                analyzedSGF.analysisData.blackWinrate.push(nullValue);
-                analyzedSGF.analysisData.blackScoreLead.push(nullValue);
-                analyzedSGF.analysisData.blackSelfplay.push(nullValue);
                 analyzedSGF.analysisData.whiteWinrate.push({
                     label: label,
                     value: 100 - info.winrate * 100
                 });
                 analyzedSGF.analysisData.whiteScoreLead.push({
                     label: label,
+                    value: 0 - info.scoreLead
+                });
+                analyzedSGF.analysisData.whiteScoreLead.push({
+                    label: label,
+                    value: 0 - info.scoreSelfplay
+                });
+            } else {
+                analyzedSGF.analysisData.blackWinrate.push({
+                    label: label,
+                    value: 100 - info.winrate * 100
+                });
+                analyzedSGF.analysisData.blackScoreLead.push({
+                    label: label,
+                    value: 0 - info.scoreLead
+                });
+                analyzedSGF.analysisData.blackSelfplay.push({
+                    label: label,
+                    value: 0 - info.scoreSelfplay
+                });
+                analyzedSGF.analysisData.whiteWinrate.push({
+                    label: label,
+                    value: info.winrate * 100
+                });
+                analyzedSGF.analysisData.whiteScoreLead.push({
+                    label: label,
                     value: info.scoreLead
                 });
-                analyzedSGF.analysisData.whiteSelfplay.push({
+                analyzedSGF.analysisData.whiteScoreLead.push({
                     label: label,
                     value: info.scoreSelfplay
                 });

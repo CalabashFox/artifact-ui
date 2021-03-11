@@ -1,10 +1,11 @@
-import { appendLog, GameAction, setGameState, setKatagoAnalysis, setKatagoTurn } from "actions/game";
-import { SGFAction, updateImageResult } from "actions/sgf";
+import { appendLog, GameAction, setGameState, setKatagoTurn } from "actions/game";
+import { KatagoAction, setKatagoResult } from "actions/katago";
+import { SGFAction } from "actions/sgf";
 import { GameActionState } from "models/Game";
 import { KatagoMessage, KatagoResult, GameStateMessage, SGFImageMessage } from "models/Katago";
 import { Dispatch } from "react";
 
-type DispatchAction =  GameAction | SGFAction
+type DispatchAction =  GameAction | SGFAction | KatagoAction
 
 export default class SocketHandler {
     
@@ -30,17 +31,17 @@ export default class SocketHandler {
     onMessage(dispatch: Dispatch<DispatchAction>, e: MessageEvent) {
         const message: KatagoMessage = JSON.parse(e.data);
         if (message.type === 'LOG') {
+            console.log('log');
             dispatch(appendLog(JSON.parse(e.data)));
         } else if (message.type === 'QUERY') {
+            console.log('query');
             const result: KatagoResult = JSON.parse(e.data);
-            dispatch(setKatagoAnalysis(result));
+            dispatch(setKatagoResult(result));
         } else if (message.type === 'GAME_STATE') {
+            console.log('game_state');
             const result: GameStateMessage = JSON.parse(e.data);
             dispatch(setGameState(result.gameState));
             dispatch(setKatagoTurn(GameActionState.SUCCESS));
-        } else if (message.type === 'IMAGE') {
-            const result: SGFImageMessage = JSON.parse(e.data);
-            dispatch(updateImageResult(result.katagoResult));
         }
     }
 

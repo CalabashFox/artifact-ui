@@ -107,6 +107,7 @@ export enum MovePriority {
 }
 
 export const InitialSGFState: SGFState = {
+    hasSGF: false,
     sgfImage: {
         stones: new Array<SGFStone>(),
         katagoResult: EmptyResult

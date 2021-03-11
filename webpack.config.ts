@@ -46,7 +46,22 @@ const config: webpack.Configuration = {
             },
             {
                 test: /\.less$/,
-                use: ['style-loader', 'css-loader', 'less-loader']
+                use: [{
+                    loader: 'style-loader'
+                }, {
+                    loader: 'css-loader'
+                }, {
+                    loader: 'less-loader',
+                    options: {
+                        lessOptions: {
+                            modifyVars: {
+                                '@primary-color': '#112a45',
+                                '@text-color-base': '#ffffff3'
+                            },
+                            javascriptEnabled: true
+                        }
+                    }
+                }]
             }
         ]
     },

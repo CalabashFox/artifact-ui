@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function useIcon(component: ReactNode, disabled: boolean): ReactElement {
+export default function useIcon(component: ReactNode, disabled = false): ReactElement {
     const classes = useStyles();
     const componentClasses: Array<string> = [];
     componentClasses.push(classes.icon);

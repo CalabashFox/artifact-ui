@@ -12,6 +12,7 @@ import {
     SET_IMAGE,
     UPDATE_IMAGE_RESULT
 } from 'actions/sgf';
+import { EmptyResult } from 'models/Katago';
 import { InitialSGFState } from 'models/SGF';
 import {SGFState} from 'models/StoreState';
 import SgfUtils from 'utils/sgfUtils';
@@ -39,7 +40,7 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
             sgf = SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, sgf);
             sgf = SgfUtils.calculateSGFMatchAnalysisData(state.sgfProperties, sgf);
             return {
-                ...state, analyzedSGF: sgf,
+                ...state, analyzedSGF: sgf, hasSGF: true,
                 sgfProperties: {
                     ...state.sgfProperties, currentMove: 0
                 }
@@ -67,7 +68,10 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
             };
         case SET_IMAGE:
             return {
-                ...state, sgfImage: action.payload.sgfImage
+                ...state, sgfImage: {
+                    stones: action.payload.sgfImage.stones,
+                    katagoResult: EmptyResult
+                }
             };
         case UPDATE_IMAGE_RESULT:
             return {
