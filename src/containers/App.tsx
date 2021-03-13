@@ -11,8 +11,9 @@ import { authorize } from 'actions/auth';
 import TokenUtils from 'utils/tokenUtils';
 import { IconProvider, DEFAULT_ICON_CONFIGS } from '@icon-park/react';
 import { IIconConfig } from '@icon-park/react/lib/runtime';
+import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
 
-import '../styles/artifact.less'
+const breakpoints = createBreakpoints({});
 
 let theme = createMuiTheme({
     palette: {
@@ -66,6 +67,9 @@ let theme = createMuiTheme({
         },
         MuiTab: {
             root: {
+                [breakpoints.up('sm')]: {
+                    minWidth: 'unset'
+                },
                 height: '30px',
                 minHeight: '30px',
                 "&:hover": {
@@ -76,6 +80,11 @@ let theme = createMuiTheme({
             selected: {
                 backgroundColor: '#FFFFF3',
                 color: '#566971'
+            }
+        },
+        MuiBottomNavigation: {
+            root: {
+                height: '40px'
             }
         },
         MuiBottomNavigationAction: {
@@ -89,6 +98,21 @@ let theme = createMuiTheme({
             selected: {
                 backgroundColor: '#FFFFF3',
                 color: '#566971'
+            }
+        },
+        MuiSelect: {
+            root: {
+                color: '#566971'
+            }
+        },
+        MuiMenuItem: {
+            root: {
+                color: '#566971'
+            }
+        },
+        MuiCircularProgress: {
+            colorPrimary: {
+                color: '#FFFFF3'
             }
         }
     },

@@ -1,9 +1,9 @@
 import React, {ReactElement} from 'react';
 import {
-    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, Label
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, Label, ResponsiveContainer
 } from 'recharts';
 import {useSelector} from 'react-redux';
-import {SGFState, StoreState, ViewState} from 'models/StoreState';
+import {SGFState, StoreState} from 'models/StoreState';
 import {SGFGraphValue} from 'models/SGF';
 import { makeStyles } from '@material-ui/core';
 
@@ -47,7 +47,6 @@ const GraphTooltip = ({ active, payload, label }: any) => {
 
 export default function SGFGraph(props: SGFGraphProps): ReactElement {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
-    const viewState = useSelector<StoreState, ViewState>(state => state.viewState);
     const {identifier, data, color, name, player} = props;
     const vMargin = 5;
     const hMargin = 0;
@@ -55,27 +54,28 @@ export default function SGFGraph(props: SGFGraphProps): ReactElement {
     const chartColor = '#fffff3';
 
     return (
-        <LineChart
-            width={viewState.infoWidth}
-            height={200}
-            data={data}
-            margin={{
-                left: hMargin, top: vMargin, right: hMargin, bottom: vMargin
-            }}
-        >
-            <ReferenceLine x={sgfState.sgfProperties.currentMove} stroke={color}/>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis stroke={chartColor} dataKey="label" minTickGap={50}/>
-            <YAxis stroke={chartColor} width={40}/>
-            {player && 
-                <YAxis yAxisId='labelAxis' orientation='right' tickLine={false} axisLine={false} stroke={chartColor}>
-                    <Label position="insideTop" fill={chartColor}>{player.playerBlack}</Label>
-                    <Label position="insideBottom" fill={chartColor}>{player.playerWhite}</Label>
-                </YAxis>
-            }
-            <Tooltip content={<GraphTooltip/>}/>
-            <Legend />
-            <Line key={`${identifier}`} connectNulls dataKey="value" type="monotone" name={name} stroke={color} dot={false} />
-        </LineChart>
+        <ResponsiveContainer
+            width={'100%'}
+            height={200}>
+            <LineChart
+                data={data}
+                margin={{
+                    left: hMargin, top: vMargin, right: hMargin, bottom: vMargin
+                }}>
+                <ReferenceLine x={sgfState.sgfProperties.currentMove} stroke={color}/>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis stroke={chartColor} dataKey="label" minTickGap={50}/>
+                <YAxis stroke={chartColor} width={40}/>
+                {player && 
+                    <YAxis yAxisId='labelAxis' orientation='right' tickLine={false} axisLine={false} stroke={chartColor}>
+                        <Label position="insideTop" fill={chartColor}>{player.playerBlack}</Label>
+                        <Label position="insideBottom" fill={chartColor}>{player.playerWhite}</Label>
+                    </YAxis>
+                }
+                <Tooltip content={<GraphTooltip/>}/>
+                <Legend />
+                <Line key={`${identifier}`} connectNulls dataKey="value" type="monotone" name={name} stroke={color} dot={false} />
+            </LineChart>
+        </ResponsiveContainer>
     );
 }

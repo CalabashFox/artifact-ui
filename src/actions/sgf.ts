@@ -2,7 +2,7 @@ import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 import {SGFState} from 'models/StoreState';
 import {ApiResponse, post, upload} from '../api/api';
 import {AxiosError, AxiosResponse} from 'axios';
-import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFStone} from 'models/SGF';
+import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFProperties, SGFStone} from 'models/SGF';
 import { KatagoResult } from 'models/Katago';
 
 export const UPLOAD_SGF_FILE = 'UPLOAD_SGF_FILE'
@@ -46,6 +46,16 @@ export type SET_IMAGE = typeof SET_IMAGE
 
 export const UPDATE_IMAGE_RESULT = "UPDATE_IMAGE_RESULT"
 export type UPDATE_IMAGE_RESULT = typeof UPDATE_IMAGE_RESULT
+
+export const SET_SGF_PROPERTIES = "SET_SGF_PROPERTIES"
+export type SET_SGF_PROPERTIES = typeof SET_SGF_PROPERTIES
+
+export interface SetSGFProperties {
+    type: SET_SGF_PROPERTIES,
+    payload: {
+        sgfProperties: SGFProperties
+    }
+}
 
 export interface UpdateImageResult {
     type: UPDATE_IMAGE_RESULT,
@@ -142,6 +152,16 @@ export type SGFAction = RecalculateAnalysisDataAction | LoadProgressAction
     | UploadSGFFileAction | UploadingAction | UploadSuccess 
     | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction 
     | SetMoveAction | BrowseMoveAction | SetImage | UpdateImageResult
+    | SetSGFProperties
+
+export const setSGFProperties = (sgfProperties: SGFProperties): SGFAction => {
+    return {
+        type: SET_SGF_PROPERTIES,
+        payload: {
+            sgfProperties: sgfProperties
+        }
+    };
+}
 
 export const screenShot = (dataUrl: string)
     : ThunkAction<Promise<SGFAction>, SGFState, null, SGFAction> => {
@@ -173,14 +193,11 @@ export const uploadImage = (image: File)
     };
 };  
 
-export const uploadSGFFile = (file: string)
+export const uploadSGFFile = (file: File)
     : ThunkAction<Promise<void>, SGFState, null, SGFAction> => {
     return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
         dispatch(uploading(true));
-        return post<AnalyzedSGF>('api/sgf/analysis',
-            {
-                file
-            })
+        return upload<AnalyzedSGF>('api/sgf/analysis',file)
             .then((res: AxiosResponse<ApiResponse<AnalyzedSGF>>) => {
                 dispatch(uploadSuccess(res.data.content));
             })

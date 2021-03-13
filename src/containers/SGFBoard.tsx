@@ -158,14 +158,14 @@ const createSVGPoliy = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[]
     return svgPolicy;
 }
 
-const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], ownership: Array<number>, blackTurn: boolean): Array<React.SVGProps<SVGRectElement>> => {
+const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], ownership: Array<number>, blackTurn: boolean, minimumOwnershipValue: number): Array<React.SVGProps<SVGRectElement>> => {
     const svgOwnership = new Array<React.SVGProps<SVGRectElement>>();
     if (!svgRenderer.getSgfProperties().displayOwnership)  {
         return svgOwnership;
     }
     ownership.forEach((value, index) => {
         let opacity = Math.abs(value);
-        if (opacity < 0.1) { // TODO make this as settings
+        if (opacity < minimumOwnershipValue) {
             return;
         }
         opacity *= 0.5;
@@ -299,8 +299,9 @@ export default function SGFBoard(props: SGFBoardProperties): ReactElement {
     const svgStones = createSVGStones(svgRenderer, occupiedCoordinates, stones, classes);
     const svgHoverStones = createHoverStone(svgRenderer, occupiedCoordinates, hoverStone, hoverEffect);
     const svgMoves = createSVGMoves(svgRenderer, occupiedCoordinates, moveInfos);
-    const svgOwnership = createSVGOwnership(svgRenderer, occupiedCoordinates, ownership, blackTurn);
-    const svgPolicy = createSVGPoliy(svgRenderer, occupiedCoordinates, policy);
+    const svgOwnership = sgfProperties.displayOwnership ? createSVGOwnership(svgRenderer, occupiedCoordinates, ownership, blackTurn, sgfProperties.minimumOwnershipValue) : [];
+    const svgPolicy = sgfProperties.displayPolicy ? createSVGPoliy(svgRenderer, occupiedCoordinates, policy) : [];
+
 
     return <svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" className={classes.font}
         pointerEvents={'none'}

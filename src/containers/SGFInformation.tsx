@@ -1,36 +1,20 @@
-import React, {useState, ReactElement} from 'react';
+import React, {ReactElement} from 'react';
 import {useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles, Theme} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-import SGFGraph from 'components/SGFGraph';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import blackIcon from 'assets/images/black.svg';
-import blackTurnIcon from 'assets/images/black-turn.svg';
-import whiteIcon from 'assets/images/white.svg';
-import whiteTurnIcon from 'assets/images/white-turn.svg';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import Divider from '@material-ui/core/Divider';
-import { SGFGraphValue } from 'models/SGF';
 import Box from '@material-ui/core/Box';
-import useIconText from 'components/iconText';
-import useIcon from "components/icon";
-import {Upload, Info, Config, Up, Down} from '@icon-park/react'
-import Popover from '@material-ui/core/Popover';
-import Collapse from '@material-ui/core/Collapse';
-const useStyles = makeStyles((theme) => ({
+import SGFGraphTab from "components/SGFGraphTab";
+import SGFPlayers from 'components/SGFPlayers';
+import SGFStatusBar from 'components/SGFStatusBar';
+
+const useStyles = makeStyles((theme: Theme) => ({
     container: {
         display: 'grid',
         gridTemplateColumns: 'repeat(12, 1fr)',
         gridGap: theme.spacing(1)
-    },
-    leftContainer: {
-        textAlign: 'left'
-    },
-    rightContainer: {
-        textAlign: 'right'
     },
     paper: {
         padding: theme.spacing(1),
@@ -44,295 +28,39 @@ const useStyles = makeStyles((theme) => ({
             borderRadius: 0
         }
     },
-    gameInfo: {
-
-    },
-    whitePlayer: {
-        color: '#fff'
-    },
-    blackPlayer: {
-        color: '#0'
-    },
-    playerTitle: {
-        fontSize: 20,
-        display: 'inline-block',
-        verticalAlign: 'middle',
-        marginLeft: theme.spacing(0.5),
-        marginRight: theme.spacing(0.5)
-    },
-    statusContainer: {
-        width: '100%'
-    },
-    status: {
-        height: 20,
-        display: 'inline-block',
-        textAlign: 'center'
-    },
-    blackStatus: {
-        backgroundColor: '#000',
-        color: '#fff'
-    },
-    whiteStatus: {
-        backgroundColor: '#fff',
-        color: '#000'
-    },
-    graphContainer: {
-        boxSizing: 'border-box',
-        padding: theme.spacing(1)
-    },
     divider: {
         color: '#fff',
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1)
-    },
-    info: {
-        color: '#fff'
-    },
-    popover: {
-        pointerEvents: 'none'
-    },
+    }
 }));
 
-function SGFInformation(): ReactElement {
+const SGFInformation = (): ReactElement => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
-    const [graphTabValue, setGraphTabValue] = useState(0);
-    const [graphExpanded, setGraphExpanded] = useState(true);
-
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    const toggleGraphTab = (event: React.ChangeEvent<{ }>, newValue: number) => {
-        setGraphTabValue(newValue);
-    };
-
-    const handleUploadClick = () => {
-        console.log('c');
-    };
     
-    const [gameInfoAnchorElement, setGameInfoAnchorElement] = React.useState<HTMLElement | null>(null);
-    const gameInfoOpen = Boolean(gameInfoAnchorElement);
-
-    const handleOpenGameInfo = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-        setGameInfoAnchorElement(event.currentTarget);
-    };
-
-    const handleCloseGameInfo = () => {
-        setGameInfoAnchorElement(null);
-    };
-
-    const handleGraphExpandClick = () => {
-        setGraphExpanded(!graphExpanded);
-    };
-
-    const uploadButton = useIconText(<Upload/>, () => handleUploadClick(), 'Upload');
-    
-    const infoIcon = useIcon(<Info onClick={handleUploadClick} onMouseEnter={handleOpenGameInfo} onMouseLeave={handleCloseGameInfo}/>);
-    const settingsIcon = useIcon(<Config onClick={handleUploadClick}/>);
-    const expandIcon = useIcon(<Down onClick={handleGraphExpandClick}/>);
-    const collapseIcon = useIcon(<Up onClick={handleGraphExpandClick}/>);
     if (!sgfState.hasSGF) {
         return <Box>
             <Paper className={classes.paper}>
-                {uploadButton}
+                
             </Paper>
             </Box>;
     }
 
-    const index = sgfState.sgfProperties.currentMove;
-    const useBlackData = index % 2 === 0;
-    const winrateList = useBlackData ? sgfState.analyzedSGF.analysisData.blackWinrate : sgfState.analyzedSGF.analysisData.whiteWinrate;
-    const winrate = winrateList[index].value ?? 0;
-    const blackWinrate = useBlackData ? winrate : 100 - winrate;
-    const whiteWinrate = 100 - blackWinrate;
-
-    const showDiff = index >= 1;
-
-    let previousWinrate = 0;
-    let blackWinrateDiff = 0;
-    let whiteWinrateDiff = 0;
-    if (showDiff) {
-        const previousWinrateList = useBlackData ? sgfState.analyzedSGF.analysisData.whiteWinrate : sgfState.analyzedSGF.analysisData.blackWinrate;
-        const prevWinrate = previousWinrateList[index - 1].value ?? 0;
-        previousWinrate = useBlackData ? prevWinrate : 100 - prevWinrate;
-        whiteWinrateDiff = whiteWinrate - previousWinrate;
-        blackWinrateDiff = -whiteWinrateDiff;
-    }
-
-    const playerProps = {
-        playerBlack: sgfState.analyzedSGF.playerBlack,
-        playerWhite: sgfState.analyzedSGF.playerWhite,
-    };
-
-    let graph;
-    switch(graphTabValue) {
-        case 0:
-            graph = <SGFGraph player={playerProps} identifier={`score-lead-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackScoreLead} color={'#fff'}/>;
-            break;
-        case 1:
-            graph = <SGFGraph player={playerProps} identifier={`winrate-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackWinrate} color={'#fff'}/>;
-            break;
-        case 2:
-            graph = <SGFGraph player={playerProps} identifier={`score-selfplay-graph`} name={sgfState.analyzedSGF.playerBlack} data={sgfState.analyzedSGF.analysisData.blackSelfplay} color={'#fff'}/>;
-            break;
-    }
-
-    const gameInfo = sgfState.analyzedSGF;
-    const headers = [];
-    const info = [];
-
-    if (gameInfo.event) {
-        headers.push(<Typography noWrap>Event: </Typography>);
-        info.push(<Typography noWrap>{gameInfo.event} (Round {gameInfo.round})</Typography>);
-    }
-    if (gameInfo.date) {
-        headers.push(<Typography noWrap>Date: </Typography>);
-        info.push(<Typography noWrap>{gameInfo.date}</Typography>);
-    }
-
-    if (gameInfo.rules) {
-        headers.push(<Typography noWrap>Rule: </Typography>);
-        info.push(<Typography noWrap>{gameInfo.rules}</Typography>);
-    }
-
-    if (gameInfo.timeLimit) {
-        headers.push(<Typography noWrap>Time: </Typography>);
-        info.push(<Typography noWrap>{gameInfo.timeLimit}</Typography>);
-    }
-
-    if (gameInfo.komi) {
-        headers.push(<Typography noWrap>Komi: </Typography>);
-        info.push(<Typography noWrap>{gameInfo.komi}</Typography>);
-    }
-
-    if (gameInfo.result) {
-        headers.push(<Typography noWrap>Result: </Typography>);
-        info.push(<Typography noWrap>{gameInfo.result}</Typography>);
-    }
-
-    const blackMatchAnalysis = new Array<SGFGraphValue>();
-    const whiteMatchAnalysis = new Array<SGFGraphValue>();
-    
-    let blackMatch = 0;
-    sgfState.analyzedSGF.analysisData.blackMatchAnalysis.forEach((match, index) => {
-        if (match) {
-            blackMatch++;
-        }
-        blackMatchAnalysis.push({
-            label: index.toString(),
-            value: blackMatch / (index + 1) * 100
-        })
-    });
-
-    let whiteMatch = 0;
-    sgfState.analyzedSGF.analysisData.whiteMatchAnalysis.forEach((match, index) => {
-        if (match) {
-            whiteMatch++;
-        }
-        whiteMatchAnalysis.push({
-            label: index.toString(),
-            value: whiteMatch / (index + 1) * 100
-        })
-    });
-
-    return <Box>
+    return <React.Fragment>
         <Paper className={classes.paper}>
             <Grid container spacing={1}>
-                <Grid item xs={6} className={classes.leftContainer}>
-                    {uploadButton}
-                </Grid>
-                <Grid item xs={6} className={classes.rightContainer}>
-                    {infoIcon}
-                    {settingsIcon}
-                    <Popover
-                        className={classes.popover}
-                        classes={{
-                            paper: classes.paper,
-                        }}
-                        open={gameInfoOpen}
-                        anchorEl={gameInfoAnchorElement}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                        }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                        }}
-                        onClose={handleCloseGameInfo}
-                        disableRestoreFocus>
-                        <Grid container spacing={1} className={classes.info}>
-                            <Grid item xs={3}>
-                                {headers}
-                            </Grid>
-                            <Grid item xs={9}>
-                                {info}
-                            </Grid>
-                        </Grid>
-                    </Popover>
-                </Grid>
+                <SGFStatusBar/>
             </Grid>
             <Divider className={classes.divider}/>
             <Grid container spacing={1}>
-                <Grid item xs={6} className={classes.blackPlayer}>
-                    <img src={useBlackData ? blackTurnIcon : blackIcon} className={classes.playerTitle} alt="black"/>
-                    <Typography className={classes.playerTitle} noWrap>
-                        {sgfState.analyzedSGF.playerBlack}({sgfState.analyzedSGF.rankBlack})
-                    </Typography>
-                </Grid>
-                <Grid item xs={6} className={classes.whitePlayer}>
-                    <img src={useBlackData ? whiteIcon : whiteTurnIcon} className={classes.playerTitle} alt="white"/>
-                    <Typography className={classes.playerTitle} noWrap>
-                        {sgfState.analyzedSGF.playerWhite}({sgfState.analyzedSGF.rankWhite})
-                    </Typography>
-                </Grid>
+                {sgfState.hasSGF && <SGFPlayers/>}
             </Grid>
-            <Grid container spacing={1}>
-                <Grid item xs={6} className={classes.blackPlayer}>
-                    <Typography className={classes.playerTitle} noWrap>
-
-                    </Typography>
-                </Grid>
-            </Grid>
-            <div className={classes.statusContainer}>
-                <div className={[classes.blackStatus, classes.status].join(' ')} style={{width: blackWinrate + '%', minWidth: '10%'}}>
-                    {blackWinrate.toFixed(1) + '%'} {showDiff && blackWinrateDiff > 0 ? '(+' + blackWinrateDiff.toFixed(1) + '%)' : ''}
-                </div>
-                <div className={[classes.whiteStatus, classes.status].join(' ')} style={{width: whiteWinrate + '%', minWidth: '10%'}}>
-                    {whiteWinrate.toFixed(1) + '%'} {showDiff && whiteWinrateDiff > 0 ? '(+' + whiteWinrateDiff.toFixed(1) + '%)' : ''}
-                </div>
-            </div>
         </Paper>
         <Paper className={classes.paper}>
-            <Grid container>
-                <Grid item xs={11}>
-                    <Tabs
-                        value={graphTabValue}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        onChange={toggleGraphTab}>
-                        <Tab label="Lead" />
-                        <Tab label="Winrate" />
-                        <Tab label="Selfplay" />
-                    </Tabs>
-                </Grid>
-                <Grid item xs={1}>
-                    {graphExpanded && collapseIcon}
-                    {!graphExpanded && expandIcon}
-                </Grid>
-            </Grid>
-            <Collapse in={graphExpanded} timeout="auto" unmountOnExit>
-                <div className={classes.graphContainer}>
-                    {graph}
-                </div>
-            </Collapse>
+            <SGFGraphTab/>
         </Paper>
-        <Paper className={classes.paper}>
-            <SGFGraph player={null} identifier={`winrate-analysis-black`} name={sgfState.analyzedSGF.playerBlack} data={blackMatchAnalysis} color={'#fff'}/>
-        </Paper>
-
-        <Paper className={classes.paper}>
-            <SGFGraph player={null} identifier={`winrate-analysis-white`} name={sgfState.analyzedSGF.playerWhite} data={whiteMatchAnalysis} color={'#fff'}/>
-        </Paper>
-    </Box>;
+    </React.Fragment>;
 }
 
 export default SGFInformation;

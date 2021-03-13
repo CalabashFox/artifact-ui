@@ -1,10 +1,8 @@
 import React, {ReactElement} from 'react';
 import {
-    BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+    BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import {SGFStackGraphValue} from 'models/SGF';
-import { StoreState, ViewState } from 'models/StoreState';
-import { useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core';
 
 export interface SGFStackGraphProps {
@@ -36,30 +34,29 @@ const GraphTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 export default function SGFStackGraph(props: SGFStackGraphProps): ReactElement {
-    const viewState = useSelector<StoreState, ViewState>(state => state.viewState);
     const {identifier, data, name} = props;
     const margin = 10;
     //#54cc7c gr
     //#b71c1c re
     return (
-        <BarChart
-            width={viewState.screenWidth / 2}
-            height={360}
-            data={data}
-            margin={{
-                top: margin, right: margin, bottom: margin, left: margin
-            }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis stroke={'#78909c'} dataKey="label" minTickGap={50}/>
-            <YAxis stroke={'#78909c'}/>
-            <Tooltip content={<GraphTooltip/>}/>
-            <Legend />
-            <Bar key={`stack-${identifier}-player`} dataKey="player" name={name} stackId="stack" fill={'#78909c'}/>
-            <Bar key={`stack-${identifier}-ai`} dataKey="diff" name={'katago'} stackId="stack" fill={'#54cc7c'}>
-                {data.map((entry) => (
-                    <Cell key={`stack-${identifier}-entry-${entry.label}-ai`} fill={entry.diff >= 0 ? '#54cc7c' : '#b71c1c' }/>
-                ))}
-            </Bar>
-        </BarChart>
+        <ResponsiveContainer width={'100%'} height={360}>
+            <BarChart
+                data={data}
+                margin={{
+                    top: margin, right: margin, bottom: margin, left: margin
+                }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis stroke={'#78909c'} dataKey="label" minTickGap={50}/>
+                <YAxis stroke={'#78909c'}/>
+                <Tooltip content={<GraphTooltip/>}/>
+                <Legend />
+                <Bar key={`stack-${identifier}-player`} dataKey="player" name={name} stackId="stack" fill={'#78909c'}/>
+                <Bar key={`stack-${identifier}-ai`} dataKey="diff" name={'katago'} stackId="stack" fill={'#54cc7c'}>
+                    {data.map((entry) => (
+                        <Cell key={`stack-${identifier}-entry-${entry.label}-ai`} fill={entry.diff >= 0 ? '#54cc7c' : '#b71c1c' }/>
+                    ))}
+                </Bar>
+            </BarChart>
+        </ResponsiveContainer>
     );
 }

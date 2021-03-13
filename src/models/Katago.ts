@@ -56,19 +56,19 @@ export interface SGFImageMessage extends KatagoMessage {
 
 export const EmptyResult: KatagoResult = {
     id: '',
-        isDuringSearch: false,
-        turnNumber: 0,
-        moveInfos: new Array<KatagoMoveInfo>(),
-        rootInfo: {
-            scoreLead: 0,
-            scoreSelfplay: 0,
-            scoreStdev: 0,
-            utility: 0,
-            visits: 0,
-            winrate: 0
-        },
-        ownership: new Array<number>(),
-        policy: new Array<number>()
+    isDuringSearch: false,
+    turnNumber: 0,
+    moveInfos: new Array<KatagoMoveInfo>(),
+    rootInfo: {
+        scoreLead: 0,
+        scoreSelfplay: 0,
+        scoreStdev: 0,
+        utility: 0,
+        visits: 0,
+        winrate: 0
+    },
+    ownership: new Array<number>(),
+    policy: new Array<number>()
 }
 
 export const InitialKatagoState: KatagoState = {

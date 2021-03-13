@@ -50,6 +50,13 @@ export type RECONNECT = typeof RECONNECT
 export const KATAGO_TURN = "KATAGO_TURN"
 export type KATAGO_TURN = typeof KATAGO_TURN
 
+export const ACTION_ENDED = "ACTION_ENDED"
+export type ACTION_ENDED = typeof ACTION_ENDED
+
+export interface ActionEnded {
+    type: ACTION_ENDED,
+    payload: {}
+}
 
 export interface SetKatagoTurn {
     type: KATAGO_TURN,
@@ -148,7 +155,7 @@ export type GameAction = StartGameAction | PlaceStoneAction
     | ActionCompleted | ActionFailed | PlaceStoneSuccess | ActionPending
     | SetGameState | ActionStateUpdate | AppendLogAction
     | SetKatagoAnalysis | Undo | StopGame | StopGameSuccess | Reconnect
-    | SetKatagoTurn
+    | SetKatagoTurn | ActionEnded
 
 
 export const stopGame = ()
@@ -360,4 +367,11 @@ export const setKatagoTurn = (state: GameActionState): GameAction => {
             state: state
         }
     }
+}
+
+export const actionEnded = (): GameAction => {
+    return {
+        type: ACTION_ENDED,
+        payload: {}
+    };
 }

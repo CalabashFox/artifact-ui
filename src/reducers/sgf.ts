@@ -10,7 +10,8 @@ import {
     UPLOAD_SUCCESS,
     UPLOADING,
     SET_IMAGE,
-    UPDATE_IMAGE_RESULT
+    UPDATE_IMAGE_RESULT,
+    SET_SGF_PROPERTIES
 } from 'actions/sgf';
 import { EmptyResult } from 'models/Katago';
 import { InitialSGFState } from 'models/SGF';
@@ -21,6 +22,10 @@ const initialState = InitialSGFState;
 
 export function sgfReducer(state: SGFState = initialState, action: SGFAction): SGFState {
     switch (action.type) {
+        case SET_SGF_PROPERTIES:
+            return {
+                ...state, sgfProperties: action.payload.sgfProperties
+            };
         case RECALCULATE_ANALYSIS_DATA:
             return {
                 ...state, analyzedSGF: SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, state.analyzedSGF!)
@@ -36,7 +41,7 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
                 }
             };
         case SET:
-            let sgf = SgfUtils.calculateSGFAnalysisData(action.payload.analyzedSGF)!;
+            let sgf = SgfUtils.calculateSGFAnalysisData(state.sgfProperties, action.payload.analyzedSGF)!;
             sgf = SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, sgf);
             sgf = SgfUtils.calculateSGFMatchAnalysisData(state.sgfProperties, sgf);
             return {

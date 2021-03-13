@@ -35,9 +35,9 @@ export interface KatagoState {
 export interface GameState {
     game: Game
     logs: Array<KatagoLog>
-    actionState: GameActionState
     currentResult: KatagoResult
     gameProperties: GameProperties
+    actionState: GameActionState
 }
 
 export interface SGFState {
@@ -47,5 +47,6 @@ export interface SGFState {
     error: string
     sgfProperties: SGFProperties
     uploading: boolean
+    uploadProgress: number
     sgfImage: SGFImage
 }

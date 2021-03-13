@@ -19,7 +19,6 @@ import {ReactComponent as ArtifactIcon} from 'assets/images/icon.svg';
 import {useDispatch, useSelector} from 'react-redux';
 import {logout} from 'actions/auth';
 import {AuthState, StoreState} from 'models/StoreState';
-import {uploadSGFFile} from 'actions/sgf';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -70,7 +69,7 @@ export default function Navigation(): ReactElement {
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
     const handleSGFFileUpload = () => {
-        dispatch(uploadSGFFile(''));
+        console.log('');
     };
 
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {

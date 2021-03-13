@@ -1,4 +1,4 @@
-import React, {ReactElement,useEffect, useState} from "react";
+import React, {ReactElement,useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {GameState, KatagoState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
@@ -8,11 +8,9 @@ import SGFBoard from './SGFBoard';
 import {ChartHistogram, Analysis} from '@icon-park/react'
 import { placeStone, setKatagoTurn } from "actions/game";
 import GameInformation from "./GameInformation";
-import * as placeStoneSound from 'assets/audio/placestone.mp3';
-import * as invalidMoveSound from 'assets/audio/invalidmove.mp3';
-import * as removeStoneSound from 'assets/audio/removestone.mp3';
 import { GameActionState } from "models/Game";
 import useIcon from "components/icon";
+import SGFBoardSound from "components/SGFBoardSound";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -75,7 +73,6 @@ const useStyles = makeStyles((theme) => ({
 export default function GameView(): ReactElement {
     const gameState = useSelector<StoreState, GameState>(state => state.gameState);
     const katagoState = useSelector<StoreState, KatagoState>(state => state.katagoState);
-    const actionState = gameState.actionState;
     const classes = useStyles();
     const dispatch = useDispatch();
     const game = gameState.game;
@@ -83,10 +80,6 @@ export default function GameView(): ReactElement {
     const stones = game.stones;
     const currentMove = game.currentMove;
     const {policy, ownership, moveInfos} = katagoState.katagoResult;
-
-    const [placeStoneAudio] = useState(new Audio(placeStoneSound.default));
-    const [invalidActionAudio] = useState(new Audio(invalidMoveSound.default));
-    const [removeStoneAudio] = useState(new Audio(removeStoneSound.default));
 
     const blackTurn = game.black.turn;
     const whiteTurn = game.white.turn;
@@ -103,30 +96,7 @@ export default function GameView(): ReactElement {
         }
     }, [dispatch, blackTurn, whiteTurn, blackHuman, whiteHuman]);
 
-    useEffect(() => {
-        invalidActionAudio.currentTime = 0;
-        placeStoneAudio.currentTime = 0;
-        removeStoneAudio.currentTime = 0;
-        switch (actionState) {
-            case GameActionState.FAIL:
-                invalidActionAudio.play();
-                return;
-            case GameActionState.SUCCESS:
-                placeStoneAudio.play();
-                return;
-            case GameActionState.SUCCESS_REMOVE_STONE:
-                placeStoneAudio.play();
-                removeStoneAudio.play();
-                return;
-            case GameActionState.PENDING:
-            case GameActionState.NONE:
-            default:
-                placeStoneAudio.pause();
-                invalidActionAudio.pause();
-                removeStoneAudio.pause();
-                return;
-        }
-    }, [actionState, placeStoneAudio, invalidActionAudio, removeStoneAudio]);
+    SGFBoardSound(gameState.actionState);
 
     const handleClick = (x: number, y: number) => {
         /*

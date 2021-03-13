@@ -1,11 +1,13 @@
-import { ACTION_STATE_UPDATE, APPEND_LOG, GameAction, KATAGO_TURN, PLACE_STONE_SUCCESS, SET_GAME_STATE, SET_KATAGO_ANALYSIS, START_GAME, STOP_GAME_SUCCESS } from "actions/game";
-import { InitialGameState } from "models/Game";
+import { ACTION_ENDED, ACTION_STATE_UPDATE, APPEND_LOG, GameAction, KATAGO_TURN, PLACE_STONE_SUCCESS, SET_GAME_STATE, SET_KATAGO_ANALYSIS, START_GAME, STOP_GAME_SUCCESS } from "actions/game";
+import { GameActionState, InitialGameState } from "models/Game";
 import { GameState } from "models/StoreState";
 
 const initialState = InitialGameState;
 
 export function gameReducer(state: GameState = initialState, action: GameAction): GameState {
     switch (action.type) {
+        case ACTION_ENDED:
+            return {...state, actionState: GameActionState.NONE};
         case START_GAME:
             return {...state};
         case SET_GAME_STATE:
