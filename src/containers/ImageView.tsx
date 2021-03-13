@@ -172,7 +172,7 @@ export default function ImageView(): ReactElement {
     const stopIcon = useIcon(<Power title={'stop capture'} onClick={() => handleStopCapture()}/>);
     const convertIcon = useIcon(<Checkerboard title={'convert to SGF'} onClick={() => handleConvertToSGF()}/>);
 
-    return <div>
+    return <React.Fragment>
         <Grid container spacing={1}>
             <Grid container item sm={7} xs={12} spacing={0} className={classes.boardContainer} >
                 <Grid item xs={12} className={classes.boardGrid}>
@@ -210,5 +210,5 @@ export default function ImageView(): ReactElement {
             </Grid>
             
         </Grid>
-    </div>;
+    </React.Fragment>;
 }

@@ -1,4 +1,4 @@
-import {AnalyzedSGF, MovePriority, SGFProperties, SGFStackGraphValue} from 'models/SGF';
+import {AnalyzedSGF, MovePriority, SGFProperties, SGFStackGraphValue, WinrateReport} from 'models/SGF';
 import {KatagoMoveInfo} from 'models/Katago';
 
 type Point = [number, number];
@@ -27,7 +27,7 @@ export default class SgfUtils {
         return hoshi.some(p => p[0] === point[0] && p[1] === point[1]);
     }
     
-    static calculateSGFAnalysisData(analyzedSGF: AnalyzedSGF | undefined): AnalyzedSGF | undefined {
+    static calculateSGFAnalysisData(sgfProperties: SGFProperties, analyzedSGF: AnalyzedSGF | undefined): AnalyzedSGF | undefined {
         if (analyzedSGF === undefined) {
             return analyzedSGF;
         }
@@ -49,7 +49,7 @@ export default class SgfUtils {
             const info = analyzedSGF.snapshotList[i].katagoResults[0].rootInfo;
             const blackTurn = analyzedSGF.snapshotList[i].stones[analyzedSGF.snapshotList[i].stones.length - 1][0] === 'B';
             const label = i.toString();
-            if (blackTurn) {
+            if (blackTurn || sgfProperties.reportAnalysisWinratesAs === WinrateReport.BLACK) {
                 analyzedSGF.analysisData.blackWinrate.push({
                     label: label,
                     value: info.winrate * 100

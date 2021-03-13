@@ -26,8 +26,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function useIconText(component: ReactNode, handler: React.MouseEventHandler<HTMLElement>, 
-    text: string, variant: Variant = 'body1', disabled = false): ReactElement {
+const dummy = () => {
+    // empty
+};
+
+export default function useIconText(component: ReactNode, text: string, 
+    handler: React.MouseEventHandler<HTMLElement> = dummy, variant: Variant = 'body1', disabled = false): ReactElement {
     const classes = useStyles();
     
     const componentClasses: Array<string> = [];

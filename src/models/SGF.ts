@@ -95,6 +95,14 @@ export interface SGFProperties {
     moveCount: number
     minimumPolicyValue: number
     topMatch: number
+    reportAnalysisWinratesAs: WinrateReport
+    minimumOwnershipValue: number
+    continuousAnalysis: boolean
+    useSound: boolean
+}
+
+export enum WinrateReport {
+    BLACK, WHITE, SIDETOMOVE
 }
 
 export interface SGFImage {
@@ -159,7 +167,12 @@ export const InitialSGFState: SGFState = {
         movePriority: MovePriority.WINRATE,
         moveCount: 5,
         minimumPolicyValue: 0.1,
-        topMatch: 5
+        topMatch: 5,
+        reportAnalysisWinratesAs: WinrateReport.BLACK,
+        minimumOwnershipValue: 0.1,
+        continuousAnalysis: false,
+        useSound: true
     },
-    uploading: false
+    uploading: false,
+    uploadProgress: 0
 };

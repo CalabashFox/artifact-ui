@@ -82,9 +82,7 @@ const SGFStatusBar = (): ReactElement => {
 
     const uploadProgress = useProgress(sgfState.uploadProgress, 'Analyzing...');
 
-    const uploadButton = useIconText(<Upload/>, (e) => {
-        e.preventDefault();
-    }, 'Upload');
+    const uploadButton = useIconText(<Upload/>, 'Upload');
     
     const infoIcon = useIcon(<Info onClick={handleOpenGameInfo} onMouseEnter={handleOpenGameInfo} onMouseLeave={handleCloseGameInfo}/>);
     const settingsIcon = useIcon(<Config onClick={handleSGFBoardSettingsClick}/>);

@@ -115,11 +115,11 @@ const GameInformation: React.FC = () => {
         dispatch(stopGame());
     };
 
-    const startButton = useIconText(<RightOne/>, () => handleStartClick(), 'Start');
-    const undoButton = useIconText(<Undo/>, () => handleUndoClick(), 'Undo');
-    const stopButton = useIconText(<CloseOne/>, () => handleStopClick(), 'Stop');
+    const startButton = useIconText(<RightOne/>, 'Start', () => handleStartClick);
+    const undoButton = useIconText(<Undo/>, 'Undo', () => handleUndoClick());
+    const stopButton = useIconText(<CloseOne/>, 'Stop', () => handleStopClick());
     
-    return <div>
+    return <React.Fragment>
         <Paper className={classes.paper}>
             <Grid container spacing={1} className={classes.info}>
                 <Grid item xs={12}>
@@ -167,7 +167,7 @@ const GameInformation: React.FC = () => {
                     }}/>
             </Grid>
         </Paper>
-    </div>;
+    </React.Fragment>;
 };
 
 export default GameInformation;

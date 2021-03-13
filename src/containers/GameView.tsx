@@ -123,7 +123,7 @@ export default function GameView(): ReactElement {
     const chartIcon = useIcon(<ChartHistogram onClick={() => handleChartClick()}/>);
     const analysisIcon = useIcon(<Analysis onClick={() => handleAnalysisClick()}/>);
     
-    return <div>
+    return <React.Fragment>
         <Grid container spacing={1}>
             <Grid container item xs={7} spacing={0} className={classes.leftContainer}>
                 <Grid item xs={12}>
@@ -154,5 +154,5 @@ export default function GameView(): ReactElement {
                 <GameInformation/>
             </Grid>
         </Grid>
-    </div>;
+    </React.Fragment>;
 }

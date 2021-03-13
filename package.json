@@ -21,7 +21,8 @@
     "recharts": "2.0.2",
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
-    "sockjs-client": "^1.4.0"
+    "sockjs-client": "^1.4.0",
+    "use-sound": "^2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

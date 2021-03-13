@@ -1,6 +1,6 @@
 import React, {ReactElement, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {SGFState, StoreState} from "models/StoreState";
+import {GameState, SGFState, StoreState} from "models/StoreState";
 import {makeStyles, withStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -15,6 +15,7 @@ import withWidth, {WithWidth} from '@material-ui/core/withWidth';
 import useIcon from "components/icon";
 import Divider from '@material-ui/core/Divider';
 import Hidden from '@material-ui/core/Hidden';
+import SGFBoardSound from "components/SGFBoardSound";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -115,6 +116,7 @@ const InputField = withStyles({
 
 function SGFView(props: WithWidth): ReactElement {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
+    const gameState = useSelector<StoreState, GameState>(state => state.gameState);
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -136,6 +138,10 @@ function SGFView(props: WithWidth): ReactElement {
         if (!isNaN(move) && move >= 0 && move < totalMoves) {
             setMoveText(moveText);
             dispatch(setMove(move));
+        }
+        if (isNaN(move)) {
+            setMoveText(0);
+            dispatch(setMove(0));
         }
     };
 
@@ -179,6 +185,10 @@ function SGFView(props: WithWidth): ReactElement {
         }
     };
 
+    if (sgfState.sgfProperties.useSound) {
+        SGFBoardSound(gameState.actionState);
+    }
+
     useEffect(() => {
         setMoveText(currentMove);
     }, [currentMove]);
@@ -202,8 +212,7 @@ function SGFView(props: WithWidth): ReactElement {
     const chartIcon = useIcon(<ChartHistogram onClick={() => setAnalysisDrawer(true)}/>);
     const analysisIcon = useIcon(<Analysis onClick={() => setAnalysisDrawer(true)}/>);
     const downloadIcon = useIcon(<Download onClick={() => setAnalysisDrawer(true)}/>);
-    
-    return <div>
+    return <React.Fragment>
         <React.Fragment key={'anchor'}>
             <Drawer anchor="bottom" open={analysisDrawer} onClose={() => setAnalysisDrawer(false)} className={classes.analsysiDrawer}>
                 <Grid container spacing={1}>
@@ -220,13 +229,13 @@ function SGFView(props: WithWidth): ReactElement {
             <Grid container item sm={7} xs={12} spacing={0} className={classes.boardContainer}>
                 <Grid item xs={12} className={classes.boardGrid}>
                     <Paper className={`${classes.paper} ${classes.board}`} onWheel={(e) => scroll(e)}>
-                    <SGFBoard click={(x, y) => handleClick(x, y)}
-                        currentMove={currentMove}
-                        policy={policy} 
-                        moveInfos={moveInfos} 
-                        stones={stones}
-                        ownership={ownership}
-                        hoverEffect={false}/>
+                        <SGFBoard click={(x, y) => handleClick(x, y)}
+                            currentMove={currentMove}
+                            policy={policy} 
+                            moveInfos={moveInfos} 
+                            stones={stones}
+                            ownership={ownership}
+                            hoverEffect={false}/>
                     </Paper>
                 </Grid>
                 <Grid item xs={12}>
@@ -265,7 +274,7 @@ function SGFView(props: WithWidth): ReactElement {
                 <SGFInformation/>
             </Grid>
         </Grid>
-    </div>;
+    </React.Fragment>;
     /*
     if (authState.isLoading) {
         return <Loading/>;

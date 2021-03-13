@@ -172,7 +172,7 @@ export default function SGFBoardSettings(props: SGFBoardSettingsProps): ReactEle
         return `${value}`;
     };
 
-    return <div>
+    return <React.Fragment>
         <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
             <AppBar className={classes.appBar}>
                 <Toolbar>
@@ -302,5 +302,5 @@ export default function SGFBoardSettings(props: SGFBoardSettingsProps): ReactEle
                 </Grid>
             </Grid>
         </Dialog>
-    </div>;
+    </React.Fragment>;
 }

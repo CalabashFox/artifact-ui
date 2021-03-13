@@ -5,7 +5,6 @@ import {makeStyles, Theme} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
-import Box from '@material-ui/core/Box';
 import SGFGraphTab from "components/SGFGraphTab";
 import SGFPlayers from 'components/SGFPlayers';
 import SGFStatusBar from 'components/SGFStatusBar';
@@ -38,14 +37,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 const SGFInformation = (): ReactElement => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
-    
-    if (!sgfState.hasSGF) {
-        return <Box>
-            <Paper className={classes.paper}>
-                
-            </Paper>
-            </Box>;
-    }
 
     return <React.Fragment>
         <Paper className={classes.paper}>

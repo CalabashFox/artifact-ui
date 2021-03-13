@@ -8,7 +8,7 @@ import {makeStyles} from '@material-ui/core/styles';
 import {AnalyzedSGF} from 'models/SGF';
 import * as mock from 'assets/sample.json'
 import {set} from 'actions/sgf';
-import { setTab, setView } from 'actions/view';
+import { setTab } from 'actions/view';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -20,11 +20,13 @@ import SocketHandler from "utils/socketHandler";
 import { TAB_VIEW_GAME, TAB_VIEW_IMAGE, TAB_VIEW_SGF } from 'models/view';
 import {ImageFiles,} from '@icon-park/react'
 import useIcon from "components/icon";
-import withWidth, {WithWidth} from '@material-ui/core/withWidth';
 
 const useStyles = makeStyles((theme) => ({
     container: {
-        padding: theme.spacing(1),
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
+        paddingRight: 0,
+        paddingLeft: 0,
         boxSizing: 'border-box',
         [theme.breakpoints.down('xs')]: {
             padding: 0
@@ -59,15 +61,13 @@ const KeyEvent = {
     DOM_VK_DELETE: 46,
 };
 
-function Dashboard(props: WithWidth): ReactElement {
+function Dashboard(): ReactElement {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const viewState = useSelector<StoreState, ViewState>(state => state.viewState);
     const classes = useStyles();
     const dispatch = useDispatch();
 
     const tabIndex = viewState.tab;
-
-    const {width} = props;
 
     const [socket] = useState(new SocketHandler());
 
@@ -82,8 +82,7 @@ function Dashboard(props: WithWidth): ReactElement {
         };
     }, [initConnection, socket]);
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    const handleTabChange = (event: ChangeEvent<{}>, index: number) => {
+    const handleTabChange = (event: ChangeEvent<Record<string, unknown>>, index: number) => {
         dispatch(setTab(index));
     };
 
@@ -104,11 +103,6 @@ function Dashboard(props: WithWidth): ReactElement {
 
     const initFetch = useCallback(() => {
         dispatch(set(mock as unknown as AnalyzedSGF));
-        if (width === 'xs') {
-            dispatch(setView(window.innerWidth - 30, 1000));
-        } else {
-            dispatch(setView(Math.min(window.innerWidth - 30, 400), 1000));
-        }
     }, [dispatch]);
 
     useEffect(() => {
@@ -122,7 +116,7 @@ function Dashboard(props: WithWidth): ReactElement {
     const uploadIcon = useIcon(<ImageFiles title={'upload file'} />);
 
     if (sgfState.analyzedSGF === undefined) {
-        return <div>1</div>
+        return <React.Fragment>1</React.Fragment>
     }
     return <Container disableGutters={true}>
         <Hidden xsDown>
@@ -147,4 +141,4 @@ function Dashboard(props: WithWidth): ReactElement {
     </Container>;
 }
 
-export default withWidth()(Dashboard);
+export default Dashboard;

@@ -152,7 +152,7 @@ export default function Navigation(): ReactElement {
     );
     /* ignore login state
     if (emptyValue(authState.auth)) {
-        return <div />;
+        return <React.Fragment />;
     }*/
 
     return (
