@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+// unused code
 export default function Loading(): ReactElement {
 
     const classes = useStyles();

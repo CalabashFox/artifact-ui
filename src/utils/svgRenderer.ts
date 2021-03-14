@@ -78,7 +78,6 @@ export default class SvgRenderer {
         } else {
             return ownership < 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
         }
-        
     }
 
     color(color: string): string {

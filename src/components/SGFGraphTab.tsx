@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const TAB_LEAD = 0, TAB_WINRATE = 1, TAB_SELFPLAY = 2, TAB_WINRATE_ANALYSIS = 3;
 
-const SGFGraphTab = (): ReactElement => {
+const SGFGraphTab: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const [graphTabValue, setGraphTabValue] = useState(0);

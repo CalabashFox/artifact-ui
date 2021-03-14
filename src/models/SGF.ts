@@ -16,6 +16,7 @@ export interface AnalyzedSGF {
     round: string
     timeLimit: string
     komi: number
+    handicap: number
     result: string
     place: string
     rules: string
@@ -135,6 +136,7 @@ export const InitialSGFState: SGFState = {
         round: '',
         timeLimit: '',
         komi: 0,
+        handicap: 0,
         result: '',
         place: '',
         rules: '',
@@ -168,7 +170,7 @@ export const InitialSGFState: SGFState = {
         moveCount: 5,
         minimumPolicyValue: 0.1,
         topMatch: 5,
-        reportAnalysisWinratesAs: WinrateReport.BLACK,
+        reportAnalysisWinratesAs: WinrateReport.SIDETOMOVE,
         minimumOwnershipValue: 0.1,
         continuousAnalysis: false,
         useSound: true

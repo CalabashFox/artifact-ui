@@ -58,6 +58,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+// unused code
 export default function SignIn(): ReactElement {
     const classes = useStyles();
     const authState = useSelector<StoreState, AuthState>(state => state.authState);

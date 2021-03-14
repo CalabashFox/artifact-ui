@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { ReactElement } from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
@@ -33,19 +32,27 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-export default function useProgress(progress: number, label: string): Array<ReactElement> {
+interface ProgressProps {
+    progress: number
+    label: string
+}
+
+const Progress: React.FC<ProgressProps> = ({progress, label}) => {
     const classes = useStyles();
-    return [
+    const value = isNaN(progress) ? 0: progress;
+    return <React.Fragment>
         <Box className={classes.progressImage} key={`${label}-image`}>
-            <CircularProgress size={24} variant="indeterminate" value={progress} />
+            <CircularProgress size={24} variant="indeterminate" value={value} />
             <Box className={classes.progressValue}>
                 <Typography variant="caption" className={classes.progressText}>
-                    {`${Math.round(progress)}%`}
+                    {`${Math.round(value)}%`}
                 </Typography>
             </Box>
-        </Box>,
+        </Box>
         <Typography variant="caption" className={classes.progressLabel}key={`${label}-label`}>
             {label}
         </Typography>
-    ];
+    </React.Fragment>;
 }
+
+export default Progress;

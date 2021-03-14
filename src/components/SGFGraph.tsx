@@ -1,4 +1,4 @@
-import React, {ReactElement} from 'react';
+import React from 'react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, Label, ResponsiveContainer
 } from 'recharts';
@@ -45,9 +45,8 @@ const GraphTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-export default function SGFGraph(props: SGFGraphProps): ReactElement {
+const SGFGraph: React.FC<SGFGraphProps> = ({identifier, data, color, name, player}) => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
-    const {identifier, data, color, name, player} = props;
     const vMargin = 5;
     const hMargin = 0;
 
@@ -79,3 +78,4 @@ export default function SGFGraph(props: SGFGraphProps): ReactElement {
         </ResponsiveContainer>
     );
 }
+export default SGFGraph;

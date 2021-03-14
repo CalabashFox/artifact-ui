@@ -1,5 +1,5 @@
 export enum Rank {
-    P9
+    P9, P8, P7, P6, L9, L8, L18
 }
 
 export enum UserState {

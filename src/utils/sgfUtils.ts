@@ -46,8 +46,9 @@ export default class SgfUtils {
             whiteMatchAnalysis: []
         }
         for (let i = 0; i < analyzedSGF.snapshotList.length; i++) {
-            const info = analyzedSGF.snapshotList[i].katagoResults[0].rootInfo;
-            const blackTurn = analyzedSGF.snapshotList[i].stones[analyzedSGF.snapshotList[i].stones.length - 1][0] === 'B';
+            const snapshot = analyzedSGF.snapshotList[i];
+            const info = snapshot.katagoResults[0].rootInfo;
+            const blackTurn = i === 0 || analyzedSGF.handicap > 0 || snapshot.stones[snapshot.stones.length - 1][0] === 'B';
             const label = i.toString();
             if (blackTurn || sgfProperties.reportAnalysisWinratesAs === WinrateReport.BLACK) {
                 analyzedSGF.analysisData.blackWinrate.push({

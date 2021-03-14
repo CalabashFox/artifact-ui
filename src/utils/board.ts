@@ -1,4 +1,3 @@
-import { TwoDimensionalCodeOne } from "@icon-park/react";
 import { SGFColor, SGFStone } from "models/SGF";
 
 export default class GameBoard {
@@ -32,14 +31,14 @@ export default class GameBoard {
 
     public updateBoard(stones: Array<SGFStone>): void {
         this.resetBoard();
-        stones.forEach((stone, index) => {
+        stones.forEach((stone) => {
             const color = stone[0] === 'B' ? SGFColor.BLACK : SGFColor.WHITE;
             const [x, y] = this.gtpToCoordinate(stone[1]);
             this.board[x][y] = color;
         });
     }
 
-    public isValidMove(color: SGFColor, x: number, y: number): boolean {
+    public isValidMove(x: number, y: number): boolean {
         if (this.board[x][y] !== SGFColor.NONE) {
             return false;
         }

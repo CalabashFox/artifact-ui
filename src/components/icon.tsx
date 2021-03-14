@@ -26,7 +26,7 @@ export default function useIcon(component: ReactNode, disabled = false): ReactEl
         componentClasses.push(classes.disabledIcon);
     }
     
-    const color = disabled ? '#cccccc' : '#ffffff';
+    const color = disabled ? '#cccccc' : '#fffff3';
 
     const icon = React.Children.map(component, c => {
         if (React.isValidElement(c)) {

@@ -1,6 +1,6 @@
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 import {SGFState} from 'models/StoreState';
-import {ApiResponse, post, upload} from '../api/api';
+import {ApiResponse, get, post, upload} from '../api/api';
 import {AxiosError, AxiosResponse} from 'axios';
 import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFProperties, SGFStone} from 'models/SGF';
 import { KatagoResult } from 'models/Katago';
@@ -197,7 +197,7 @@ export const uploadSGFFile = (file: File)
     : ThunkAction<Promise<void>, SGFState, null, SGFAction> => {
     return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
         dispatch(uploading(true));
-        return upload<AnalyzedSGF>('api/sgf/analysis',file)
+        return upload<AnalyzedSGF>('sgf/analysis',file)
             .then((res: AxiosResponse<ApiResponse<AnalyzedSGF>>) => {
                 dispatch(uploadSuccess(res.data.content));
             })
@@ -245,7 +245,7 @@ export const uploadFail = (message: string): SGFAction => {
 
 export const loadProgress = () : ThunkAction<Promise<void>, SGFState, null, SGFAction> => {
     return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
-        return post<AnalysisProgress>('api/sgf/progress', {})
+        return get<AnalysisProgress>('sgf/progress', {})
             .then((res: AxiosResponse<ApiResponse<AnalysisProgress>>) => {
                 dispatch(receiveProgress(res.data.content));
             })

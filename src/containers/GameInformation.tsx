@@ -21,14 +21,6 @@ const useStyles = makeStyles((theme) => ({
         gridTemplateColumns: 'repeat(12, 1fr)',
         gridGap: theme.spacing(1)
     },
-    paper: {
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.primary,
-        whiteSpace: 'nowrap',
-        marginBottom: theme.spacing(1),
-        backgroundColor: theme.palette.primary.main
-    },
     logContainer: {
         padding: theme.spacing(2),
         backgroundColor: theme.palette.primary.main,
@@ -37,9 +29,6 @@ const useStyles = makeStyles((theme) => ({
     logField: {
         backgroundColor: theme.palette.primary.main,
         width: '100%'
-    },
-    whitePlayer: {
-        color: '#ffffff'
     },
     blackPlayer: {
         color: '#000000'
@@ -60,25 +49,13 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center'
     },
     blackStatus: {
-        backgroundColor: '#000',
-        color: '#fff'
+        backgroundColor: '#000000',
+        color: '#fffff3'
     },
     whiteStatus: {
-        backgroundColor: '#fff',
+        backgroundColor: '#fffff3',
         color: '#000'
-    },
-    graphContainer: {
-        boxSizing: 'border-box',
-        padding: theme.spacing(1)
-    },
-    divider: {
-        color: '#fff',
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1)
-    },
-    info: {
-        color: '#fff'
-    },
+    }
 }));
 
 const GameInformation: React.FC = () => {
@@ -120,15 +97,15 @@ const GameInformation: React.FC = () => {
     const stopButton = useIconText(<CloseOne/>, 'Stop', () => handleStopClick());
     
     return <React.Fragment>
-        <Paper className={classes.paper}>
-            <Grid container spacing={1} className={classes.info}>
+        <Paper>
+            <Grid container spacing={1}>
                 <Grid item xs={12}>
                     {startButton}
                     {undoButton}
                     {stopButton}
                 </Grid>
             </Grid>
-            <Divider className={classes.divider}/>
+            <Divider/>
             <Grid container spacing={1}>
                 <Grid item xs={6} className={classes.blackPlayer}>
                     <img src={black.turn ? blackTurnIcon : blackIcon} className={classes.playerTitle} alt="black"/>
@@ -136,7 +113,7 @@ const GameInformation: React.FC = () => {
                         {black.isHuman ? 'Human' : 'AI'}
                     </Typography>
                 </Grid>
-                <Grid item xs={6} className={classes.whitePlayer}>
+                <Grid item xs={6}>
                     <img src={white.turn ? whiteTurnIcon : whiteIcon} className={classes.playerTitle} alt="white"/>
                     <Typography className={classes.playerTitle} noWrap>
                         {white.isHuman ? 'Human' : 'AI'}

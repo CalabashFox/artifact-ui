@@ -15,7 +15,7 @@ import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
 
 const breakpoints = createBreakpoints({});
 
-let theme = createMuiTheme({
+const defaultTheme = createMuiTheme({
     palette: {
         primary: {
             light: '#6E7783',
@@ -35,6 +35,10 @@ let theme = createMuiTheme({
             disabled: '#CCCCCC'
         }
     },
+});
+
+let theme = createMuiTheme({
+    palette: defaultTheme.palette,
     typography: {
         fontSize: 12,
         fontFamily: ["Lucida Grande", "Tahoma", "Verdana", "Arial", "sans-serif"].join(','),
@@ -42,16 +46,16 @@ let theme = createMuiTheme({
     overrides: {
         MuiInputBase: {
             input: {
-                borderColor: '#FFFFF3',
+                borderColor: defaultTheme.palette.text.primary,
                 "&$focused": {
-                    borderColor: '#FFFFF3'
+                    borderColor: defaultTheme.palette.text.primary
                 }
             }
         },
         MuiFormLabel: {
             root: {
                 "&$focused": {
-                    color: '#FFFFF3'
+                    color: defaultTheme.palette.text.primary
                 }
             },
             focused: {}
@@ -73,13 +77,13 @@ let theme = createMuiTheme({
                 height: '30px',
                 minHeight: '30px',
                 "&:hover": {
-                    backgroundColor: '#FFFFF3',
-                    color: '#566971'
+                    backgroundColor: defaultTheme.palette.text.primary,
+                    color: defaultTheme.palette.primary.main
                 }
             },
             selected: {
-                backgroundColor: '#FFFFF3',
-                color: '#566971'
+                backgroundColor: defaultTheme.palette.text.primary,
+                color: defaultTheme.palette.primary.main
             }
         },
         MuiBottomNavigation: {
@@ -89,30 +93,62 @@ let theme = createMuiTheme({
         },
         MuiBottomNavigationAction: {
             root: {
-                color: '#FFFFF3',
+                color: defaultTheme.palette.text.primary,
                 "&:hover": {
-                    backgroundColor: '#FFFFF3',
-                    color: '#566971'
+                    backgroundColor: defaultTheme.palette.text.primary,
+                    color: defaultTheme.palette.primary.main
                 }
             },
             selected: {
-                backgroundColor: '#FFFFF3',
-                color: '#566971'
+                backgroundColor: defaultTheme.palette.text.primary,
+                color: defaultTheme.palette.primary.main
             }
         },
         MuiSelect: {
             root: {
-                color: '#566971'
+                color: defaultTheme.palette.primary.main
             }
         },
         MuiMenuItem: {
             root: {
-                color: '#566971'
+                color: defaultTheme.palette.primary.main
             }
         },
         MuiCircularProgress: {
             colorPrimary: {
-                color: '#FFFFF3'
+                color: defaultTheme.palette.text.primary
+            }
+        },
+        MuiDivider: {
+            root: {
+                color: defaultTheme.palette.text.primary,
+                margin: defaultTheme.spacing(1, 0)
+            }
+        },
+        MuiPaper: {
+            root: {
+                padding: defaultTheme.spacing(1),
+                textAlign: 'center',
+                color: defaultTheme.palette.text.primary,
+                margin: defaultTheme.spacing(0.5, 0),
+                backgroundColor: defaultTheme.palette.primary.main,
+                '&.MuiPaper-rounded': {
+                    borderRadius: 0
+                },
+                [breakpoints.down('xs')]: {
+                    margin: 0,
+                    borderRadius: 0
+                }
+            }
+        },
+        MuiContainer: {
+            root: {
+                paddingLeft: 0,
+                paddingRight: 0,
+                [breakpoints.up('sm')]: {
+                    paddingLeft: 0,
+                    paddingRight: 0
+                }
             }
         }
     },

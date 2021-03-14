@@ -1,4 +1,4 @@
-import React, {ReactElement, useState} from "react";
+import React, {useState} from "react";
 import {useSelector} from "react-redux";
 import {SGFState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
@@ -8,34 +8,7 @@ import { SGFStone } from "models/SGF";
 import { KatagoMoveInfo } from "models/Katago";
 import { ClassNameMap } from "@material-ui/core/styles/withStyles";
 
-const useStyles = makeStyles((theme) => ({
-    container: {
-        display: 'inline-block',
-        position: 'relative',
-        width: '100%'
-    },
-    dummy: {
-        marginTop: '100%'
-    },
-    element: {
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        //backgroundColor: '#ffa54f',
-        backgroundColor: '#deb887',
-        borderRadius: '2px',
-        padding: theme.spacing(2),
-    },
-    boardContainer: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(19, 1fr)',
-        gridGap: theme.spacing(0),
-    },
-    block: {
-        border: '1px solid black'
-    },
+const useStyles = makeStyles(() => ({
     font: {
         fontSize: 10,
         fontWeight: 100,
@@ -60,7 +33,7 @@ const svgProps = {
     hoshiDim: 3,
     tengenDim: 5,
     blackColor: '#000',
-    whiteColor: '#fff',
+    whiteColor: '#fffff3',
     stoneHolderDim: BASE_DIM,
     stoneHolderOffset: BASE_DIM * 0.5,
     stoneDim: BASE_DIM * 0.9 * 0.5, // radius
@@ -81,7 +54,7 @@ const svgProps = {
     worstMoveColor: '#b71c1c'
 }
 
-interface SGFBoardProperties {
+interface SGFBoardProps {
     click: (x: number, y: number) => void
     currentMove: number
     stones: Array<SGFStone>
@@ -229,15 +202,13 @@ interface HoverStone {
     y: number
 }
 
-export default function SGFBoard(props: SGFBoardProperties): ReactElement {
+const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, moveInfos, hoverEffect}) => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const sgfProperties = sgfState.sgfProperties;
     const dimension = 19;
-    const {click, stones, policy, ownership, moveInfos, hoverEffect} = props;
 
-    const blackTurn = stones.length === 0 ? true : 
-        stones[stones.length - 1][0] === 'B' ? false : true;
+    const blackTurn = stones.length === 0 || stones[stones.length - 1][0] === 'W';
 
     const svgRenderer = new SvgRenderer(dimension, svgProps, sgfProperties);
 
@@ -317,3 +288,4 @@ export default function SGFBoard(props: SGFBoardProperties): ReactElement {
         {svgPolicy}
     </svg>;
 }
+export default SGFBoard;

@@ -1,4 +1,4 @@
-import React, {ChangeEvent, ReactElement, useRef, useState} from "react";
+import React, {ChangeEvent, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {KatagoState, SGFState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
@@ -17,18 +17,6 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.down('xs')]: {
             gridGap: 0
         }
-    },
-    paper: {
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.primary,
-        whiteSpace: 'nowrap',
-        marginBottom: theme.spacing(1),
-        backgroundColor: theme.palette.primary.main,
-        [theme.breakpoints.down('xs')]: {
-            borderRadius: 0,
-            marginBottom: 0
-        },
     },
     board: {
         marginBottom: 0
@@ -71,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function ImageView(): ReactElement {
+const ImageView: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const katagoState = useSelector<StoreState, KatagoState>(state => state.katagoState);
     const classes = useStyles();
@@ -176,7 +164,7 @@ export default function ImageView(): ReactElement {
         <Grid container spacing={1}>
             <Grid container item sm={7} xs={12} spacing={0} className={classes.boardContainer} >
                 <Grid item xs={12} className={classes.boardGrid}>
-                    <Paper className={`${classes.paper} ${classes.board}`} >
+                    <Paper className={classes.board} >
                     <SGFBoard click={(x, y) => handleClick(x, y)}
                         currentMove={0}
                         policy={policy} 
@@ -188,7 +176,7 @@ export default function ImageView(): ReactElement {
                 </Grid>
             </Grid>
             <Grid item sm={5} xs={12} className={classes.infoContainer}>
-                <Paper className={classes.paper}>
+                <Paper>
                     <input accept="image/*" className={classes.input} id="icon-button-file" type="file" onChange={e => handleImageUpload(e)} />
                     <label htmlFor="icon-button-file">
                         {!capturing && uploadIcon}
@@ -198,12 +186,12 @@ export default function ImageView(): ReactElement {
                     {capturing && stopIcon}
                     {convertIcon}
                 </Paper>
-                <Paper className={classes.paper + ' ' + (capturing ? '' : classes.hidden)}>
+                <Paper className={(capturing ? '' : classes.hidden)}>
                     <video autoPlay={true} playsInline={true} ref={video} className={classes.video}></video>
                     <img src={screenshotImage} className={classes.screenshot}/>
                     <canvas className={classes.canvas} ref={canvas}></canvas>
                 </Paper>
-                <Paper className={classes.paper}>
+                <Paper>
                     black: {blackWinrate.toFixed(2)}%
                     white: {whiteWinrate.toFixed(2)}%
                 </Paper>
@@ -212,3 +200,4 @@ export default function ImageView(): ReactElement {
         </Grid>
     </React.Fragment>;
 }
+export default ImageView;

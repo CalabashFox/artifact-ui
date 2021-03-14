@@ -1,4 +1,4 @@
-import React, {ChangeEvent, ReactElement, useCallback, useEffect, useState} from 'react';
+import React, {ChangeEvent, useCallback, useEffect, useState} from 'react';
 import SGFView from './SGFView';
 import GameView from './GameView';
 import ImageView from './ImageView';
@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState, ViewState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
 import {AnalyzedSGF} from 'models/SGF';
-import * as mock from 'assets/sample.json'
+import * as mock from 'assets/sample-2.json'
 import {set} from 'actions/sgf';
 import { setTab } from 'actions/view';
 import AppBar from '@material-ui/core/AppBar';
@@ -22,15 +22,8 @@ import {ImageFiles,} from '@icon-park/react'
 import useIcon from "components/icon";
 
 const useStyles = makeStyles((theme) => ({
-    container: {
-        paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
-        paddingRight: 0,
-        paddingLeft: 0,
-        boxSizing: 'border-box',
-        [theme.breakpoints.down('xs')]: {
-            padding: 0
-        }
+    desktopAppBar: {
+        padding: 0
     },
     tab: {
         fontSize: '1.2em'
@@ -61,7 +54,7 @@ const KeyEvent = {
     DOM_VK_DELETE: 46,
 };
 
-function Dashboard(): ReactElement {
+const Dashboard: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const viewState = useSelector<StoreState, ViewState>(state => state.viewState);
     const classes = useStyles();
@@ -118,9 +111,9 @@ function Dashboard(): ReactElement {
     if (sgfState.analyzedSGF === undefined) {
         return <React.Fragment>1</React.Fragment>
     }
-    return <Container disableGutters={true}>
+    return <Container>
         <Hidden xsDown>
-            <AppBar position="static">
+            <AppBar position="static" className={classes.desktopAppBar}>
                 <Tabs value={tabIndex} onChange={(e, v) => handleTabChange(e, v)}>
                     <Tab label="Scanner" className={classes.tab}/>
                     <Tab label="Game" className={classes.tab}/>
@@ -128,9 +121,9 @@ function Dashboard(): ReactElement {
                 </Tabs>
             </AppBar>
         </Hidden>
-        {tabIndex === TAB_VIEW_IMAGE && <Container className={classes.container}><ImageView/></Container>}
-        {tabIndex === TAB_VIEW_GAME && <Container className={classes.container}><GameView/></Container>}
-        {tabIndex === TAB_VIEW_SGF && <Container className={classes.container}><SGFView/></Container>}
+        {tabIndex === TAB_VIEW_IMAGE && <Container><ImageView/></Container>}
+        {tabIndex === TAB_VIEW_GAME && <Container><GameView/></Container>}
+        {tabIndex === TAB_VIEW_SGF && <Container><SGFView/></Container>}
         <Hidden smUp>
              <BottomNavigation value={tabIndex} onChange={(e, v) => handleTabChange(e, v)} className={classes.navigation}>
                  <BottomNavigationAction label="Scanner" value={TAB_VIEW_IMAGE} icon={uploadIcon} />

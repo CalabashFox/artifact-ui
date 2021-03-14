@@ -31,14 +31,11 @@ export default class SocketHandler {
     onMessage(dispatch: Dispatch<DispatchAction>, e: MessageEvent) {
         const message: KatagoMessage = JSON.parse(e.data);
         if (message.type === 'LOG') {
-            console.log('log');
             dispatch(appendLog(JSON.parse(e.data)));
         } else if (message.type === 'QUERY') {
-            console.log('query');
             const result: KatagoResult = JSON.parse(e.data);
             dispatch(setKatagoResult(result));
         } else if (message.type === 'GAME_STATE') {
-            console.log('game_state');
             const result: GameStateMessage = JSON.parse(e.data);
             dispatch(setGameState(result.gameState));
             dispatch(setKatagoTurn(GameActionState.SUCCESS));

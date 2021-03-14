@@ -58,6 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+// unused code
 export default function Navigation(): ReactElement {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

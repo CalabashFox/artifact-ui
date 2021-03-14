@@ -25,8 +25,12 @@ import Slider from '@material-ui/core/Slider';
 import { setSGFProperties } from 'actions/sgf';
 
 const useStyles = makeStyles((theme: Theme) => ({
+    dialog: {
+        padding: 0
+    },
     appBar: {
         position: 'relative',
+        padding: 0
     },
     title: {
         marginLeft: theme.spacing(2),
@@ -34,7 +38,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     formContainer: {
         color: theme.palette.primary.main,
-        padding: theme.spacing(2),
+        backgroundColor: theme.palette.text.primary,
+        padding: theme.spacing(1),
+        boxSizing: 'border-box',
         textAlign: 'left'
     },
     select: {
@@ -115,12 +121,11 @@ function generateEnumOptions(array: Array<EnumTuple>) {
 const movePriorities = getEnumTuples(MovePriority);
 const winrateReports = getEnumTuples(WinrateReport);
 
-export default function SGFBoardSettings(props: SGFBoardSettingsProps): ReactElement {
+const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { open, onClose } = props;
     const sgfProperties = sgfState.sgfProperties;
 
     const [displayOwnership, setDisplayOwnership] = useState(sgfProperties.displayOwnership);
@@ -149,7 +154,8 @@ export default function SGFBoardSettings(props: SGFBoardSettingsProps): ReactEle
             displayOwnersminimumPolicyValuehip: minimumPolicyValue,
             minimumOwnershipValue: minimumOwnershipValue,
             topMatch: topMatch,
-        };        if (topMatch !== sgfProperties.topMatch) {
+        };        
+        if (topMatch !== sgfProperties.topMatch) {
             // recalculate
         }
         dispatch(setSGFProperties(properties));
@@ -173,7 +179,7 @@ export default function SGFBoardSettings(props: SGFBoardSettingsProps): ReactEle
     };
 
     return <React.Fragment>
-        <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
+        <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition} className={classes.dialog}>
             <AppBar className={classes.appBar}>
                 <Toolbar>
                     <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
@@ -304,3 +310,4 @@ export default function SGFBoardSettings(props: SGFBoardSettingsProps): ReactEle
         </Dialog>
     </React.Fragment>;
 }
+export default SGFBoardSettings;

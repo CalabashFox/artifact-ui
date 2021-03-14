@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import { ReactElement, ReactNode } from 'react';
-import useIcon from './icon';
+import useIcon from 'components/icon';
 import Typography from '@material-ui/core/Typography';
 import { Variant } from '@material-ui/core/styles/createTypography';
 

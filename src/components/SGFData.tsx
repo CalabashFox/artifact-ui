@@ -1,19 +1,11 @@
-import React, {ReactElement} from 'react';
-import {makeStyles, Theme} from '@material-ui/core/styles';
+import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { useSelector } from 'react-redux';
 import { SGFState, StoreState } from 'models/StoreState';
 import Typography from '@material-ui/core/Typography';
 
-const useStyles = makeStyles((theme: Theme) => ({
-    info: {
-        color: theme.palette.text.primary
-    },
-}));
-
-const SGFData = (): ReactElement => {
+const SGFData: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
-    const classes = useStyles();
     const gameInfo = sgfState.analyzedSGF;
 
     const headers = [];
@@ -48,7 +40,7 @@ const SGFData = (): ReactElement => {
         info.push(<Typography noWrap>{gameInfo.result}</Typography>);
     }
 
-    return <Grid container spacing={1} className={classes.info}>
+    return <Grid container spacing={1}>
         <Grid item xs={3}>
             {headers}
         </Grid>

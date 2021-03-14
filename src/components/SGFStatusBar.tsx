@@ -1,12 +1,12 @@
-import React, {useState, ReactElement, ChangeEvent} from 'react';
+import React, {useState, ChangeEvent} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
-import {makeStyles, Theme} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import useIconText from 'components/iconText';
-import useIcon from "components/icon";
-import useTimer from "components/timer";
-import useProgress from "components/progress";
+import useIcon from 'components/icon';
+import useTimer from 'components/timer';
+import Progress from 'components/Progress';
 import {Upload, Info, Config} from '@icon-park/react'
 import Popover from '@material-ui/core/Popover';
 
@@ -14,39 +14,22 @@ import { loadProgress, uploadSGFFile } from 'actions/sgf';
 import SGFData from 'components/SGFData';
 import SGFBoardSettings from 'components/SGFBoardSettings';
 
-const useStyles = makeStyles((theme: Theme) => ({
-    paper: {
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.primary,
-        whiteSpace: 'nowrap',
-        marginBottom: theme.spacing(1),
-        backgroundColor: theme.palette.primary.main,
-        [theme.breakpoints.down('xs')]: {
-            marginBottom: theme.spacing(0.5),
-            borderRadius: 0
-        }
-    },
-    leftContainer: {
+const useStyles = makeStyles(() => ({
+    statusContainer: {
         textAlign: 'left'
     },
-    rightContainer: {
+    infoContainer: {
         textAlign: 'right'
     },
     input: {
         display: 'none',
-    },
-    divider: {
-        color: '#fff',
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1)
     },
     popover: {
         pointerEvents: 'none'
     },
 }));
 
-const SGFStatusBar = (): ReactElement => {
+const SGFStatusBar: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -80,8 +63,6 @@ const SGFStatusBar = (): ReactElement => {
         dispatch(loadProgress());
     });
 
-    const uploadProgress = useProgress(sgfState.uploadProgress, 'Analyzing...');
-
     const uploadButton = useIconText(<Upload/>, 'Upload');
     
     const infoIcon = useIcon(<Info onClick={handleOpenGameInfo} onMouseEnter={handleOpenGameInfo} onMouseLeave={handleCloseGameInfo}/>);
@@ -89,21 +70,18 @@ const SGFStatusBar = (): ReactElement => {
 
     return <React.Fragment>
         <SGFBoardSettings open={sgfBoardSettingsOpen} onClose={() => setSGFBoardSettingsOpen(false)}/>
-        <Grid item xs={6} className={classes.leftContainer}>
+        <Grid item xs={6} className={classes.statusContainer}>
             {!sgfState.uploading && <input accept=".sgf" className={classes.input} id="icon-button-file" type="file" onChange={(e) => handleSGFupload(e)} />}
             {!sgfState.uploading &&<label htmlFor="icon-button-file">
                 {uploadButton}
             </label>}                        
-            {sgfState.uploading && uploadProgress}
+            {sgfState.uploading && <Progress progress={sgfState.analysisProgress.analyzed / sgfState.analysisProgress.total} label={'Analyzing...'}/>}
         </Grid>
-        <Grid item xs={6} className={classes.rightContainer}>
+        <Grid item xs={6} className={classes.infoContainer}>
             {sgfState.hasSGF && infoIcon}
             {settingsIcon}
             {sgfState.hasSGF && <Popover
                 className={classes.popover}
-                classes={{
-                    paper: classes.paper,
-                }}
                 open={gameInfoOpen}
                 anchorEl={gameInfoAnchorElement}
                 anchorOrigin={{

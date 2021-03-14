@@ -1,4 +1,4 @@
-import React, {ReactElement} from 'react';
+import React from 'react';
 import {useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
 import {makeStyles, Theme} from '@material-ui/core/styles';
@@ -12,13 +12,22 @@ import whiteTurnIcon from 'assets/images/white-turn.svg';
 
 const useStyles = makeStyles((theme: Theme) => ({
     whitePlayer: {
-        color: '#fff'
+        color: '#fffff3'
     },
     blackPlayer: {
-        color: '#0'
+        color: '#000000'
     },
     playerTitle: {
-        fontSize: 20,
+        fontSize: 18,
+        lineHeight: '18px',
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        marginLeft: theme.spacing(0.5),
+        marginRight: theme.spacing(0.5)
+    },
+    playerStoneImage: {
+        width: '24px',
+        height: '24px',
         display: 'inline-block',
         verticalAlign: 'middle',
         marginLeft: theme.spacing(0.5),
@@ -34,15 +43,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     blackStatus: {
         backgroundColor: '#000',
-        color: '#fff'
+        color: '#fffff3'
     },
     whiteStatus: {
-        backgroundColor: '#fff',
+        backgroundColor: '#fffff3',
         color: '#000'
     },
 }));
 
-const SGFPlayers = (): ReactElement => {
+const SGFPlayers: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
 
@@ -69,13 +78,13 @@ const SGFPlayers = (): ReactElement => {
     return <React.Fragment>
         <Grid container spacing={1}>
             <Grid item xs={6} className={classes.blackPlayer}>
-                <img src={useBlackData ? blackTurnIcon : blackIcon} className={classes.playerTitle} alt="black"/>
+                <img src={useBlackData ? blackTurnIcon : blackIcon} className={classes.playerStoneImage} alt="black"/>
                 <Typography className={classes.playerTitle} noWrap>
                     {sgfState.analyzedSGF.playerBlack}({sgfState.analyzedSGF.rankBlack})
                 </Typography>
             </Grid>
             <Grid item xs={6} className={classes.whitePlayer}>
-                <img src={useBlackData ? whiteIcon : whiteTurnIcon} className={classes.playerTitle} alt="white"/>
+                <img src={useBlackData ? whiteIcon : whiteTurnIcon} className={classes.playerStoneImage} alt="white"/>
                 <Typography className={classes.playerTitle} noWrap>
                     {sgfState.analyzedSGF.playerWhite}({sgfState.analyzedSGF.rankWhite})
                 </Typography>

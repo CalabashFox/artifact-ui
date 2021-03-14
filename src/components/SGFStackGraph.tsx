@@ -1,4 +1,4 @@
-import React, {ReactElement} from 'react';
+import React from 'react';
 import {
     BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
@@ -13,7 +13,7 @@ export interface SGFStackGraphProps {
 
 const useStyles = makeStyles((theme) => ({
     tooltip: {
-      backgroundColor: '#fff',
+      backgroundColor: '#fffff3',
       padding: theme.spacing(1)
     }
 }));
@@ -33,8 +33,7 @@ const GraphTooltip = ({ active, payload, label }: any) => {
     }
     return null;
 };
-export default function SGFStackGraph(props: SGFStackGraphProps): ReactElement {
-    const {identifier, data, name} = props;
+const SGFStackGraph: React.FC<SGFStackGraphProps> = ({identifier, data, name}) => {
     const margin = 10;
     //#54cc7c gr
     //#b71c1c re
@@ -60,3 +59,4 @@ export default function SGFStackGraph(props: SGFStackGraphProps): ReactElement {
         </ResponsiveContainer>
     );
 }
+export default SGFStackGraph;
