@@ -5,5 +5,5 @@ export const TAB_VIEW_SGF = 2;
 export const InitialViewState = {
     infoWidth: 0,
     screenWidth: 0,
-    tab: TAB_VIEW_GAME
+    tab: TAB_VIEW_SGF
 }

@@ -21,18 +21,22 @@ const defaultTheme = createMuiTheme({
             light: '#6E7783',
             main: '#566971',
             dark: '#383A3F',
-            contrastText: '#FFFFFF',
+            contrastText: '#FFFFF3',
         },
         secondary: {
             light: '#EC6A5C',
             main: '#C65146',
             dark: '#AF4034',
-            contrastText: '#FFFFFF',
+            contrastText: '#FFFFF3',
         },
         text: {
             primary: '#FFFFF3',
             secondary: '#FFFFF3',
             disabled: '#CCCCCC'
+        },
+        common: {
+            white: '#FFFFF3',
+            black: '#000000'
         }
     },
 });
