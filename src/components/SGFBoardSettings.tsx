@@ -35,6 +35,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     title: {
         marginLeft: theme.spacing(2),
         flex: 1,
+        lineHeight: '40px'
     },
     formContainer: {
         color: theme.palette.primary.main,
@@ -162,7 +163,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
         onClose();
     };
 
-    const handleSliderChange = (event: React.ChangeEvent<Record<string, unknown>>, value: number | number[], setter: Dispatch<SetStateAction<number>>) => {
+    const handleSliderChange = (value: number | number[], setter: Dispatch<SetStateAction<number>>) => {
         setter(value as number);
     };
 
@@ -242,7 +243,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                             step={0.01}
                             min={0}
                             max={1}
-                            onChange={(e, v) => handleSliderChange(e, v, setMinimumPolicyValue)}
+                            onChange={(e, v) => handleSliderChange(v, setMinimumPolicyValue)}
                             getAriaValueText={sliderValueText}
                             valueLabelDisplay="on" />
                     </FormControl>
@@ -259,7 +260,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                             step={0.01}
                             min={0}
                             max={1}
-                            onChange={(e, v) => handleSliderChange(e, v, setMinimumOwnershipValue)}
+                            onChange={(e, v) => handleSliderChange(v, setMinimumOwnershipValue)}
                             getAriaValueText={sliderValueText}
                             valueLabelDisplay="on" />
                     </FormControl>

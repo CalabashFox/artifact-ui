@@ -44,11 +44,33 @@ let theme = createMuiTheme({
         fontFamily: ["Lucida Grande", "Tahoma", "Verdana", "Arial", "sans-serif"].join(','),
     },
     overrides: {
-        MuiInputBase: {
-            input: {
-                borderColor: defaultTheme.palette.text.primary,
+        MuiInputLabel: {
+            root: {
+                '&.Mui-disabled': {
+                    color: defaultTheme.palette.text.primary
+                },
                 "&$focused": {
-                    borderColor: defaultTheme.palette.text.primary
+                    color: defaultTheme.palette.text.primary
+                }
+            },
+            focused: {}
+        },
+        MuiOutlinedInput: {
+            root: {
+                '&.Mui-disabled': {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: defaultTheme.palette.text.primary,
+                        "&$focused": {
+                            borderColor: defaultTheme.palette.text.primary
+                        }
+                    }
+                },
+            }
+        },
+        MuiInputBase: {
+            root: {
+                '&.Mui-disabled': {
+                    color: defaultTheme.palette.text.primary
                 }
             }
         },
@@ -94,6 +116,7 @@ let theme = createMuiTheme({
         MuiBottomNavigationAction: {
             root: {
                 color: defaultTheme.palette.text.primary,
+                boxSizing: 'border-box',
                 "&:hover": {
                     backgroundColor: defaultTheme.palette.text.primary,
                     color: defaultTheme.palette.primary.main
@@ -122,13 +145,14 @@ let theme = createMuiTheme({
         MuiDivider: {
             root: {
                 color: defaultTheme.palette.text.primary,
-                margin: defaultTheme.spacing(1, 0)
+                margin: 0
             }
         },
         MuiPaper: {
             root: {
                 padding: defaultTheme.spacing(1),
                 textAlign: 'center',
+                boxSizing: 'border-box',
                 color: defaultTheme.palette.text.primary,
                 margin: defaultTheme.spacing(0.5, 0),
                 backgroundColor: defaultTheme.palette.primary.main,

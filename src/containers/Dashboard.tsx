@@ -1,7 +1,7 @@
 import React, {ChangeEvent, useCallback, useEffect, useState} from 'react';
-import SGFView from './SGFView';
-import GameView from './GameView';
-import ImageView from './ImageView';
+import SGFView from './sgf/SGFView';
+import GameView from './game/GameView';
+import ImageView from './image/ImageView';
 import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState, ViewState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
@@ -32,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         color: theme.palette.text.primary,
         whiteSpace: 'nowrap',
-        marginBottom: theme.spacing(1),
         backgroundColor: theme.palette.primary.main
     }
 }));

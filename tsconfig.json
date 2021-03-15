@@ -22,7 +22,7 @@
     "baseUrl": "src",
     "paths": {
       "containers/*": [
-        "components/*"
+        "containers/*"
       ],
       "models/*": [
         "models/*"
