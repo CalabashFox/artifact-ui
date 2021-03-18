@@ -8,15 +8,7 @@ import whiteIcon from 'assets/images/white.svg';
 import whiteTurnIcon from 'assets/images/white-turn.svg';
 
 const useStyles = makeStyles((theme: Theme) => ({
-    whitePlayer: {
-        color: '#fffff3'
-    },
-    blackPlayer: {
-        color: '#000000'
-    },
     playerTitle: {
-        fontSize: 18,
-        lineHeight: '18px',
         display: 'inline-block',
         verticalAlign: 'middle',
         marginLeft: theme.spacing(0.5),
@@ -46,11 +38,9 @@ const SGFPlayer: React.FC<SGFPlayerProps> = ({color, name, rank, turn}) => {
         (turn ? blackTurnIcon : blackIcon) 
         : (turn ? whiteTurnIcon : whiteIcon);
 
-    const titleClass = color === SGFColor.BLACK ? classes.blackPlayer : classes.whitePlayer;
-
     return <React.Fragment>
         <img src={icon} className={classes.playerStoneImage} alt={name}/>
-        <Typography className={[classes.playerTitle, titleClass].join(' ')} noWrap>
+        <Typography className={classes.playerTitle} noWrap>
             {name}({rank})
         </Typography>
     </React.Fragment>;

@@ -1,4 +1,3 @@
-import 'assets/style/artifact.less';
 import App from './containers/App';
 import {createBrowserHistory, History} from 'history';
 import {StoreState} from 'models/StoreState';

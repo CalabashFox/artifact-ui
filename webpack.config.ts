@@ -50,17 +50,6 @@ const config: webpack.Configuration = {
                     loader: 'style-loader'
                 }, {
                     loader: 'css-loader'
-                }, {
-                    loader: 'less-loader',
-                    options: {
-                        lessOptions: {
-                            modifyVars: {
-                                '@primary-color': '#112a45',
-                                '@text-color-base': '#ffffff3'
-                            },
-                            javascriptEnabled: true
-                        }
-                    }
                 }]
             }
         ]
