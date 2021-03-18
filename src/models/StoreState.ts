@@ -17,6 +17,8 @@ export interface ViewState {
     infoWidth: number
     screenWidth: number
     tab: number
+    loading: boolean
+    loadingText: string
 }
 
 export interface StoreState {

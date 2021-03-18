@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { SGFState, StoreState } from 'models/StoreState';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import useIcon from "components/icon";
+import useIcon from "components/hook/icon";
 import Collapse from '@material-ui/core/Collapse';
 import {Up, Down} from '@icon-park/react';
 import SGFGraph from 'components/SGFGraph';

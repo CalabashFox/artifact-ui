@@ -6,11 +6,11 @@ import Grid from '@material-ui/core/Grid';
 import {setMove} from 'actions/sgf';
 import TextField from '@material-ui/core/TextField';
 import {Left, DoubleLeft, ToLeft, Right, DoubleRight, ToRight, ChartHistogram, Analysis, Download} from '@icon-park/react'
-import useIcon from "components/icon";
+import useIcon from "components/hook/icon";
 import Divider from '@material-ui/core/Divider';
 import Hidden from '@material-ui/core/Hidden';
 import SGFComplexAnalysis from 'components/sgf/SGFComplexAnalysis';
-import useNavigation from "components/navigation";
+import useNavigation from "components/hook/navigation";
 
 const useStyles = makeStyles(() => ({
     graphButtons: {

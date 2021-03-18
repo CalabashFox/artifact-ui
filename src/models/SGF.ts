@@ -100,6 +100,7 @@ export interface SGFProperties {
     minimumOwnershipValue: number
     continuousAnalysis: boolean
     useSound: boolean
+    liveMode: boolean
 }
 
 export enum WinrateReport {
@@ -173,7 +174,8 @@ export const InitialSGFState: SGFState = {
         reportAnalysisWinratesAs: WinrateReport.SIDETOMOVE,
         minimumOwnershipValue: 0.1,
         continuousAnalysis: false,
-        useSound: true
+        useSound: true,
+        liveMode: false
     },
     uploading: false,
     uploadProgress: 0

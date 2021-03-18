@@ -3,13 +3,14 @@ import {useSelector} from "react-redux";
 import {GameState, SGFState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
+import Paper from '@material-ui/core/Paper'
 import SGFBoard from 'components/SGFBoard';
 import SGFInformation from './SGFInformation';
 import withWidth, {WithWidth} from '@material-ui/core/withWidth';
-import SGFBoardSound from "components/SGFBoardSound";
-import SGFBoardPanel from "components/sgf/SGFBoardPanel";
-import useNavigation from "components/navigation";
+import SGFBoardSound from 'components/SGFBoardSound';
+import SGFBoardPanel from 'components/sgf/SGFBoardPanel';
+import useNavigation from 'components/hook/navigation';
+import SGFShortcut from "./SGFShortcut";
 
 const useStyles = makeStyles((theme) => ({
     grid: {
@@ -79,6 +80,9 @@ const SGFView: React.FC<WithWidth> = ({width}) => {
     return <React.Fragment>
         <Grid container direction="row" spacing={1} className={classes.grid}>
             <Grid item sm={7} xs={12} className={classes.boardContainer}>
+                <Paper>
+                    <SGFShortcut/>
+                </Paper>
                 <Paper onWheel={e => scroll(e)}>
                     <SGFBoard click={(x, y) => handleClick(x, y)}
                         currentMove={currentMove}

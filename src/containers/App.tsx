@@ -178,6 +178,23 @@ let theme = createMuiTheme({
                     paddingRight: 0
                 }
             }
+        },
+        MuiFormControlLabel: {
+            root: {
+                marginLeft: 0,
+                marginRight: 0
+            }
+        },
+        MuiCheckbox: {
+            colorPrimary: {
+                color: defaultTheme.palette.text.primary,
+                '&$checked': {
+                    color: defaultTheme.palette.text.primary
+                }
+            },
+            root: {
+                padding: defaultTheme.spacing(0, 0.5)
+            }
         }
     },
 });

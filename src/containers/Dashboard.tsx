@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import SGFView from './sgf/SGFView';
 import GameView from './game/GameView';
 import ImageView from './image/ImageView';
@@ -19,7 +19,8 @@ import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import SocketHandler from "utils/socketHandler";
 import { TAB_VIEW_GAME, TAB_VIEW_IMAGE, TAB_VIEW_SGF } from 'models/view';
 import {ImageFiles,} from '@icon-park/react'
-import useIcon from "components/icon";
+import useIcon from "components/hook/icon";
+import Snackbar from '@material-ui/core/Snackbar';
 
 const useStyles = makeStyles((theme) => ({
     desktopAppBar: {
@@ -74,7 +75,7 @@ const Dashboard: React.FC = () => {
         };
     }, [initConnection, socket]);
 
-    const handleTabChange = (event: ChangeEvent<Record<string, unknown>>, index: number) => {
+    const handleTabChange = (index: number) => {
         dispatch(setTab(index));
     };
 
@@ -111,9 +112,16 @@ const Dashboard: React.FC = () => {
         return <React.Fragment>1</React.Fragment>
     }
     return <Container>
+        <Snackbar
+            anchorOrigin={{ 
+                vertical: 'top',
+                horizontal: 'center'
+             }}
+            open={viewState.loading}
+            message={viewState.loadingText}/>
         <Hidden xsDown>
             <AppBar position="static" className={classes.desktopAppBar}>
-                <Tabs value={tabIndex} onChange={(e, v) => handleTabChange(e, v)}>
+                <Tabs value={tabIndex} onChange={(e, v) => handleTabChange(v)}>
                     <Tab label="Scanner" className={classes.tab}/>
                     <Tab label="Game" className={classes.tab}/>
                     <Tab label="SGF" className={classes.tab}/>
@@ -124,7 +132,7 @@ const Dashboard: React.FC = () => {
         {tabIndex === TAB_VIEW_GAME && <Container><GameView/></Container>}
         {tabIndex === TAB_VIEW_SGF && <Container><SGFView/></Container>}
         <Hidden smUp>
-             <BottomNavigation value={tabIndex} onChange={(e, v) => handleTabChange(e, v)} className={classes.navigation}>
+             <BottomNavigation value={tabIndex} onChange={(e, v) => handleTabChange(v)} className={classes.navigation}>
                  <BottomNavigationAction label="Scanner" value={TAB_VIEW_IMAGE} icon={uploadIcon} />
                  <BottomNavigationAction label="Game" value={TAB_VIEW_GAME} />
                  <BottomNavigationAction label="SGF" value={TAB_VIEW_SGF} />

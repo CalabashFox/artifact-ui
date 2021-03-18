@@ -9,7 +9,7 @@ import {ChartHistogram, Analysis} from '@icon-park/react'
 import { placeStone, setKatagoTurn } from "actions/game";
 import GameInformation from "./GameInformation";
 import { GameActionState } from "models/Game";
-import useIcon from "components/icon";
+import useIcon from "components/hook/icon";
 import SGFBoardSound from "components/SGFBoardSound";
 
 const useStyles = makeStyles((theme) => ({

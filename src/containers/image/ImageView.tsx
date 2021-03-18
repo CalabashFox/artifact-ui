@@ -7,7 +7,7 @@ import Paper from '@material-ui/core/Paper';
 import SGFBoard from 'components/SGFBoard';
 import {ScreenshotTwo, Camera, ImageFiles, Power, Checkerboard} from '@icon-park/react'
 import { screenShot, uploadImage } from "actions/sgf";
-import useIcon from "components/icon";
+import useIcon from "components/hook/icon";
 
 const useStyles = makeStyles((theme) => ({
     container: {

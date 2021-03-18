@@ -11,7 +11,8 @@ import {
     UPLOADING,
     SET_IMAGE,
     UPDATE_IMAGE_RESULT,
-    SET_SGF_PROPERTIES
+    SET_SGF_PROPERTIES,
+    TOGGLE_LIVE_MODE
 } from 'actions/sgf';
 import { EmptyResult } from 'models/Katago';
 import { InitialSGFState } from 'models/SGF';
@@ -22,6 +23,11 @@ const initialState = InitialSGFState;
 
 export function sgfReducer(state: SGFState = initialState, action: SGFAction): SGFState {
     switch (action.type) {
+        case TOGGLE_LIVE_MODE:
+            return {...state, sgfProperties: {
+                ...state.sgfProperties, liveMode: action.payload.liveMode
+                }
+            };
         case SET_SGF_PROPERTIES:
             return {
                 ...state, sgfProperties: action.payload.sgfProperties

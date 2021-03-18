@@ -4,6 +4,7 @@ import {ApiResponse, get, post, upload} from '../api/api';
 import {AxiosError, AxiosResponse} from 'axios';
 import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFProperties, SGFStone} from 'models/SGF';
 import { KatagoResult } from 'models/Katago';
+import { loadingComplete, setLoading, ViewAction } from './view';
 
 export const UPLOAD_SGF_FILE = 'UPLOAD_SGF_FILE'
 export type UPLOAD_SGF_FILE = typeof UPLOAD_SGF_FILE
@@ -49,6 +50,16 @@ export type UPDATE_IMAGE_RESULT = typeof UPDATE_IMAGE_RESULT
 
 export const SET_SGF_PROPERTIES = "SET_SGF_PROPERTIES"
 export type SET_SGF_PROPERTIES = typeof SET_SGF_PROPERTIES
+
+export const TOGGLE_LIVE_MODE = "TOGGLE_LIVE_MODE"
+export type TOGGLE_LIVE_MODE = typeof TOGGLE_LIVE_MODE
+
+export interface ToggleLiveMode {
+    type: TOGGLE_LIVE_MODE,
+    payload: {
+        liveMode: boolean
+    }
+}
 
 export interface SetSGFProperties {
     type: SET_SGF_PROPERTIES,
@@ -152,7 +163,7 @@ export type SGFAction = RecalculateAnalysisDataAction | LoadProgressAction
     | UploadSGFFileAction | UploadingAction | UploadSuccess 
     | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction 
     | SetMoveAction | BrowseMoveAction | SetImage | UpdateImageResult
-    | SetSGFProperties
+    | SetSGFProperties | ToggleLiveMode
 
 export const setSGFProperties = (sgfProperties: SGFProperties): SGFAction => {
     return {
@@ -162,6 +173,26 @@ export const setSGFProperties = (sgfProperties: SGFProperties): SGFAction => {
         }
     };
 }
+
+type CompositAction = SGFAction | ViewAction;
+
+export const toggleLiveMode = (liveMode: boolean)
+    : ThunkAction<Promise<CompositAction>, SGFState, null, CompositAction> => {
+    return (dispatch: ThunkDispatch<SGFState, null, CompositAction>) => {
+        dispatch(setLoading(''));
+        return post<boolean>('sgf/toggleLiveMode', {
+                liveMode: liveMode
+            })
+            .then((res: AxiosResponse<ApiResponse<boolean>>) => {
+                //dispatch(setImage(res.data.content));
+                dispatch(loadingComplete());
+            })
+            .catch((err: AxiosError<ApiResponse<boolean>>) => {
+                console.log(err);
+            })
+            .then();
+    };
+};    
 
 export const screenShot = (dataUrl: string)
     : ThunkAction<Promise<SGFAction>, SGFState, null, SGFAction> => {

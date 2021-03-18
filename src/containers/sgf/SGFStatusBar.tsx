@@ -3,9 +3,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import useIconText from 'components/iconText';
-import useIcon from 'components/icon';
-import useTimer from 'components/timer';
+import useIconText from 'components/hook/iconText';
+import useIcon from 'components/hook/icon';
+import useTimer from 'components/hook/timer';
 import Progress from 'components/Progress';
 import {Upload, Info, Config} from '@icon-park/react'
 import Popover from '@material-ui/core/Popover';

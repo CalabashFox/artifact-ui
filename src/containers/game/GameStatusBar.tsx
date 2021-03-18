@@ -3,8 +3,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {GameState, StoreState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import useIconText from 'components/iconText';
-import useIcon from 'components/icon';
+import useIconText from 'components/hook/iconText';
+import useIcon from 'components/hook/icon';
 import {Undo, CloseOne, Checkerboard} from '@icon-park/react'
 import {Info, Config} from '@icon-park/react'
 import Popover from '@material-ui/core/Popover';
