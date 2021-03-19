@@ -54,10 +54,29 @@ export type SET_SGF_PROPERTIES = typeof SET_SGF_PROPERTIES
 export const TOGGLE_LIVE_MODE = "TOGGLE_LIVE_MODE"
 export type TOGGLE_LIVE_MODE = typeof TOGGLE_LIVE_MODE
 
+export const SET_LIVE_MODE = "SET_LIVE_MODE"
+export type SET_LIVE_MODE = typeof SET_LIVE_MODE
+
+export const GET_ANALYZED_SGF = "GET_ANALYZED_SGF"
+export type GET_ANALYZED_SGF = typeof GET_ANALYZED_SGF
+
+export interface GetAnalyzedSGF {
+    type: GET_ANALYZED_SGF,
+    payload: {}
+}
+
+export interface SetLiveMode {
+    type: SET_LIVE_MODE,
+    payload: {
+        liveMode: boolean
+    }
+}
+
 export interface ToggleLiveMode {
     type: TOGGLE_LIVE_MODE,
     payload: {
         liveMode: boolean
+        snapshot: number
     }
 }
 
@@ -163,7 +182,7 @@ export type SGFAction = RecalculateAnalysisDataAction | LoadProgressAction
     | UploadSGFFileAction | UploadingAction | UploadSuccess 
     | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction 
     | SetMoveAction | BrowseMoveAction | SetImage | UpdateImageResult
-    | SetSGFProperties | ToggleLiveMode
+    | SetSGFProperties | ToggleLiveMode | SetLiveMode
 
 export const setSGFProperties = (sgfProperties: SGFProperties): SGFAction => {
     return {
@@ -176,15 +195,30 @@ export const setSGFProperties = (sgfProperties: SGFProperties): SGFAction => {
 
 type CompositAction = SGFAction | ViewAction;
 
-export const toggleLiveMode = (liveMode: boolean)
+
+export const getAnalyzedSGF = ()
+    : ThunkAction<Promise<SGFAction>, SGFState, null, SGFAction> => {
+    return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
+        return post<AnalyzedSGF>('sgf/getAnalyzedSGF', {})
+            .then((res: AxiosResponse<ApiResponse<AnalyzedSGF>>) => {
+                dispatch(set(res.data.content));
+            })
+            .catch((err: AxiosError<ApiResponse<AnalyzedSGF>>) => {
+                console.log(err);
+            }).then();
+    };
+};    
+
+export const toggleLiveMode = (liveMode: boolean, snapshot: number)
     : ThunkAction<Promise<CompositAction>, SGFState, null, CompositAction> => {
     return (dispatch: ThunkDispatch<SGFState, null, CompositAction>) => {
         dispatch(setLoading(''));
         return post<boolean>('sgf/toggleLiveMode', {
-                liveMode: liveMode
+                liveMode: liveMode,
+                snapshot: snapshot
             })
             .then((res: AxiosResponse<ApiResponse<boolean>>) => {
-                //dispatch(setImage(res.data.content));
+                dispatch(setLiveMode(liveMode));
                 dispatch(loadingComplete());
             })
             .catch((err: AxiosError<ApiResponse<boolean>>) => {
@@ -238,10 +272,18 @@ export const uploadSGFFile = (file: File)
                 } else {
                     dispatch(uploadFail('Login failed'));
                 }
-            })
-            .then(() => uploadComplete(dispatch));
+            });
     };
 };
+
+export const setLiveMode = (liveMode: boolean): SGFAction => {
+    return {
+        type: SET_LIVE_MODE,
+        payload: {
+            liveMode: liveMode
+        }
+    }
+}
 
 export const uploading = (uploading: boolean): SGFAction => {
     return {
@@ -278,6 +320,7 @@ export const loadProgress = () : ThunkAction<Promise<void>, SGFState, null, SGFA
     return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
         return get<AnalysisProgress>('sgf/progress', {})
             .then((res: AxiosResponse<ApiResponse<AnalysisProgress>>) => {
+                console.log('progress received:', res.data.content);
                 dispatch(receiveProgress(res.data.content));
             })
             .catch((err: AxiosError<ApiResponse<AnalysisProgress>>) => {
@@ -286,8 +329,7 @@ export const loadProgress = () : ThunkAction<Promise<void>, SGFState, null, SGFA
                 } else {
                     dispatch(receiveProgressFail('Could not load progress data'));
                 }
-            })
-            .then(() => uploadComplete(dispatch));
+            });
     };
 }
 

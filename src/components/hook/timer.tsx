@@ -1,12 +1,15 @@
 import {useCallback, useEffect, useState} from "react";
 
-const useTimer = (interval: number, state: boolean, func: () => void): void => {
+type TimerFunction = () => void;
+
+const useTimer = (interval: number, state: boolean, func: () => void): TimerFunction => {
     const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
     
     const start = useCallback(() => {
-        setTimer(setInterval(() => {
+        const timerId = setInterval(() => {
             func();
-        }, interval));
+        }, interval);
+        setTimer(timerId);
     }, [interval, func]);
 
     const terminate = useCallback(() => {
@@ -21,9 +24,8 @@ const useTimer = (interval: number, state: boolean, func: () => void): void => {
         } else {
             terminate();
         }
-        return () => {
-            terminate();
-        };
-    }, [state, interval, start, terminate]);
+    }, [state]);// eslint-disable-line react-hooks/exhaustive-deps
+
+    return terminate;
 };
 export default useTimer;

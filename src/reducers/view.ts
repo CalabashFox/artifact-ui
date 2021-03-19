@@ -1,4 +1,4 @@
-import {ViewAction, SET_VIEW, SET_TAB, SET_LOADING, LOADING_COMPLETE} from 'actions/view';
+import {ViewAction, SET_VIEW, SET_TAB, SET_LOADING, LOADING_COMPLETE, SET_SOCKET_CONNECTION_STATE} from 'actions/view';
 import {ViewState} from 'models/StoreState';
 import { InitialViewState } from 'models/view';
 
@@ -11,6 +11,10 @@ export function viewReducer(state: ViewState = initialState, action: ViewAction)
                 ...state,
                 infoWidth: action.payload.infoWidth,
                 screenWidth: action.payload.screenWidth
+            };
+        case SET_SOCKET_CONNECTION_STATE:
+            return {
+                ...state, socketConnectionState: action.payload.state
             };
         case SET_TAB:
             return {

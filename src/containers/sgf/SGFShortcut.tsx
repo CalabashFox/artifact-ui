@@ -12,7 +12,7 @@ const SGFShortcut: React.FC = () => {
     const dispatch = useDispatch();
 
     const handleLiveModeClick = () => {
-        dispatch(toggleLiveMode(!sgfState.sgfProperties.liveMode));
+        dispatch(toggleLiveMode(!sgfState.sgfProperties.liveMode, sgfState.sgfProperties.currentMove));
     };
 
     return <FormGroup row>

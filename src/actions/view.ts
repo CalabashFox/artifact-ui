@@ -1,3 +1,5 @@
+import { SocketConnectionState } from "models/view"
+
 export const SET_VIEW = "SET_VIEW"
 export type SET_VIEW = typeof SET_VIEW
 
@@ -9,6 +11,16 @@ export type SET_LOADING = typeof SET_LOADING
 
 export const LOADING_COMPLETE = "LOADING_COMPLETE"
 export type LOADING_COMPLETE = typeof LOADING_COMPLETE
+
+export const SET_SOCKET_CONNECTION_STATE = "SET_SOCKET_CONNECTION_STATE"
+export type SET_SOCKET_CONNECTION_STATE = typeof SET_SOCKET_CONNECTION_STATE
+
+export interface SetSocketConectionState {
+    type: SET_SOCKET_CONNECTION_STATE,
+    payload: {
+        state: SocketConnectionState
+    }
+}
 
 export interface SetViewAction {
     type: SET_VIEW,
@@ -37,7 +49,17 @@ export interface SetTabAction {
     }
 }
 
-export type ViewAction = SetViewAction | SetTabAction | SetLoading | LoadingComplete
+export type ViewAction = SetViewAction | SetTabAction | SetLoading 
+            | LoadingComplete | SetSocketConectionState;
+
+export const setSocketConnectionState = (state: SocketConnectionState): ViewAction => {
+    return {
+        type: SET_SOCKET_CONNECTION_STATE,
+        payload: {
+            state: state
+        }
+    };
+}
 
 export const setLoading = (loadingText: string): ViewAction => {
     return {

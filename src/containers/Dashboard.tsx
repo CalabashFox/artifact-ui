@@ -13,14 +13,16 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Hidden from '@material-ui/core/Hidden';
+import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import SocketHandler from "utils/socketHandler";
 import { TAB_VIEW_GAME, TAB_VIEW_IMAGE, TAB_VIEW_SGF } from 'models/view';
-import {ImageFiles,} from '@icon-park/react'
+import {ImageFiles} from '@icon-park/react'
 import useIcon from "components/hook/icon";
 import Snackbar from '@material-ui/core/Snackbar';
+import ConnectionStatus from 'components/ConnectionStatus';
 
 const useStyles = makeStyles((theme) => ({
     desktopAppBar: {
@@ -34,6 +36,14 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.text.primary,
         whiteSpace: 'nowrap',
         backgroundColor: theme.palette.primary.main
+    },
+    tabs: {
+        textAlign: 'left'
+    },
+    connectionState: {
+        textAlign: 'right',
+        paddingRight: theme.spacing(1),
+        fontSize: '1.2em'
     }
 }));
 
@@ -121,11 +131,18 @@ const Dashboard: React.FC = () => {
             message={viewState.loadingText}/>
         <Hidden xsDown>
             <AppBar position="static" className={classes.desktopAppBar}>
-                <Tabs value={tabIndex} onChange={(e, v) => handleTabChange(v)}>
-                    <Tab label="Scanner" className={classes.tab}/>
-                    <Tab label="Game" className={classes.tab}/>
-                    <Tab label="SGF" className={classes.tab}/>
-                </Tabs>
+                <Grid container>
+                    <Grid item xs={9} className={classes.tabs}>
+                        <Tabs value={tabIndex} onChange={(e, v) => handleTabChange(v)}>
+                            <Tab label="Scanner" className={classes.tab}/>
+                            <Tab label="Game" className={classes.tab}/>
+                            <Tab label="SGF" className={classes.tab}/>
+                        </Tabs>
+                    </Grid>
+                    <Grid item xs={3} className={classes.connectionState}>
+                        <ConnectionStatus/>
+                    </Grid>
+                </Grid>
             </AppBar>
         </Hidden>
         {tabIndex === TAB_VIEW_IMAGE && <Container><ImageView/></Container>}

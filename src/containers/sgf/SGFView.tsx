@@ -1,6 +1,6 @@
 import React from "react";
 import {useSelector} from "react-redux";
-import {GameState, SGFState, StoreState} from "models/StoreState";
+import {GameState, KatagoState, SGFState, StoreState, ViewState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper'
@@ -11,6 +11,9 @@ import SGFBoardSound from 'components/SGFBoardSound';
 import SGFBoardPanel from 'components/sgf/SGFBoardPanel';
 import useNavigation from 'components/hook/navigation';
 import SGFShortcut from "./SGFShortcut";
+import { SGFStone } from "models/SGF";
+import { KatagoMoveInfo } from "models/Katago";
+import { SocketConnectionState } from "models/view";
 
 const useStyles = makeStyles((theme) => ({
     grid: {
@@ -41,7 +44,9 @@ const useStyles = makeStyles((theme) => ({
 
 const SGFView: React.FC<WithWidth> = ({width}) => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
+    const viewState = useSelector<StoreState, ViewState>(state => state.viewState);
     const gameState = useSelector<StoreState, GameState>(state => state.gameState);
+    const katagoState = useSelector<StoreState, KatagoState>(state => state.katagoState);
     const classes = useStyles();
 
     const [navigateBackward, navigateForward] = useNavigation();
@@ -68,21 +73,30 @@ const SGFView: React.FC<WithWidth> = ({width}) => {
     }
 
     const snapshot = sgfState.analyzedSGF.snapshotList[sgfState.sgfProperties.currentMove];
-
-    const hasKatagoResult = sgfState.hasSGF && snapshot.katagoResults.length > 0;
-    
     const currentMove = sgfState.sgfProperties.currentMove;
-    const stones = sgfState.hasSGF ? snapshot.stones : [];
-    const ownership = hasKatagoResult ? snapshot.katagoResults[0].ownership : [];
-    const policy = hasKatagoResult ? snapshot.katagoResults[0].policy : [];
-    const moveInfos = hasKatagoResult ? snapshot.katagoResults[0].moveInfos : [];
+
+    const stones: Array<SGFStone> = snapshot.stones;
+    let ownership: Array<number> = [];
+    let policy: Array<number> = [];
+    let moveInfos: Array<KatagoMoveInfo> = [];
+
+    if (sgfState.sgfProperties.liveMode) {
+        ownership = katagoState.katagoResult.ownership;
+        policy = katagoState.katagoResult.policy;
+        moveInfos = katagoState.katagoResult.moveInfos;
+    } else if (sgfState.hasSGF && snapshot.katagoResults.length > 0) {
+        ownership = snapshot.katagoResults[0].ownership;
+        policy = snapshot.katagoResults[0].policy;
+        moveInfos = snapshot.katagoResults[0].moveInfos;
+    }
 
     return <React.Fragment>
         <Grid container direction="row" spacing={1} className={classes.grid}>
             <Grid item sm={7} xs={12} className={classes.boardContainer}>
-                <Paper>
-                    <SGFShortcut/>
-                </Paper>
+                {viewState.socketConnectionState === SocketConnectionState.CONNECTED 
+                    && <Paper>
+                        <SGFShortcut/>
+                    </Paper>}
                 <Paper onWheel={e => scroll(e)}>
                     <SGFBoard click={(x, y) => handleClick(x, y)}
                         currentMove={currentMove}

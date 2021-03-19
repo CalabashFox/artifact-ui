@@ -2,6 +2,7 @@ import {User} from 'models/User';
 import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFProperties} from 'models/SGF';
 import {Game, GameActionState, GameProperties} from 'models/Game';
 import { KatagoLog, KatagoResult } from './Katago';
+import { SocketConnectionState } from './view';
 
 export type Nullable<T> = T | null;
 export type NullableString = Nullable<string>;
@@ -19,6 +20,7 @@ export interface ViewState {
     tab: number
     loading: boolean
     loadingText: string
+    socketConnectionState: SocketConnectionState
 }
 
 export interface StoreState {

@@ -45,7 +45,7 @@ const Progress: React.FC<ProgressProps> = ({progress, label}) => {
             <CircularProgress size={24} variant="indeterminate" value={value} />
             <Box className={classes.progressValue}>
                 <Typography variant="caption" className={classes.progressText}>
-                    {`${Math.round(value)}%`}
+                    {`${Math.round(value * 100)}%`}
                 </Typography>
             </Box>
         </Box>

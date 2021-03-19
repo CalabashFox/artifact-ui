@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
 import Paper from '@material-ui/core/Paper';
@@ -10,15 +10,20 @@ import KatagoLog from 'components/KatagoLog';
 
 const SGFInformation: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
+    const analysisCompleted = useMemo(() => {
+        return sgfState.analyzedSGF.isValid && sgfState.analysisProgress.total !== 0 && sgfState.analysisProgress.analyzed === sgfState.analysisProgress.total;
+    }, [sgfState.analyzedSGF.isValid, sgfState.analysisProgress.total, sgfState.analysisProgress.analyzed]);
+
+    const displayAnalysisContent = sgfState.hasSGF && analysisCompleted;
 
     return <React.Fragment>
         <Paper>
             <SGFStatusBar/>
-            {sgfState.hasSGF && <Divider/>}
-            {sgfState.hasSGF && <SGFPlayers/>}
+            {displayAnalysisContent && <Divider/>}
+            {displayAnalysisContent && <SGFPlayers/>}
         </Paper>
         <Paper>
-            <SGFGraphTab/>
+            {displayAnalysisContent && <SGFGraphTab/>}
         </Paper>
         <Paper>
             <KatagoLog/>

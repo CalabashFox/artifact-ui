@@ -1,4 +1,4 @@
-import React, {useState, ChangeEvent} from 'react';
+import React, {useState, ChangeEvent, useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
@@ -9,10 +9,10 @@ import useTimer from 'components/hook/timer';
 import Progress from 'components/Progress';
 import {Upload, Info, Config} from '@icon-park/react'
 import Popover from '@material-ui/core/Popover';
-
-import { loadProgress, uploadSGFFile } from 'actions/sgf';
+import { getAnalyzedSGF, loadProgress, uploading, uploadSGFFile } from 'actions/sgf';
 import SGFData from 'components/SGFData';
 import SGFBoardSettings from 'components/SGFBoardSettings';
+
 
 const useStyles = makeStyles(() => ({
     statusContainer: {
@@ -55,9 +55,28 @@ const SGFStatusBar: React.FC = () => {
         dispatch(uploadSGFFile(file));
     };
 
-    useTimer(1000, sgfState.uploading, () => {
+    const progressFinished = useMemo(() => {
+        return sgfState.analysisProgress.total !== 0 && sgfState.analysisProgress.total === sgfState.analysisProgress.analyzed;
+    }, [sgfState.analysisProgress.total, sgfState.analysisProgress.analyzed]);
+
+    const terminate = useTimer(1000, sgfState.uploading, () => {
         dispatch(loadProgress());
     });
+
+    useEffect(() => {
+        if (progressFinished) {
+            dispatch(uploading(false));
+            dispatch(getAnalyzedSGF());
+            terminate();
+        }
+    }, [progressFinished, dispatch, terminate]);
+
+    useEffect(() => {
+        return () => {
+            console.log('terminate on unmount');
+            terminate();
+        };
+    }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
     const uploadButton = useIconText(<Upload/>, 'Upload');
     
