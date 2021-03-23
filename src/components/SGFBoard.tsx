@@ -9,7 +9,7 @@ import { KatagoMoveInfo } from "models/Katago";
 import { ClassNameMap } from "@material-ui/core/styles/withStyles";
 
 const useStyles = makeStyles(() => ({
-    font: {
+    svg: {
         fontSize: 10,
         fontWeight: 100,
         fontFamily: 'Courier New, monospace',
@@ -92,7 +92,7 @@ const createSVGStones = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[
             //stones.push(<circle key={`white-stone-boarder-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} strokeWidth={2} stroke={svgRenderer.oppositeColor(stone[0])} />);
         }
         svgStones.push(<circle key={`stone-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} fill={color}/>);
-        if (!svgRenderer.getSgfProperties().displayMoves) {
+        if (svgRenderer.getSgfProperties().displayMoves) {
             svgStones.push(<text key={`snapshot-text-${index}`} x={x - svgProps.stoneTextOffset} y={y + svgProps.stoneTextOffsetY} stroke={svgRenderer.oppositeColor(stone[0])}>{index + 1}</text>);
         }     
         if (index === stones.length - 1) {
@@ -157,6 +157,9 @@ const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: boole
 
 const createSVGMoves = (svgRenderer: SvgRenderer, occupiedCoordinates: boolean[][], moves: Array<KatagoMoveInfo>): Array<React.SVGProps<SVGRectElement>> => {
     const svgMoves = new Array<React.SVGProps<SVGRectElement>>();
+    if (!svgRenderer.getSgfProperties().displayRecommendations) {
+        return svgMoves;
+    }
     for (let index = 0; index < moves.length; index++) {
         const move = moves[index];
         const [i, j] = SgfUtils.translateToCoordinate(move.move);
@@ -274,7 +277,7 @@ const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, mo
     const svgPolicy = sgfProperties.displayPolicy ? createSVGPoliy(svgRenderer, occupiedCoordinates, policy) : [];
 
 
-    return <svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" className={classes.font}
+    return <svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" className={classes.svg}
         pointerEvents={'none'}
         onClick={(e) => handleClick(e)} 
         onMouseOut={() => handleMouseOut()}

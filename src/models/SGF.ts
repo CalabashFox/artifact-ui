@@ -89,9 +89,11 @@ export interface SGFCoordinate {
 
 export interface SGFProperties {
     currentMove: number
+    displayRecommendations: boolean
     displayOwnership: boolean
     displayPolicy: boolean
     displayMoves: boolean
+    displayIndex: boolean
     movePriority: MovePriority
     moveCount: number
     minimumPolicyValue: number
@@ -101,6 +103,7 @@ export interface SGFProperties {
     continuousAnalysis: boolean
     useSound: boolean
     liveMode: boolean
+    editMode: boolean
 }
 
 export enum WinrateReport {
@@ -158,12 +161,12 @@ export const InitialSGFState: SGFState = {
         }
     },
     analysisProgress: {
-        analyzed: 0,
-        total: 0
+        analyzed: 1,
+        total: 1
     },
     error: '',
     sgfProperties: {
-        currentMove: 0,
+        currentMove: 80,
         displayOwnership: true,
         displayPolicy: true,
         displayMoves: true,
@@ -175,7 +178,10 @@ export const InitialSGFState: SGFState = {
         minimumOwnershipValue: 0.1,
         continuousAnalysis: false,
         useSound: true,
-        liveMode: false
+        liveMode: false,
+        editMode: false,
+        displayIndex: false,
+        displayRecommendations: true
     },
     uploading: false,
     uploadProgress: 0

@@ -15,6 +15,9 @@ import SGFBoardSettings from 'components/SGFBoardSettings';
 import GameSettings from 'components/game/GameSettings';
 
 const useStyles = makeStyles(() => ({
+    container: {
+        height: '24px'
+    },
     statusContainer: {
         textAlign: 'left'
     },
@@ -67,7 +70,7 @@ const GameStatusBar: React.FC = () => {
     return <React.Fragment>
         <SGFBoardSettings open={sgfBoardSettingsOpen} onClose={() => setSGFBoardSettingsOpen(false)}/>
         <GameSettings open={gameSettingsOpen} onClose={() => setGameSettingsOpen(false)}/>
-        <Grid container>
+        <Grid container className={classes.container}>
             <Grid item xs={6} className={classes.statusContainer}>
                 {!game.inGame && startButton}
                 {game.inGame && undoButton}

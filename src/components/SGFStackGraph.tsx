@@ -17,12 +17,17 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(1)
     }
 }));
+
+const WHITE = '#fffff3';
+const RED = '#b71c1c';
+const GREEN = '#54cc7c';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const GraphTooltip = ({ active, payload, label }: any) => {
     const classes = useStyles();
     if (active && payload.length !== 0) {
         const data = payload[0].payload;
-        const color = data.diff >= 0 ? '#b71c1c' : '#54cc7c';
+        const color = data.diff >= 0 ? RED : GREEN;
         return (
             <div className={classes.tooltip}>
                 <p className="label">{`move ${label}`}</p>
@@ -45,14 +50,14 @@ const SGFStackGraph: React.FC<SGFStackGraphProps> = ({identifier, data, name}) =
                     top: margin, right: margin, bottom: margin, left: margin
                 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis stroke={'#78909c'} dataKey="label" minTickGap={50}/>
-                <YAxis stroke={'#78909c'}/>
+                <XAxis stroke={WHITE} dataKey="label" minTickGap={50}/>
+                <YAxis stroke={WHITE}/>
                 <Tooltip content={<GraphTooltip/>}/>
                 <Legend />
-                <Bar key={`stack-${identifier}-player`} dataKey="player" name={name} stackId="stack" fill={'#78909c'}/>
-                <Bar key={`stack-${identifier}-ai`} dataKey="diff" name={'katago'} stackId="stack" fill={'#54cc7c'}>
+                <Bar key={`stack-${identifier}-player`} dataKey="player" name={name} stackId="stack" fill={WHITE}/>
+                <Bar key={`stack-${identifier}-ai`} dataKey="diff" name={'katago'} stackId="stack" fill={GREEN}>
                     {data.map((entry) => (
-                        <Cell key={`stack-${identifier}-entry-${entry.label}-ai`} fill={entry.diff >= 0 ? '#54cc7c' : '#b71c1c' }/>
+                        <Cell key={`stack-${identifier}-entry-${entry.label}-ai`} fill={entry.diff >= 0 ? GREEN : RED }/>
                     ))}
                 </Bar>
             </BarChart>

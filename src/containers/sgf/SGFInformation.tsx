@@ -7,6 +7,7 @@ import SGFGraphTab from 'components/sgf/SGFGraphTab';
 import SGFPlayers from 'components/sgf/SGFPlayers';
 import SGFStatusBar from './SGFStatusBar';
 import KatagoLog from 'components/KatagoLog';
+import SGFBranchContainer from 'containers/SGFBranchContainer';
 
 const SGFInformation: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
@@ -22,9 +23,10 @@ const SGFInformation: React.FC = () => {
             {displayAnalysisContent && <Divider/>}
             {displayAnalysisContent && <SGFPlayers/>}
         </Paper>
-        <Paper>
-            {displayAnalysisContent && <SGFGraphTab/>}
-        </Paper>
+        {displayAnalysisContent && <SGFBranchContainer/>}
+        {displayAnalysisContent && <Paper>
+            <SGFGraphTab/>
+        </Paper>}
         <Paper>
             <KatagoLog/>
         </Paper>

@@ -42,12 +42,20 @@ const defaultTheme = createMuiTheme({
 });
 
 let theme = createMuiTheme({
+    
     palette: defaultTheme.palette,
     typography: {
         fontSize: 12,
         fontFamily: ["Lucida Grande", "Tahoma", "Verdana", "Arial", "sans-serif"].join(','),
     },
     overrides: {
+        MuiCssBaseline: {
+            '@global': {
+                body: {
+                    lineHeight: 1
+                }
+            }
+        },
         MuiInputLabel: {
             root: {
                 '&.Mui-disabled': {
@@ -146,10 +154,15 @@ let theme = createMuiTheme({
                 color: defaultTheme.palette.text.primary
             }
         },
+        MuiAppBar: {
+            root: {
+                marginTop: 0
+            }
+        },
         MuiDivider: {
             root: {
                 color: defaultTheme.palette.text.primary,
-                margin: 0
+                margin: defaultTheme.spacing(1, 0)
             }
         },
         MuiPaper: {

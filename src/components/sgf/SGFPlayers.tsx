@@ -10,7 +10,7 @@ import { SGFColor } from 'models/SGF';
 
 const useStyles = makeStyles((theme) => ({
     playerContainer: {
-        padding: theme.spacing(1, 0)
+        paddingBottom: theme.spacing(1)
     }
 }));
 

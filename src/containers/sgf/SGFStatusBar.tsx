@@ -15,6 +15,9 @@ import SGFBoardSettings from 'components/SGFBoardSettings';
 
 
 const useStyles = makeStyles(() => ({
+    container: {
+        height: '24px'
+    },
     statusContainer: {
         textAlign: 'left'
     },
@@ -29,7 +32,7 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-const SGFStatusBar: React.FC = () => {
+const SGFModeSettings: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -85,7 +88,7 @@ const SGFStatusBar: React.FC = () => {
 
     return <React.Fragment>
         <SGFBoardSettings open={sgfBoardSettingsOpen} onClose={() => setSGFBoardSettingsOpen(false)}/>
-        <Grid container>
+        <Grid container className={classes.container}>
             <Grid item xs={6} className={classes.statusContainer}>
                 {!sgfState.uploading && <input accept=".sgf" className={classes.input} id="icon-button-file" type="file" onChange={(e) => handleSGFupload(e)} />}
                 {!sgfState.uploading &&<label htmlFor="icon-button-file">
@@ -117,4 +120,4 @@ const SGFStatusBar: React.FC = () => {
     </React.Fragment>;
 }
 
-export default SGFStatusBar;
+export default SGFModeSettings;

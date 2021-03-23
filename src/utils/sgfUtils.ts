@@ -107,8 +107,6 @@ export default class SgfUtils {
 
     static calculateSGFMatchAnalysisData(sgfProperties: SGFProperties, analyzedSGF: AnalyzedSGF): AnalyzedSGF {
         const topMoves = sgfProperties.topMatch - 1;
-        const blackMove = new Array<string>();
-        const whiteMove = new Array<string>();
         for (let i = 0; i < analyzedSGF.snapshotList.length; i+=2) {
             const analysisResult = analyzedSGF.snapshotList[i].katagoResults[0];
             const currentMove = analysisResult.rootInfo;

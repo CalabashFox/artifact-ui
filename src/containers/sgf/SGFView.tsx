@@ -10,10 +10,11 @@ import withWidth, {WithWidth} from '@material-ui/core/withWidth';
 import SGFBoardSound from 'components/SGFBoardSound';
 import SGFBoardPanel from 'components/sgf/SGFBoardPanel';
 import useNavigation from 'components/hook/navigation';
-import SGFShortcut from "./SGFShortcut";
 import { SGFStone } from "models/SGF";
 import { KatagoMoveInfo } from "models/Katago";
 import { SocketConnectionState } from "models/view";
+import SGFDisplaySettings from "./SGFDisplaySettings";
+import SGFModeSettings from "./SGFModeSettings";
 
 const useStyles = makeStyles((theme) => ({
     grid: {
@@ -72,30 +73,36 @@ const SGFView: React.FC<WithWidth> = ({width}) => {
         SGFBoardSound(gameState.actionState);
     }
 
-    const snapshot = sgfState.analyzedSGF.snapshotList[sgfState.sgfProperties.currentMove];
-    const currentMove = sgfState.sgfProperties.currentMove;
-
-    const stones: Array<SGFStone> = snapshot.stones;
+    const hasValidSGF = sgfState.hasSGF && sgfState.analyzedSGF.isValid;
+    let currentMove = 0;
+    let stones: Array<SGFStone> = [];
     let ownership: Array<number> = [];
     let policy: Array<number> = [];
     let moveInfos: Array<KatagoMoveInfo> = [];
-
-    if (sgfState.sgfProperties.liveMode) {
-        ownership = katagoState.katagoResult.ownership;
-        policy = katagoState.katagoResult.policy;
-        moveInfos = katagoState.katagoResult.moveInfos;
-    } else if (sgfState.hasSGF && snapshot.katagoResults.length > 0) {
-        ownership = snapshot.katagoResults[0].ownership;
-        policy = snapshot.katagoResults[0].policy;
-        moveInfos = snapshot.katagoResults[0].moveInfos;
+    if (hasValidSGF) {
+        const snapshot = sgfState.analyzedSGF.snapshotList[sgfState.sgfProperties.currentMove];
+        currentMove = sgfState.sgfProperties.currentMove;
+        stones = snapshot.stones;
+        if (sgfState.sgfProperties.liveMode) {
+            ownership = katagoState.katagoResult.ownership;
+            policy = katagoState.katagoResult.policy;
+            moveInfos = katagoState.katagoResult.moveInfos;
+        } else if (snapshot.katagoResults.length > 0) {
+            ownership = snapshot.katagoResults[0].ownership;
+            policy = snapshot.katagoResults[0].policy;
+            moveInfos = snapshot.katagoResults[0].moveInfos;
+        }
     }
 
     return <React.Fragment>
         <Grid container direction="row" spacing={1} className={classes.grid}>
             <Grid item sm={7} xs={12} className={classes.boardContainer}>
                 {viewState.socketConnectionState === SocketConnectionState.CONNECTED 
-                    && <Paper>
-                        <SGFShortcut/>
+                    && hasValidSGF && <Paper>
+                        <SGFModeSettings/>
+                    </Paper>}
+                {hasValidSGF && <Paper>
+                        <SGFDisplaySettings/>
                     </Paper>}
                 <Paper onWheel={e => scroll(e)}>
                     <SGFBoard click={(x, y) => handleClick(x, y)}
@@ -106,9 +113,9 @@ const SGFView: React.FC<WithWidth> = ({width}) => {
                         ownership={ownership}
                         hoverEffect={false}/>
                 </Paper>
-                <Paper>
+                {hasValidSGF && <Paper>
                     <SGFBoardPanel/>
-                </Paper>
+                </Paper>}
             </Grid>
             <Grid item sm={5} xs={12} className={classes.infoContainer}>
                 <SGFInformation/>

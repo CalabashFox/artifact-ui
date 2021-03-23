@@ -94,7 +94,7 @@ const SGFBoardPanel: React.FC = () => {
     const downloadIcon = useIcon(<Download onClick={() => setAnalysisDrawer(true)}/>);
 
     return <React.Fragment>
-        <SGFComplexAnalysis open={analysisDrawer} setOpen={setAnalysisDrawer}/>
+        {hasKatagoResult && <SGFComplexAnalysis open={analysisDrawer} setOpen={setAnalysisDrawer}/>}
         <Grid container>
             <Grid item sm={8} xs={12}>
                 {toStartIcon}

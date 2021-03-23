@@ -5,10 +5,16 @@ import {Up, Down} from '@icon-park/react';
 import useIcon from "components/hook/icon";
 import Grid from '@material-ui/core/Grid';
 import TextComponent from 'components/form/TextComponent';
+import Typography from '@material-ui/core/Typography';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
+    container: {
+        height: '24px'
+    },
     title: {
-        textAlign: 'left'
+        textAlign: 'left',
+        boxSizing: 'border-box',
+        paddingLeft: theme.spacing(1)
     },
     icon: {
         textAlign: 'right'
@@ -32,9 +38,11 @@ const FoldableTextContainer: React.FC<FoldableTextContainerProps> = ({label, tex
 
     if (collapsable) {
         return <React.Fragment>
-            <Grid container justify="flex-end">
+            <Grid container justify="flex-end" className={classes.container}>
                 <Grid item xs={9} className={classes.title}>
-                    {label}
+                    <Typography variant="subtitle1">
+                        {label}
+                    </Typography>
                 </Grid>
                 <Grid item xs={3} className={classes.icon}>
                     {expanded && collapseIcon}
