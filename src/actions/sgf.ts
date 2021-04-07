@@ -320,7 +320,6 @@ export const loadProgress = () : ThunkAction<Promise<void>, SGFState, null, SGFA
     return (dispatch: ThunkDispatch<SGFState, null, SGFAction>) => {
         return get<AnalysisProgress>('sgf/progress', {})
             .then((res: AxiosResponse<ApiResponse<AnalysisProgress>>) => {
-                console.log('progress received:', res.data.content);
                 dispatch(receiveProgress(res.data.content));
             })
             .catch((err: AxiosError<ApiResponse<AnalysisProgress>>) => {

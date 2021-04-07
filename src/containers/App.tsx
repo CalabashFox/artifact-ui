@@ -120,6 +120,17 @@ let theme = createMuiTheme({
                 color: defaultTheme.palette.primary.main
             }
         },
+        MuiIconButton: {
+            root: {
+                padding: 0
+            }
+        },
+        MuiTablePagination: {
+            toolbar: {
+                minHeight: 'unset',
+                paddingTop: defaultTheme.spacing(1)
+            }
+        },
         MuiBottomNavigation: {
             root: {
                 height: '40px'

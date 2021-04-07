@@ -138,7 +138,7 @@ const GameSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
     const [minimumPolicyValue, setMinimumPolicyValue] = useState(sgfProperties.minimumPolicyValue);
     const [minimumOwnershipValue, setMinimumOwnershipValue] = useState(sgfProperties.minimumOwnershipValue);
     const [reportAnalysisWinratesAs, setReportAnalysisWinratesAs] = useState(sgfProperties.reportAnalysisWinratesAs);
-    const [topMatch, setTopMatch] = useState(sgfProperties.topMatch);
+    const [matchRecommended, setMatchRecommended] = useState(sgfProperties.matchRecommended);
 
     const handleClose = () => {
         onClose();
@@ -155,9 +155,9 @@ const GameSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
             minimumPolicyValue: minimumPolicyValue,
             displayOwnersminimumPolicyValuehip: minimumPolicyValue,
             minimumOwnershipValue: minimumOwnershipValue,
-            topMatch: topMatch,
+            matchRecommended: matchRecommended,
         };        
-        if (topMatch !== sgfProperties.topMatch) {
+        if (matchRecommended !== sgfProperties.matchRecommended) {
             // recalculate
         }
         dispatch(setSGFProperties(properties));
@@ -282,8 +282,8 @@ const GameSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                     <FormControl>
                         <Select
                             className={classes.select}
-                            value={topMatch}
-                            onChange={(e) => handleSelectChange(e.target.value as string, setTopMatch)}>
+                            value={matchRecommended}
+                            onChange={(e) => handleSelectChange(e.target.value as string, setMatchRecommended)}>
                             {generateIntOptions(2, 15)}
                         </Select>
                     </FormControl>

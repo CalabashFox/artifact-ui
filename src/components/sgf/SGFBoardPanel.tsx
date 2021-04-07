@@ -3,9 +3,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {SGFState, StoreState} from "models/StoreState";
 import {makeStyles, withStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import {setMove} from 'actions/sgf';
+import {setMove, setSGFProperties} from 'actions/sgf';
 import TextField from '@material-ui/core/TextField';
-import {Left, DoubleLeft, ToLeft, Right, DoubleRight, ToRight, ChartHistogram, Analysis, Download} from '@icon-park/react'
+import {Left, DoubleLeft, ToLeft, Right, DoubleRight, ToRight, BalanceTwo, ChartHistogram, Analysis, Download} from '@icon-park/react'
 import useIcon from "components/hook/icon";
 import Divider from '@material-ui/core/Divider';
 import Hidden from '@material-ui/core/Hidden';
@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const InputField = withStyles({
+const InputField = withStyles(theme => ({
     root: {
         '& label': {
             display: 'none'
@@ -28,20 +28,22 @@ const InputField = withStyles({
         },
         '& .MuiInputBase-input': {
             width: 50,
-            color: '#fffff3',
+            color: theme.palette.text.primary,
             textAlign: 'center'
         },
         '& .MuiInput-underline:before' : {
-            borderBottomColor: '#fffff3'
+            borderBottomColor: theme.palette.text.primary
         },
         '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-            borderBottom: '2px solid #fffff3'
+            borderBottomWidth: '2px',
+            borderBottomStyle: 'solid',
+            borderBottomColor: theme.palette.text.primary
         },
         '& .MuiInput-underline:after': {
             display: 'none'
         }
     }
-})(TextField);
+}))(TextField);
 
 const SGFBoardPanel: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
@@ -89,6 +91,9 @@ const SGFBoardPanel: React.FC = () => {
     const fastForwardIcon = useIcon(<DoubleRight onClick={() => navigateForward(10)}/>, forwardDisabled);
     const toEndIcon = useIcon(<ToRight onClick={() => updateMove(totalMoves)}/>, forwardDisabled);
 
+    const situationIcon = useIcon(<BalanceTwo onClick={() => dispatch(setSGFProperties({
+        ...sgfState.sgfProperties, situationAnalysisMode: !sgfState.sgfProperties.situationAnalysisMode
+    }))}/>);
     const chartIcon = useIcon(<ChartHistogram onClick={() => setAnalysisDrawer(true)}/>);
     const analysisIcon = useIcon(<Analysis onClick={() => setAnalysisDrawer(true)}/>);
     const downloadIcon = useIcon(<Download onClick={() => setAnalysisDrawer(true)}/>);
@@ -116,6 +121,7 @@ const SGFBoardPanel: React.FC = () => {
                 <Hidden smUp>
                     <Divider/>  
                 </Hidden>   
+                {situationIcon}
                 {chartIcon}
                 {analysisIcon}
                 {downloadIcon}

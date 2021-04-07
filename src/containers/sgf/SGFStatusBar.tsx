@@ -76,7 +76,6 @@ const SGFModeSettings: React.FC = () => {
 
     useEffect(() => {
         return () => {
-            console.log('terminate on unmount');
             terminate();
         };
     }, []);// eslint-disable-line react-hooks/exhaustive-deps

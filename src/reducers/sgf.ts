@@ -53,7 +53,7 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
             return {
                 ...state, analyzedSGF: sgf, hasSGF: true,
                 sgfProperties: {
-                    ...state.sgfProperties, currentMove: 0
+                    ...state.sgfProperties/*, currentMove: 0*/
                 }
             };
         case UPLOAD_SUCCESS:

@@ -71,7 +71,7 @@ export interface SnapshotAnalysisData {
 }
 
 export enum SGFColor {
-    BLACK, WHITE, NONE
+    BLACK, WHITE, NONE, OCCUPIED
 }
 
 export interface AnalysisProgress {
@@ -97,13 +97,15 @@ export interface SGFProperties {
     movePriority: MovePriority
     moveCount: number
     minimumPolicyValue: number
-    topMatch: number
+    matchRecommended: number
     reportAnalysisWinratesAs: WinrateReport
     minimumOwnershipValue: number
     continuousAnalysis: boolean
     useSound: boolean
     liveMode: boolean
     editMode: boolean
+    situationAnalysisMode: boolean
+    maxVisits: number
 }
 
 export enum WinrateReport {
@@ -161,19 +163,19 @@ export const InitialSGFState: SGFState = {
         }
     },
     analysisProgress: {
-        analyzed: 1,
-        total: 1
+        analyzed: 0,
+        total: 0
     },
     error: '',
     sgfProperties: {
-        currentMove: 80,
+        currentMove: 239,
         displayOwnership: true,
         displayPolicy: true,
         displayMoves: true,
         movePriority: MovePriority.WINRATE,
         moveCount: 5,
         minimumPolicyValue: 0.1,
-        topMatch: 5,
+        matchRecommended: 5,
         reportAnalysisWinratesAs: WinrateReport.SIDETOMOVE,
         minimumOwnershipValue: 0.1,
         continuousAnalysis: false,
@@ -181,7 +183,9 @@ export const InitialSGFState: SGFState = {
         liveMode: false,
         editMode: false,
         displayIndex: false,
-        displayRecommendations: true
+        displayRecommendations: true,
+        maxVisits: 200,
+        situationAnalysisMode: true
     },
     uploading: false,
     uploadProgress: 0

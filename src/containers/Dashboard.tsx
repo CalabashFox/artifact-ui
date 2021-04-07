@@ -6,8 +6,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState, ViewState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
 import {AnalyzedSGF} from 'models/SGF';
-import * as mock from 'assets/sample-2.json'
-import {set} from 'actions/sgf';
+import * as mock from 'assets/sample.json'
+import {receiveProgress, set} from 'actions/sgf';
 import { setTab } from 'actions/view';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -105,7 +105,12 @@ const Dashboard: React.FC = () => {
     };
 
     const initFetch = useCallback(() => {
-        dispatch(set(mock as unknown as AnalyzedSGF));
+        const analyzedSGF = mock as unknown as AnalyzedSGF;
+        dispatch(set(analyzedSGF));
+        dispatch(receiveProgress({
+            total: analyzedSGF.snapshotList.length,
+            analyzed: analyzedSGF.snapshotList.length
+        }));
     }, [dispatch]);
 
     useEffect(() => {

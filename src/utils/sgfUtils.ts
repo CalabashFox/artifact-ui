@@ -106,7 +106,7 @@ export default class SgfUtils {
     }
 
     static calculateSGFMatchAnalysisData(sgfProperties: SGFProperties, analyzedSGF: AnalyzedSGF): AnalyzedSGF {
-        const topMoves = sgfProperties.topMatch - 1;
+        const matchRecommended = sgfProperties.matchRecommended - 1;
         for (let i = 0; i < analyzedSGF.snapshotList.length; i+=2) {
             const analysisResult = analyzedSGF.snapshotList[i].katagoResults[0];
             const currentMove = analysisResult.rootInfo;
@@ -132,7 +132,7 @@ export default class SgfUtils {
                 white.diff = white.ai - white.player;
 
                 const whiteMove = analyzedSGF.snapshotList[i + 1].stones[analyzedSGF.snapshotList[i + 1].stones.length - 1][1];
-                whiteMatch = analysisResult.moveInfos.slice(topMoves).some(m => m.move === whiteMove);
+                whiteMatch = analysisResult.moveInfos.slice(matchRecommended).some(m => m.move === whiteMove);
             }
             if (i - 1 > 0) {
                 const prevBestMove = analyzedSGF.snapshotList[i - 1].katagoResults[0].moveInfos[0];
@@ -140,7 +140,7 @@ export default class SgfUtils {
                 black.diff = black.ai - black.player;
 
                 const blackMove = analyzedSGF.snapshotList[i].stones[analyzedSGF.snapshotList[i].stones.length - 1][1];
-                blackMatch = analyzedSGF.snapshotList[i - 1].katagoResults[0].moveInfos.slice(topMoves).some(m => m.move === blackMove);
+                blackMatch = analyzedSGF.snapshotList[i - 1].katagoResults[0].moveInfos.slice(matchRecommended).some(m => m.move === blackMove);
             }
             analyzedSGF.analysisData.blackWinrateAnalysis.push(black);
             analyzedSGF.analysisData.whiteWinrateAnalysis.push(white);

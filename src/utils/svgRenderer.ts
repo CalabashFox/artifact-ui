@@ -1,8 +1,9 @@
-import { SGFProperties } from "models/SGF";
+import { SGFColor, SGFProperties } from "models/SGF";
 
 type Point = [number, number];
 
 export interface SVGProperties {
+    boardOffset: number
     dim: number
     boardColor: string
     blockDim: number
@@ -58,13 +59,13 @@ export default class SvgRenderer {
     }
 
     loc(dim: [number, number]): Point {
-        return [this.svgProps.blockDim * dim[0] + this.svgProps.blockOffset,
-            this.svgProps.blockDim * dim[1] + this.svgProps.blockOffset];
+        return [this.svgProps.boardOffset + this.svgProps.blockDim * dim[0] + this.svgProps.blockOffset,
+            this.svgProps.boardOffset + this.svgProps.blockDim * dim[1] + this.svgProps.blockOffset];
     }
 
     deloc(loc: [number, number]): Point {
-        const x = Math.round((loc[0] - this.svgProps.blockOffset) / this.svgProps.blockDim)
-        const y = Math.round((loc[1] - this.svgProps.blockOffset) / this.svgProps.blockDim);
+        const x = Math.round((loc[0] - this.svgProps.blockOffset - this.svgProps.boardOffset) / this.svgProps.blockDim)
+        const y = Math.round((loc[1] - this.svgProps.blockOffset - this.svgProps.boardOffset) / this.svgProps.blockDim);
         return [this.toBoardCoordinate(x), this.toBoardCoordinate(y)];
     }
 
@@ -72,12 +73,16 @@ export default class SvgRenderer {
         return coordinate <= 0 ? 0 : coordinate >= 19 ? 19 : coordinate;
     }
 
-    ownershipColor(ownership: number, blackTurn: boolean): string {
+    ownership(ownership: number, blackTurn: boolean): SGFColor {
         if (blackTurn) {
-            return ownership > 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
+            return ownership > 0 ? SGFColor.BLACK : SGFColor.WHITE;
         } else {
-            return ownership < 0 ? this.svgProps.blackColor : this.svgProps.whiteColor;
+            return ownership < 0 ? SGFColor.BLACK : SGFColor.WHITE;
         }
+    }
+
+    ownershipColor(color: SGFColor): string {
+        return color === SGFColor.BLACK ? this.svgProps.blackColor : this.svgProps.whiteColor;
     }
 
     color(color: string): string {

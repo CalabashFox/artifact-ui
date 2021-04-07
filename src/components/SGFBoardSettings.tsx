@@ -14,6 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 import { TransitionProps } from '@material-ui/core/transitions';
+import Divider from '@material-ui/core/Divider';
 
 import Switch from '@material-ui/core/Switch';
 
@@ -23,6 +24,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { MovePriority, WinrateReport } from 'models/SGF';
 import Slider from '@material-ui/core/Slider';
 import { setSGFProperties } from 'actions/sgf';
+import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme: Theme) => ({
     dialog: {
@@ -62,16 +64,43 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-const SettingsSlider = withStyles({
+const SettingsSlider = withStyles(theme => ({
     valueLabel: {
         left: 'calc(-50% + 12px)',
         top: -22,
         '& *': {
             background: 'transparent',
-            color: '#000',
+            color: theme.palette.primary.main
         },
     }
-})(Slider);
+}))(Slider);
+
+const SettingsInput = withStyles(theme => ({
+    root: {
+        '& label': {
+            display: 'none'
+        },
+        '& label + .MuiInput-formControl': {
+            marginTop: theme.spacing(1)
+        },
+        '& .MuiInputBase-input': {
+            width: 50,
+            color: theme.palette.primary.main,
+            textAlign: 'center'
+        },
+        '& .MuiInput-underline:before' : {
+            borderBottomColor: theme.palette.primary.main
+        },
+        '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+            borderBottomWidth: '2px',
+            borderBottomStyle: 'solid',
+            borderBottomColor: theme.palette.primary.main
+        },
+        '& .MuiInput-underline:after': {
+            display: 'none'
+        }
+    }
+}))(TextField);
 
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & { children?: React.ReactElement },
@@ -137,7 +166,18 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
     const [minimumPolicyValue, setMinimumPolicyValue] = useState(sgfProperties.minimumPolicyValue);
     const [minimumOwnershipValue, setMinimumOwnershipValue] = useState(sgfProperties.minimumOwnershipValue);
     const [reportAnalysisWinratesAs, setReportAnalysisWinratesAs] = useState(sgfProperties.reportAnalysisWinratesAs);
-    const [topMatch, setTopMatch] = useState(sgfProperties.topMatch);
+    const [matchRecommended, setMatchRecommended] = useState(sgfProperties.matchRecommended);
+    const [maxVisitsText, setMaxVisitsText] = useState(sgfProperties.maxVisits);
+
+    const updateMaxVisits = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const maxVisits = Number.parseInt(event.target.value);
+        if (!isNaN(maxVisits) && maxVisits >= 0 && maxVisits < 10000) {
+            setMaxVisitsText(maxVisits);
+        }
+        if (isNaN(maxVisits)) {
+            setMaxVisitsText(0);
+        }
+    };
 
     const handleClose = () => {
         onClose();
@@ -154,9 +194,10 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
             minimumPolicyValue: minimumPolicyValue,
             displayOwnersminimumPolicyValuehip: minimumPolicyValue,
             minimumOwnershipValue: minimumOwnershipValue,
-            topMatch: topMatch,
+            matchRecommended: matchRecommended,
+            maxVisits: maxVisitsText
         };        
-        if (topMatch !== sgfProperties.topMatch) {
+        if (matchRecommended !== sgfProperties.matchRecommended) {
             // recalculate
         }
         dispatch(setSGFProperties(properties));
@@ -192,14 +233,34 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
             </AppBar>
             <Grid container className={classes.formContainer}>
 
+
                 <Grid item xs={9} className={classes.formLabel}>
-                        <Typography variant="subtitle1" className={classes.title}>Use sound</Typography>
-                    </Grid>
-                    <Grid item xs={3} className={classes.formInput}>
-                        <Switch
-                            checked={useSound}
-                            onChange={(e) => handleSwitchChange(e, setUseSound)}
-                            color="primary" />
+                    <Typography variant="subtitle1" className={classes.title}>Max visits</Typography>
+                </Grid>
+                <Grid item xs={3} className={classes.formInput}>
+                    <SettingsInput label="move"
+                        value={maxVisitsText}
+                        size="small"
+                        type="text"
+                        onChange={updateMaxVisits}
+                        InputLabelProps={{
+                            shrink: true
+                        }}/>
+                </Grid>
+
+
+                <Grid item xs={12}>
+                    <Divider/>
+                </Grid>
+
+                <Grid item xs={9} className={classes.formLabel}>
+                    <Typography variant="subtitle1" className={classes.title}>Use sound</Typography>
+                </Grid>
+                <Grid item xs={3} className={classes.formInput}>
+                    <Switch
+                        checked={useSound}
+                        onChange={(e) => handleSwitchChange(e, setUseSound)}
+                        color="primary" />
                 </Grid>
 
                 <Grid item xs={9} className={classes.formLabel}>
@@ -267,15 +328,15 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={7} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Display top N moves</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>Match top N recommended</Typography>
                 </Grid>
                 <Grid item xs={5} className={classes.formInput}>
                     <FormControl>
                         <Select
                             className={classes.select}
-                            value={topMatch}
-                            onChange={(e) => handleSelectChange(e.target.value as string, setTopMatch)}>
-                            {generateIntOptions(2, 15)}
+                            value={matchRecommended}
+                            onChange={(e) => handleSelectChange(e.target.value as string, setMatchRecommended)}>
+                            {generateIntOptions(2, 20)}
                         </Select>
                     </FormControl>
                 </Grid>
