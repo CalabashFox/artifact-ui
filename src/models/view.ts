@@ -4,7 +4,7 @@ export const TAB_VIEW_SGF = 2;
 
 export enum SocketConnectionState {
     IDLE = 'idle', 
-    CANNOT_CONNECT = 'cannot connect', 
+    CANNOT_CONNECT = 'cannotConnect', 
     CONNECTING = 'connecting', 
     CONNECTED = 'connected', 
     DISCONNECTED = 'disconnected'

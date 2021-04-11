@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import {useSelector} from "react-redux";
 import {SGFState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
@@ -7,10 +7,11 @@ import SvgRenderer from 'utils/svgRenderer';
 import { SGFColor, SGFStone } from "models/SGF";
 import { KatagoMoveInfo } from "models/Katago";
 import { ClassNameMap } from "@material-ui/core/styles/withStyles";
+import useMoveColor from "./hook/moveColor";
 
 const useStyles = makeStyles(() => ({
     svg: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 100,
         fontFamily: 'Courier New, monospace',
         textAnchor: 'middle'
@@ -48,7 +49,7 @@ const svgProps = {
     textColor: '#000',
     winrateOffsetY: -4,
     leadOffsetY: 10,
-    nextMoveOpacity: 0.75,
+    nextMoveOpacity: 1,//0.75,
     moveBoarderColor: '#aaa',
     moveColor: '#FCDC05',
     bestMoveColor: '#0C6CD4',
@@ -72,7 +73,7 @@ const createHoverStone = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColo
     }
     const i = stone.x;
     const j = stone.y;
-    if (occupiedCoordinates[i][j] !== SGFColor.NONE) {
+    if (occupiedCoordinates[i][j] === SGFColor.BLACK || occupiedCoordinates[i][j] === SGFColor.WHITE) {
         return hoverStones;
     }
     const color = svgRenderer.color(stone.color);
@@ -91,7 +92,7 @@ const createSVGStones = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor
         const sgfColor = stone[0] === 'B' ? SGFColor.BLACK : SGFColor.WHITE;
         svgStones.push(<rect key={`stone-holder-${stone[1]}`} x={x - svgProps.stoneHolderOffset} y={y - svgProps.stoneHolderOffset} width={svgProps.stoneHolderDim} height={svgProps.stoneHolderDim} fill={svgProps.boardColor} className={classes.stoneHolder}/>);
         if (sgfColor === SGFColor.WHITE) {
-            //stones.push(<circle key={`white-stone-boarder-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} strokeWidth={2} stroke={svgRenderer.oppositeColor(stone[0])} />);
+            svgStones.push(<circle key={`white-stone-boarder-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} strokeWidth={2} stroke={svgRenderer.oppositeColor(stone[0])} />);
         }
         svgStones.push(<circle key={`stone-${stone[1]}`} cx={x} cy={y} r={svgProps.stoneDim} fill={color}/>);
         if (svgRenderer.getSgfProperties().displayMoves && !svgRenderer.getSgfProperties().situationAnalysisMode) {
@@ -107,7 +108,7 @@ const createSVGStones = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor
 
 const createSVGPoliy = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[][], policy: Array<number>): Array<React.SVGProps<SVGRectElement>> => {
     const svgPolicy = new Array<React.SVGProps<SVGRectElement>>();
-    if (!svgRenderer.getSgfProperties().displayPolicy)  {
+    if (!svgRenderer.getSgfProperties().displayPolicy && !svgRenderer.getSgfProperties().situationAnalysisMode)  {
         return svgPolicy;
     }
     policy.forEach((value, index) => {
@@ -133,7 +134,7 @@ const createSVGPoliy = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[
     return svgPolicy;
 }
 
-const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[][], ownership: Array<number>, blackTurn: boolean, minimumOwnershipValue: number): Array<React.SVGProps<SVGRectElement>> => {
+const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[][], ownership: Array<number>, moveColor: SGFColor, minimumOwnershipValue: number): Array<React.SVGProps<SVGRectElement>> => {
     const svgOwnership = new Array<React.SVGProps<SVGRectElement>>();
     if (!svgRenderer.getSgfProperties().displayOwnership)  {
         return svgOwnership;
@@ -149,7 +150,7 @@ const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFCo
             return;
         }
         const [x, y] = svgRenderer.loc([i, j]);
-        const sgfColor = svgRenderer.ownership(value, blackTurn);
+        const sgfColor = svgRenderer.ownership(value, moveColor === SGFColor.BLACK);
         const color = svgRenderer.ownershipColor(sgfColor);
 
         // reverse color on captured stones
@@ -171,7 +172,7 @@ const createSVGOwnership = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFCo
 
 const createSVGMoves = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[][], moves: Array<KatagoMoveInfo>): Array<React.SVGProps<SVGRectElement>> => {
     const svgMoves = new Array<React.SVGProps<SVGRectElement>>();
-    if (!svgRenderer.getSgfProperties().displayRecommendations) {
+    if (!svgRenderer.getSgfProperties().displayRecommendations && !svgRenderer.getSgfProperties().situationAnalysisMode) {
         return svgMoves;
     }
     for (let index = 0; index < moves.length; index++) {
@@ -187,7 +188,7 @@ const createSVGMoves = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[
     return svgMoves;
 }
 
-const createSVGBoard = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[][]): Array<React.SVGProps<SVGRectElement>> => {
+const createSVGBoard = (svgRenderer: SvgRenderer): Array<React.SVGProps<SVGRectElement>> => {
     const svgLines = new Array<React.SVGProps<SVGRectElement>>();
     const svgDecorations = new Array<React.SVGProps<SVGRectElement>>();
     const dimension = svgRenderer.getBoardDimension();
@@ -195,7 +196,6 @@ const createSVGBoard = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[
         const length = dimension * svgProps.blockDim + svgProps.boardOffset;
         const offset = svgProps.boardOffset + i * svgProps.blockDim + svgProps.blockOffset;
 
-        occupiedCoordinates[i] = [];
         // vertical
         svgLines.push(<line pointerEvents={'none'} key={`line-x-${i}`} x1={svgProps.boardOffset + svgProps.blockOffset} x2={length} y1={offset} y2={offset} stroke={svgProps.blockColor}/>);
         // 1-19
@@ -227,15 +227,15 @@ interface HoverStone {
     y: number
 }
 
-const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, moveInfos, hoverEffect}) => {
+const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, moveInfos, hoverEffect, currentMove}) => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const sgfProperties = sgfState.sgfProperties;
     const dimension = 19;
 
-    const blackTurn = stones.length === 0 || stones[stones.length - 1][0] === 'W';
+    const moveColor = useMoveColor();
 
-    const svgRenderer = new SvgRenderer(dimension, svgProps, sgfProperties);
+    const svgRenderer = useMemo(() => new SvgRenderer(dimension, svgProps, sgfProperties), [dimension, sgfProperties]);
 
     const [hoverStone, setHoverStone] = useState({
         color: 'B',
@@ -261,6 +261,10 @@ const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, mo
 
     const handleClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
         const [x, y] = transformLocation(event);
+        // disable warning
+        if (x === -1) {
+            console.log(currentMove);
+        }
         click(x, y);
     };
 
@@ -269,7 +273,7 @@ const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, mo
             return;
         }
         setHoverStone({
-            color: blackTurn ? 'B' : 'W',
+            color: moveColor === SGFColor.BLACK ? 'B' : 'W',
             x: -1,
             y: -1
         });
@@ -284,7 +288,7 @@ const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, mo
             return;
         }
         setHoverStone({
-            color: blackTurn ? 'B' : 'W',
+            color: moveColor === SGFColor.BLACK ? 'B' : 'W',
             x: x,
             y: y
         });
@@ -292,15 +296,14 @@ const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, mo
 
     const occupiedCoordinates: SGFColor[][] = new Array(dimension)
         .fill(SGFColor.NONE)
-        .map(() => new Array(dimension)
-        .fill(SGFColor.NONE))
-    const svgBoardDecorations = createSVGBoard(svgRenderer, occupiedCoordinates);
+        .map(() => new Array(dimension).fill(SGFColor.NONE));
+
+    const svgBoardDecorations = createSVGBoard(svgRenderer);
     const svgStones = createSVGStones(svgRenderer, occupiedCoordinates, stones, classes);
     const svgHoverStones = createHoverStone(svgRenderer, occupiedCoordinates, hoverStone, hoverEffect);
-    const svgMoves = !sgfProperties.situationAnalysisMode ? createSVGMoves(svgRenderer, occupiedCoordinates, moveInfos) : [];
-    const svgOwnership = sgfProperties.displayOwnership ? createSVGOwnership(svgRenderer, occupiedCoordinates, ownership, blackTurn, sgfProperties.minimumOwnershipValue) : [];
-    const svgPolicy = sgfProperties.displayPolicy && !sgfProperties.situationAnalysisMode ? createSVGPoliy(svgRenderer, occupiedCoordinates, policy) : [];
-
+    const svgMoves = createSVGMoves(svgRenderer, occupiedCoordinates, moveInfos);
+    const svgOwnership = createSVGOwnership(svgRenderer, occupiedCoordinates, ownership, moveColor, sgfProperties.minimumOwnershipValue);
+    const svgPolicy = createSVGPoliy(svgRenderer, occupiedCoordinates, policy);
 
     return <svg viewBox="0 0 630 630" preserveAspectRatio="xMidYMid meet" className={classes.svg}
         pointerEvents={'none'}

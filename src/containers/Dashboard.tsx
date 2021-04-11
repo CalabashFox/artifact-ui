@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState, ViewState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
 import {AnalyzedSGF} from 'models/SGF';
-import * as mock from 'assets/sample.json'
+import * as mock from 'assets/var-3.json'
 import {receiveProgress, set} from 'actions/sgf';
 import { setTab } from 'actions/view';
 import AppBar from '@material-ui/core/AppBar';
@@ -23,6 +23,7 @@ import {ImageFiles} from '@icon-park/react'
 import useIcon from "components/hook/icon";
 import Snackbar from '@material-ui/core/Snackbar';
 import ConnectionStatus from 'components/ConnectionStatus';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme) => ({
     desktopAppBar: {
@@ -69,6 +70,7 @@ const Dashboard: React.FC = () => {
     const viewState = useSelector<StoreState, ViewState>(state => state.viewState);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const { t } = useTranslation();
 
     const tabIndex = viewState.tab;
 
@@ -108,8 +110,8 @@ const Dashboard: React.FC = () => {
         const analyzedSGF = mock as unknown as AnalyzedSGF;
         dispatch(set(analyzedSGF));
         dispatch(receiveProgress({
-            total: analyzedSGF.snapshotList.length,
-            analyzed: analyzedSGF.snapshotList.length
+            total: analyzedSGF.totalSnapshots,
+            analyzed: analyzedSGF.analyzedSnapshots
         }));
     }, [dispatch]);
 
@@ -139,9 +141,9 @@ const Dashboard: React.FC = () => {
                 <Grid container>
                     <Grid item xs={9} className={classes.tabs}>
                         <Tabs value={tabIndex} onChange={(e, v) => handleTabChange(v)}>
-                            <Tab label="Scanner" className={classes.tab}/>
-                            <Tab label="Game" className={classes.tab}/>
-                            <Tab label="SGF" className={classes.tab}/>
+                            <Tab label={t('ui.scannerView')} className={classes.tab}/>
+                            <Tab label={t('ui.gameView')} className={classes.tab}/>
+                            <Tab label={t('ui.sgfView')} className={classes.tab}/>
                         </Tabs>
                     </Grid>
                     <Grid item xs={3} className={classes.connectionState}>
@@ -155,9 +157,9 @@ const Dashboard: React.FC = () => {
         {tabIndex === TAB_VIEW_SGF && <Container><SGFView/></Container>}
         <Hidden smUp>
              <BottomNavigation value={tabIndex} onChange={(e, v) => handleTabChange(v)} className={classes.navigation}>
-                 <BottomNavigationAction label="Scanner" value={TAB_VIEW_IMAGE} icon={uploadIcon} />
-                 <BottomNavigationAction label="Game" value={TAB_VIEW_GAME} />
-                 <BottomNavigationAction label="SGF" value={TAB_VIEW_SGF} />
+                 <BottomNavigationAction label={t('ui.scannerView')} value={TAB_VIEW_IMAGE} icon={uploadIcon} />
+                 <BottomNavigationAction label={t('ui.gameView')} value={TAB_VIEW_GAME} />
+                 <BottomNavigationAction label={t('ui.sgfView')} value={TAB_VIEW_SGF} />
             </BottomNavigation>
         </Hidden>
     </Container>;

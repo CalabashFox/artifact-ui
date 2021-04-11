@@ -64,6 +64,7 @@ const config: webpack.Configuration = {
             components: path.resolve(__dirname, 'src/components/'),
             containers: path.resolve(__dirname, 'src/containers/'),
             assets: path.resolve(__dirname, 'src/assets/'),
+            i18n: path.resolve(__dirname, 'src/i18n/'),
             react: path.resolve('./node_modules/react')
         }
     },

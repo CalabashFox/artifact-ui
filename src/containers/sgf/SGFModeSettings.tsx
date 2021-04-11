@@ -6,10 +6,13 @@ import { setSGFProperties, toggleLiveMode } from "actions/sgf";
 import { SGFProperties } from "models/SGF";
 import CheckboxComponent from "components/form/CheckboxComponent";
 import SGFSettingsComponent from "./SGFSettingsComponent";
-
+import useConnectionState from "components/hook/connectionState";
+import { useTranslation } from 'react-i18next';
 
 const SGFModeSettings: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
+    const { connected } = useConnectionState();
+    const { t } = useTranslation();
     const dispatch = useDispatch();
 
     const sgfProperty = sgfState.sgfProperties;
@@ -22,16 +25,17 @@ const SGFModeSettings: React.FC = () => {
         dispatch(setSGFProperties(properties));
     }
 
-    return <SGFSettingsComponent label={'Mode'}>
+    return <SGFSettingsComponent label={t('ui.sgf.mode')}>
         <CheckboxComponent 
             state={sgfProperty.editMode} 
             handler={() => toggleProperty({...sgfProperty, editMode: !sgfProperty.editMode})}
-            label={'Edit mode'}/>
+            label={t('ui.sgf.editMode')}/>
 
-        <CheckboxComponent 
+        {connected && <CheckboxComponent 
             state={sgfProperty.liveMode} 
             handler={handleLiveModeClick}
-            label={'Live mode'}/>
+            label={t('ui.sgf.liveMode')}/>
+        }
     </SGFSettingsComponent>;
 };
 

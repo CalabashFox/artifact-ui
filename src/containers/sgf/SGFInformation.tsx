@@ -16,7 +16,7 @@ const SGFInformation: React.FC = () => {
         return sgfState.analyzedSGF.isValid && sgfState.analysisProgress.total !== 0 && sgfState.analysisProgress.analyzed === sgfState.analysisProgress.total;
     }, [sgfState.analyzedSGF.isValid, sgfState.analysisProgress.total, sgfState.analysisProgress.analyzed]);
 
-    const displayAnalysisContent = sgfState.hasSGF && analysisCompleted;
+    const displayAnalysisContent = sgfState.hasSGF && analysisCompleted && sgfState.analyzedSGF.analyzedSnapshots !== 0;
 
     return <React.Fragment>
         <Paper>
@@ -24,7 +24,7 @@ const SGFInformation: React.FC = () => {
             {displayAnalysisContent && <Divider/>}
             {displayAnalysisContent && <SGFPlayers/>}
         </Paper>
-            {displayAnalysisContent && <SGFBranchContainer/>}
+            {sgfState.hasSGF && <SGFBranchContainer/>}
             {displayAnalysisContent && <Paper><SGFGraphTab/></Paper>}
         <Paper>
             <KatagoLog/>

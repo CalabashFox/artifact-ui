@@ -1,31 +1,27 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
-import {makeStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import SGFPlayer from './SGFPlayer';
 import WinrateStatus from './WinrateStatus';
 import { SGFColor } from 'models/SGF';
-
-const useStyles = makeStyles((theme) => ({
-    playerContainer: {
-        paddingBottom: theme.spacing(1)
-    }
-}));
+import SGFTerritoryInfo from './SGFTerritoryInfo';
+import usePlayerTitle from "components/hook/playerTitle";
 
 const SGFPlayers: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
-    const classes = useStyles();
+    const [playerBlack, playerWhite, rankBlack, rankWhite] = usePlayerTitle();
+    const analyzedSGF = sgfState.analyzedSGF;
 
     const index = sgfState.sgfProperties.currentMove;
     const blackTurn = index % 2 === 0;
-    const winrateList = blackTurn ? sgfState.analyzedSGF.analysisData.blackWinrate : sgfState.analyzedSGF.analysisData.whiteWinrate;
-    const winrate = winrateList[index].value ?? 0;
+    const winrateList = !analyzedSGF.useAnalysis ? [] : (blackTurn ? analyzedSGF.analysisData.blackWinrate : analyzedSGF.analysisData.whiteWinrate);
+    const winrate = !analyzedSGF.useAnalysis ? 0 : winrateList[index].value ?? 0;
     const blackWinrate = blackTurn ? winrate : 100 - winrate;
     const whiteWinrate = 100 - blackWinrate;
 
-    const showDiff = index >= 1;
+    const showDiff = index >= 1 && analyzedSGF.useAnalysis;
 
     let previousWinrate = 0;
     let blackWinrateDiff = 0;
@@ -39,26 +35,31 @@ const SGFPlayers: React.FC = () => {
     }
 
     return <React.Fragment>
-        <Grid container className={classes.playerContainer}>
-            <Grid item xs={6}>
-                <SGFPlayer 
-                    color={SGFColor.BLACK}
-                    name={sgfState.analyzedSGF.playerBlack}
-                    rank={sgfState.analyzedSGF.rankBlack}
-                    turn={blackTurn}/>
+        <Box pb={1}>
+            <Grid container>
+                <Grid item xs={6}>
+                    <SGFPlayer 
+                        color={SGFColor.BLACK}
+                        name={playerBlack}
+                        rank={rankBlack}
+                        turn={blackTurn}/>
+                </Grid>
+                <Grid item xs={6}>
+                    <SGFPlayer 
+                        color={SGFColor.WHITE}
+                        name={playerWhite}
+                        rank={rankWhite}
+                        turn={!blackTurn}/>
+                </Grid>
             </Grid>
-            <Grid item xs={6}>
-                <SGFPlayer 
-                    color={SGFColor.WHITE}
-                    name={sgfState.analyzedSGF.playerWhite}
-                    rank={sgfState.analyzedSGF.rankWhite}
-                    turn={!blackTurn}/>
-            </Grid>
-        </Grid>
+        </Box>
         <Box width={1}>
             <WinrateStatus color={SGFColor.BLACK} winrate={blackWinrate} winrateDiff={blackWinrateDiff}/>
             <WinrateStatus color={SGFColor.WHITE} winrate={whiteWinrate} winrateDiff={whiteWinrateDiff}/>
         </Box>
+        {sgfState.sgfProperties.situationAnalysisMode && <Box width={1} pt={0.5} pb={0.5}>
+            <SGFTerritoryInfo/>
+        </Box>}
     </React.Fragment>;
 }
 

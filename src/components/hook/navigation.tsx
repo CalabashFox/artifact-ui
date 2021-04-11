@@ -1,4 +1,3 @@
-
 import {useDispatch, useSelector} from "react-redux";
 import {SGFState, StoreState} from "models/StoreState";
 import {setMove} from 'actions/sgf';

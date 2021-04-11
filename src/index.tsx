@@ -15,6 +15,7 @@ import { InitialGameState } from 'models/Game';
 import { InitialAuthState } from 'models/User';
 import { InitialViewState } from 'models/view';
 import { InitialKatagoState } from 'models/Katago';
+import './i18n/config';
 
 const history: History = createBrowserHistory();
 export const routerMiddleware = createRouterMiddleware(history);

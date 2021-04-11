@@ -157,7 +157,7 @@ let theme = createMuiTheme({
         },
         MuiMenuItem: {
             root: {
-                color: defaultTheme.palette.primary.main
+                color: defaultTheme.palette.text.primary
             }
         },
         MuiCircularProgress: {

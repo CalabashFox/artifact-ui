@@ -12,7 +12,7 @@ import Popover from '@material-ui/core/Popover';
 import { getAnalyzedSGF, loadProgress, uploading, uploadSGFFile } from 'actions/sgf';
 import SGFData from 'components/SGFData';
 import SGFBoardSettings from 'components/SGFBoardSettings';
-
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -36,6 +36,7 @@ const SGFModeSettings: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const { t } = useTranslation();
     
     const [sgfBoardSettingsOpen, setSGFBoardSettingsOpen] = useState(false);
     const [gameInfoAnchorElement, setGameInfoAnchorElement] = React.useState<HTMLElement | null>(null);
@@ -80,7 +81,7 @@ const SGFModeSettings: React.FC = () => {
         };
     }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
-    const uploadButton = useIconText(<Upload/>, 'Upload');
+    const uploadButton = useIconText(<Upload/>, t('ui.sgf.upload'));
     
     const infoIcon = useIcon(<Info onClick={handleOpenGameInfo} onMouseEnter={handleOpenGameInfo} onMouseLeave={handleCloseGameInfo}/>);
     const settingsIcon = useIcon(<Config onClick={() => setSGFBoardSettingsOpen(true)}/>);
@@ -93,7 +94,7 @@ const SGFModeSettings: React.FC = () => {
                 {!sgfState.uploading &&<label htmlFor="icon-button-file">
                     {uploadButton}
                 </label>}                        
-                {sgfState.uploading && <Progress progress={sgfState.analysisProgress.analyzed / sgfState.analysisProgress.total} label={'Analyzing...'}/>}
+                {sgfState.uploading && <Progress progress={sgfState.analysisProgress.analyzed / sgfState.analysisProgress.total} label={t('ui.sgf.analyzing')}/>}
             </Grid>
             <Grid item xs={6} className={classes.infoContainer}>
                 {sgfState.hasSGF && infoIcon}

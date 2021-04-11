@@ -25,6 +25,7 @@ import { MovePriority, WinrateReport } from 'models/SGF';
 import Slider from '@material-ui/core/Slider';
 import { setSGFProperties } from 'actions/sgf';
 import TextField from '@material-ui/core/TextField';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme: Theme) => ({
     dialog: {
@@ -67,7 +68,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const SettingsSlider = withStyles(theme => ({
     valueLabel: {
         left: 'calc(-50% + 12px)',
-        top: -22,
+        top: -15,
         '& *': {
             background: 'transparent',
             color: theme.palette.primary.main
@@ -144,8 +145,8 @@ function getEnumTuples(e: enums): Array<EnumTuple> {
     return array;
 }
 
-function generateEnumOptions(array: Array<EnumTuple>) {
-    return array.map(e => <MenuItem key={e.label} value={e.value}>{e.label}</MenuItem>);
+function generateEnumOptions(t: (label: string) => string, array: Array<EnumTuple>) {
+    return array.map(e => <MenuItem key={e.label} value={e.value}>{t('enums.' + e.label)}</MenuItem>);
 }
 
 const movePriorities = getEnumTuples(MovePriority);
@@ -155,6 +156,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const { t } = useTranslation();
 
     const sgfProperties = sgfState.sgfProperties;
 
@@ -227,15 +229,15 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                     <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
                         <CloseIcon />
                     </IconButton>
-                    <Typography variant="subtitle1" className={classes.title}>SGF Settings</Typography>
-                    <Button color="inherit" onClick={handleSave}>save</Button>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.sgfSettings')}</Typography>
+                    <Button color="inherit" onClick={handleSave}>{t('ui.sgf.settings.save')}</Button>
                 </Toolbar>
             </AppBar>
             <Grid container className={classes.formContainer}>
 
 
                 <Grid item xs={9} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Max visits</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.maxVisits')}</Typography>
                 </Grid>
                 <Grid item xs={3} className={classes.formInput}>
                     <SettingsInput label="move"
@@ -254,7 +256,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={9} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Use sound</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.useSound')}</Typography>
                 </Grid>
                 <Grid item xs={3} className={classes.formInput}>
                     <Switch
@@ -264,7 +266,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={9} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Display ownership</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.displayOwnership')}</Typography>
                 </Grid>
                 <Grid item xs={3} className={classes.formInput}>
                     <Switch
@@ -274,7 +276,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={9} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Display moves</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.displayMoves')}</Typography>
                 </Grid>
                 <Grid item xs={3} className={classes.formInput}>
                     <Switch
@@ -284,7 +286,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={9} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Display policy</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.displayPolicy')}</Typography>
                 </Grid>
                 <Grid item xs={3} className={classes.formInput}>
                     <Switch
@@ -294,7 +296,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={7} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Minumum policy value</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.minimumPolicyValue')}</Typography>
                 </Grid>
                 <Grid item xs={5} className={classes.formInput}>
                     <FormControl>
@@ -311,7 +313,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={7} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Minumum ownership value</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.minimumOwnershipValue')}</Typography>
                 </Grid>
                 <Grid item xs={5} className={classes.formInput}>
                     <FormControl>
@@ -328,7 +330,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={7} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Match top N recommended</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.matchAnalysisTop')}</Typography>
                 </Grid>
                 <Grid item xs={5} className={classes.formInput}>
                     <FormControl>
@@ -342,7 +344,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                 </Grid>
 
                 <Grid item xs={7} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Prioritize top moves by</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.movePriority')}</Typography>
                 </Grid>
                 <Grid item xs={5} className={classes.formInput}>
                     <FormControl>
@@ -350,13 +352,13 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                             className={classes.select}
                             value={movePriority}
                             onChange={(e) => handleSelectChange(e.target.value as string, setMovePriority)}>
-                            {generateEnumOptions(movePriorities)}
+                            {generateEnumOptions(t, movePriorities)}
                         </Select>
                     </FormControl>
                 </Grid>
 
                 <Grid item xs={7} className={classes.formLabel}>
-                    <Typography variant="subtitle1" className={classes.title}>Report analysis winrate as</Typography>
+                    <Typography variant="subtitle1" className={classes.title}>{t('ui.sgf.settings.reportWinrateAs')}</Typography>
                 </Grid>
                 <Grid item xs={5} className={classes.formInput}>
                     <FormControl>
@@ -364,7 +366,7 @@ const SGFBoardSettings: React.FC<SGFBoardSettingsProps> = ({open, onClose}) => {
                             className={classes.select}
                             value={reportAnalysisWinratesAs}
                             onChange={(e) => handleSelectChange(e.target.value as string, setReportAnalysisWinratesAs)}>
-                            {generateEnumOptions(winrateReports)}
+                            {generateEnumOptions(t, winrateReports)}
                         </Select>
                     </FormControl>
                 </Grid>

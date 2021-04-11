@@ -6,18 +6,16 @@ import {useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
 import {SGFGraphValue} from 'models/SGF';
 import { makeStyles } from '@material-ui/core';
+import { TooltipProps } from 'recharts';
+import usePlayerTitle from './hook/playerTitle';
 
 export interface SGFGraphProps {
     identifier: string
+    percentage: boolean
     data: Array<SGFGraphValue>
     color: string
     name: string
-    player: SGFGraphPlayerProps | null
-}
-
-export interface SGFGraphPlayerProps {
-    playerBlack: string
-    playerWhite: string
+    diplayPlayerName: boolean
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -32,21 +30,25 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const GraphTooltip = ({ active, payload, label }: any) => {
+interface GraphTooltipProps extends TooltipProps<number, string> {
+    percentage: boolean
+}
+
+const GraphTooltip = ({ active, payload, label, percentage }: GraphTooltipProps) => {
     const classes = useStyles();
-    if (active && payload.length !== 0) {
+    if (active && payload !== undefined && payload.length !== 0) {
         return (
             <div className={classes.tooltip}>
-                <p className="label">{`move ${label}: ${payload[0].value.toFixed(2)}%`}</p>
+                <p className="label">{`move ${label}: ${payload[0].value?.toFixed(2)}${percentage ? '%' : ''}`}</p>
             </div>
         );
     }
     return null;
 };
 
-const SGFGraph: React.FC<SGFGraphProps> = ({identifier, data, color, name, player}) => {
+const SGFGraph: React.FC<SGFGraphProps> = ({identifier, percentage, data, color, name, diplayPlayerName}) => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
+    const [playerBlack, playerWhite] = usePlayerTitle();
     const vMargin = 5;
     const hMargin = 0;
 
@@ -65,13 +67,13 @@ const SGFGraph: React.FC<SGFGraphProps> = ({identifier, data, color, name, playe
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis stroke={chartColor} dataKey="label" minTickGap={50}/>
                 <YAxis stroke={chartColor} width={40}/>
-                {player && 
+                {diplayPlayerName && 
                     <YAxis yAxisId='labelAxis' orientation='right' tickLine={false} axisLine={false} stroke={chartColor}>
-                        <Label position="insideTop" fill={chartColor}>{player.playerBlack}</Label>
-                        <Label position="insideBottom" fill={chartColor}>{player.playerWhite}</Label>
+                        <Label position="insideTop" fill={chartColor}>{playerBlack}</Label>
+                        <Label position="insideBottom" fill={chartColor}>{playerWhite}</Label>
                     </YAxis>
                 }
-                <Tooltip content={<GraphTooltip/>}/>
+                <Tooltip content={<GraphTooltip percentage={percentage}/>}/>
                 <Legend />
                 <Line key={`${identifier}`} connectNulls dataKey="value" type="monotone" name={name} stroke={color} dot={false} />
             </LineChart>

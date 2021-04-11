@@ -28,7 +28,7 @@ export default class SgfUtils {
     }
     
     static calculateSGFAnalysisData(sgfProperties: SGFProperties, analyzedSGF: AnalyzedSGF | undefined): AnalyzedSGF | undefined {
-        if (analyzedSGF === undefined) {
+        if (analyzedSGF === undefined || !analyzedSGF.useAnalysis || analyzedSGF.analyzedSnapshots === 0) {
             return analyzedSGF;
         }
         analyzedSGF.analysisData = {
@@ -44,7 +44,7 @@ export default class SgfUtils {
             whiteMatch: 0,
             blackMatchAnalysis: [],
             whiteMatchAnalysis: []
-        }
+        }/*
         for (let i = 0; i < analyzedSGF.snapshotList.length; i++) {
             const snapshot = analyzedSGF.snapshotList[i];
             const info = snapshot.katagoResults[0].rootInfo;
@@ -101,11 +101,14 @@ export default class SgfUtils {
                     value: info.scoreSelfplay
                 });
             }
-        }
+        }*/
         return analyzedSGF;
     }
 
     static calculateSGFMatchAnalysisData(sgfProperties: SGFProperties, analyzedSGF: AnalyzedSGF): AnalyzedSGF {
+        if (analyzedSGF === undefined || !analyzedSGF.useAnalysis || analyzedSGF.analyzedSnapshots === 0) {
+            return analyzedSGF;
+        }/*
         const matchRecommended = sgfProperties.matchRecommended - 1;
         for (let i = 0; i < analyzedSGF.snapshotList.length; i+=2) {
             const analysisResult = analyzedSGF.snapshotList[i].katagoResults[0];
@@ -149,16 +152,20 @@ export default class SgfUtils {
         }
         analyzedSGF.analysisData.blackMatch = analyzedSGF.analysisData.blackMatchAnalysis.filter(v => v).length / analyzedSGF.analysisData.blackMatchAnalysis.length;
         analyzedSGF.analysisData.whiteMatch = analyzedSGF.analysisData.whiteMatchAnalysis.filter(v => v).length / analyzedSGF.analysisData.whiteMatchAnalysis.length;
-        analyzedSGF.analysisData.blackWinrateAnalysis[0].ai = analyzedSGF.analysisData.blackWinrateAnalysis[0].player;
+        analyzedSGF.analysisData.blackWinrateAnalysis[0].ai = analyzedSGF.analysisData.blackWinrateAnalysis[0].player;*/
         return analyzedSGF;
     }
 
     static recalculateSnapshotAnalysisData(sgfProperties: SGFProperties, analyzedSGF: AnalyzedSGF): AnalyzedSGF {
+        if (analyzedSGF === undefined || !analyzedSGF.useAnalysis || analyzedSGF.analyzedSnapshots === 0) {
+            return analyzedSGF;
+        }
+        /*
         for (const sgfSnapshot of analyzedSGF.snapshotList) {
             sgfSnapshot.analysisData = {
                 moves: this.sortMoves(sgfProperties.movePriority, sgfSnapshot.katagoResults[0].moveInfos).slice(0, sgfProperties.moveCount)
             };
-        }
+        }*/
         return analyzedSGF;
     }
 

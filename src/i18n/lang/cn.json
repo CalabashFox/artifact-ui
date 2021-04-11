@@ -1,0 +1,95 @@
+{
+    "katago": {
+        "recommendation": "推荐",
+        "move": "步数",
+        "ownership": "领域",
+        "policy": "优先推荐"
+    },
+    "ui": {
+        "scannerView": "棋盘扫描",
+        "gameView": "对局",
+        "sgfView": "分析",
+        "game": {
+            "startGame": "开始游戏",
+            "undo": "悔棋",
+            "stop": "结束游戏"
+        },
+        "sgf": {
+            "upload": "上传",
+            "lead": "目数优势",
+            "winrate": "胜率",
+            "selfplay": "自走",
+            "matchAnalysis": "吻合率",
+            "katagoLog": "Katago日志",
+            "move": "位置",
+            "visits": "访问数",
+            "mode": "模式",
+            "liveMode": "即时模式",
+            "editMode": "试下模式",
+            "display": "显示",
+            "blackLead": "黑领先",
+            "whiteLead": "白领先",
+            "komi": "帖目",
+            "points": "目",
+            "analyzing": "分析中...",
+            "idle": "空闲状态",
+            "cannotConnect": "无法连接",
+            "connecting": "连接中",
+            "connected": "已连接",
+            "disconnected": "断开连接",
+            "settings": {
+                "save": "保存",
+                "sgfSettings": "设置",
+                "maxVisits": "最大访问数限制",
+                "useSound": "使用音效",
+                "displayOwnership": "显示领域",
+                "displayMoves": "显示步数",
+                "displayPolicy": "显示优先推荐",
+                "minimumPolicyValue": "最低推荐显示阈值",
+                "minimumOwnershipValue": "最低领域显示阈值",
+                "matchAnalysisTop": "吻合率对比前N手推荐",
+                "movePriority": "推荐优先级",
+                "reportWinrateAs": "分析报告"
+            }
+        }
+    },
+    "go": {
+        "territory": "目",
+        "area": "地",
+        "komi": "帖目",
+        "event": "比赛",
+        "time": "计时",
+        "round": "轮次",
+        "date": "日期",
+        "rule": "规则",
+        "result": "结果"
+    },
+    "player": {
+        "white": "白",
+        "black": "黑",
+        "unknown": "无",
+        "yang.dingxin": "杨鼎新",
+        "shi.yue": "时越",
+        "ke.jie": "柯洁",
+        "alphago": "Alpha Go",
+        "9p": "九段",
+        "8p": "八段",
+        "7p": "七段",
+        "6p": "六段",
+        "5p": "五段",
+        "4p": "四段",
+        "3p": "三段",
+        "2p": "二段",
+        "1p": "一段"
+    },
+    "enums": {
+        "WINRATE": "胜率",
+        "MEAN": "平均值",
+        "LEAD": "目数优势",
+        "PRIOR": "Policy优先级",
+        "ORDER": "Katago优先级",
+        "BLACK": "BLACK",
+        "WHITE": "WHITE",
+        "SIDETOMOVE": "SIDETOMOVE"
+    }
+}

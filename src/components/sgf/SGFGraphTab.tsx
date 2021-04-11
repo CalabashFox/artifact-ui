@@ -10,6 +10,8 @@ import Collapse from '@material-ui/core/Collapse';
 import {Up, Down} from '@icon-park/react';
 import SGFGraph from 'components/SGFGraph';
 import { SGFGraphValue } from 'models/SGF';
+import { useTranslation } from 'react-i18next';
+import usePlayerTitle from 'components/hook/playerTitle';
 
 const useStyles = makeStyles((theme: Theme) => ({
     info: {
@@ -42,8 +44,10 @@ const calculateMatchScore = (winrates: Array<boolean>): Array<SGFGraphValue> => 
 const SGFGraphTab: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
+    const { t } = useTranslation();
     const [graphTabValue, setGraphTabValue] = useState(0);
     const [graphExpanded, setGraphExpanded] = useState(true);
+    const [playerBlack, playerWhite] = usePlayerTitle();
 
     const analysisData = sgfState.analyzedSGF.analysisData;
 
@@ -58,13 +62,6 @@ const SGFGraphTab: React.FC = () => {
     const expandIcon = useIcon(<Down onClick={handleGraphExpandClick}/>);
     const collapseIcon = useIcon(<Up onClick={handleGraphExpandClick}/>);
 
-    const playerProps = useMemo(() => {
-        return {
-            playerBlack: sgfState.analyzedSGF.playerBlack,
-            playerWhite: sgfState.analyzedSGF.playerWhite
-        };
-    }, [sgfState.analyzedSGF.playerBlack, sgfState.analyzedSGF.playerWhite]);
-
     const blackMatchAnalysis = useMemo(() => calculateMatchScore(analysisData.blackMatchAnalysis), [analysisData.blackMatchAnalysis]);
     const whiteMatchAnalysis = useMemo(() => calculateMatchScore(analysisData.whiteMatchAnalysis), [analysisData.whiteMatchAnalysis]);
 
@@ -72,48 +69,53 @@ const SGFGraphTab: React.FC = () => {
 
     const scoreLeadGraph = useMemo(() => 
         <SGFGraph 
-            player={playerProps} 
+            diplayPlayerName={true}
+            percentage={false}
             identifier={`score-lead-graph`} 
-            name={playerProps.playerBlack} 
+            name={playerBlack} 
             data={analysisData.blackScoreLead} 
             color={COLOR}/> 
-    , [playerProps, analysisData]);
+    , [playerBlack, analysisData]);
 
     const winrateGraph = useMemo(() => 
         <SGFGraph 
-            player={playerProps} 
+            diplayPlayerName={true}
+            percentage={true}
             identifier={`winrate-graph`} 
-            name={playerProps.playerBlack} 
+            name={playerBlack} 
             data={analysisData.blackWinrate} 
             color={COLOR}/> 
-    , [playerProps, analysisData]);
+    , [playerBlack, analysisData]);
 
     const selfplayGraph = useMemo(() => 
         <SGFGraph 
-            player={playerProps} 
+            diplayPlayerName={true}
+            percentage={false}
             identifier={`score-selfplay-graph`} 
-            name={playerProps.playerBlack} 
+            name={playerBlack} 
             data={analysisData.blackSelfplay} 
             color={COLOR}/> 
-    , [playerProps, analysisData]);
+    , [playerBlack, analysisData]);
 
     const blackAnalysisGraph = useMemo(() =>
         <SGFGraph 
-            player={null} 
+            diplayPlayerName={false}
+            percentage={true}
             identifier={`winrate-analysis-black`} 
-            name={playerProps.playerBlack} 
+            name={playerBlack} 
             data={blackMatchAnalysis} 
             color={COLOR}/> 
-    , [playerProps, blackMatchAnalysis]);
+    , [playerBlack, blackMatchAnalysis]);
 
     const whiteAnalysisGraph = useMemo(() =>
         <SGFGraph 
-            player={null} 
+            diplayPlayerName={false}
+            percentage={true}
             identifier={`winrate-analysis-white`} 
-            name={playerProps.playerWhite} 
+            name={playerWhite} 
             data={whiteMatchAnalysis} 
             color={COLOR}/> 
-    , [playerProps, whiteMatchAnalysis]);
+    , [playerWhite, whiteMatchAnalysis]);
 
     return <React.Fragment>
         <Grid container>
@@ -123,10 +125,10 @@ const SGFGraphTab: React.FC = () => {
                     indicatorColor="primary"
                     textColor="primary"
                     onChange={toggleGraphTab}>
-                    <Tab label="Lead" />
-                    <Tab label="Winrate" />
-                    <Tab label="Selfplay" />
-                    <Tab label="Match analysis" />
+                    <Tab label={t('ui.sgf.lead')} />
+                    <Tab label={t('ui.sgf.winrate')} />
+                    <Tab label={t('ui.sgf.selfplay')} />
+                    <Tab label={t('ui.sgf.matchAnalysis')} />
                 </Tabs>
             </Grid>
             <Grid item xs={1}>

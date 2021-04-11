@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import { KatagoMoveInfo } from "models/Katago";
 import { TablePagination } from "@material-ui/core";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() => ({
     visuallyHidden: {
@@ -67,10 +68,10 @@ interface HeadCell {
 }
 
 const headers: Array<HeadCell> = [
-    { id: 'move', numeric: false, disablePadding: true, label: 'move' },
-    { id: 'winrate', numeric: true, disablePadding: false, label: 'winrate' },
-    { id: 'scoreLead', numeric: true, disablePadding: false, label: 'lead' },
-    { id: 'visits', numeric: true, disablePadding: false, label: 'visits' }
+    { id: 'move', numeric: false, disablePadding: true, label: 'ui.sgf.move' },
+    { id: 'winrate', numeric: true, disablePadding: false, label: 'ui.sgf.winrate' },
+    { id: 'scoreLead', numeric: true, disablePadding: false, label: 'ui.sgf.lead' },
+    { id: 'visits', numeric: true, disablePadding: false, label: 'ui.sgf.visits' }
 ]
 
 interface EnhancedTableProps {
@@ -84,6 +85,7 @@ const EnhancedTableHead: React.FC<EnhancedTableProps> = ({ classes, order, order
     const createSortHandler = (property: keyof KatagoMoveInfo) => (event: React.MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
+    const { t } = useTranslation();
 
     return (
         <TableHead>
@@ -98,7 +100,7 @@ const EnhancedTableHead: React.FC<EnhancedTableProps> = ({ classes, order, order
                             active={orderBy === header.id}
                             direction={orderBy === header.id ? order : 'asc'}
                             onClick={createSortHandler(header.id)}>
-                            {header.label}
+                            {t(header.label)}
                             {orderBy === header.id ? (
                                 <span className={classes.visuallyHidden}>
                                     {order === 'desc' ? 'sorted descending' : 'sorted ascending'}

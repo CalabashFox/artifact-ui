@@ -3,8 +3,10 @@ import { SGFState } from './StoreState';
 
 export interface AnalyzedSGF {
     isValid: boolean
-    snapShotsAnalyzed: number
-    snapshotList: Array<SGFSnapshot>
+    mainBranch: SGFSnapshotBranch
+    useAnalysis: boolean
+    totalSnapshots: number
+    analyzedSnapshots: number
     annotation: string
     application: string
     date: Date
@@ -20,8 +22,14 @@ export interface AnalyzedSGF {
     result: string
     place: string
     rules: string
-    moves: Array<SGFMove>,
+    moves: Array<SGFMove>
     analysisData: SGFAnalysisData
+}
+
+export interface SGFSnapshotBranch {
+    id: number
+    level: number
+    snapshotList: Array<SGFSnapshot>
 }
 
 export interface SGFGraphValue {
@@ -62,8 +70,13 @@ export interface SGFMove {
 export interface SGFSnapshot {
     stones: Array<SGFStone>
     index: number
-    katagoResults : Array<KatagoResult>
+    moveIndex: number
+    level: number
+    branchId: number
+    branchIndex: number
+    katagoResult: KatagoResult | null
     analysisData: SnapshotAnalysisData
+    branches: Array<SGFSnapshotBranch>
 }
 
 export interface SnapshotAnalysisData {
@@ -129,8 +142,14 @@ export const InitialSGFState: SGFState = {
     },
     analyzedSGF: {
         isValid: false,
-        snapShotsAnalyzed: 0,
-        snapshotList: new Array<SGFSnapshot>(),
+        mainBranch: {
+            id: 0,
+            level: 0,
+            snapshotList: Array<SGFSnapshot>()
+        },
+        useAnalysis: false,
+        totalSnapshots: 0,
+        analyzedSnapshots: 0,
         annotation: '',
         application: '',
         date: new Date(),
@@ -168,7 +187,7 @@ export const InitialSGFState: SGFState = {
     },
     error: '',
     sgfProperties: {
-        currentMove: 239,
+        currentMove: 2,
         displayOwnership: true,
         displayPolicy: true,
         displayMoves: true,
@@ -181,11 +200,11 @@ export const InitialSGFState: SGFState = {
         continuousAnalysis: false,
         useSound: true,
         liveMode: false,
-        editMode: false,
+        editMode: true,
         displayIndex: false,
         displayRecommendations: true,
         maxVisits: 200,
-        situationAnalysisMode: true
+        situationAnalysisMode: false
     },
     uploading: false,
     uploadProgress: 0

@@ -13,6 +13,7 @@ import GameData from 'components/game/GameData';
 import { stopGame, undo } from 'actions/game';
 import SGFBoardSettings from 'components/SGFBoardSettings';
 import GameSettings from 'components/game/GameSettings';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -36,11 +37,12 @@ const GameStatusBar: React.FC = () => {
     const gameState = useSelector<StoreState, GameState>(state => state.gameState);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const { t } = useTranslation();
     
     const game = gameState.game;
     
     const [sgfBoardSettingsOpen, setSGFBoardSettingsOpen] = useState(false);
-    const [gameSettingsOpen, setGameSettingsOpen] = useState(true);
+    const [gameSettingsOpen, setGameSettingsOpen] = useState(false);
     const [gameInfoAnchorElement, setGameInfoAnchorElement] = React.useState<HTMLElement | null>(null);
     const gameInfoOpen = Boolean(gameInfoAnchorElement);
 
@@ -55,9 +57,9 @@ const GameStatusBar: React.FC = () => {
     const infoIcon = useIcon(<Info onClick={handleOpenGameInfo} onMouseEnter={handleOpenGameInfo} onMouseLeave={handleCloseGameInfo}/>);
     const settingsIcon = useIcon(<Config onClick={() => setSGFBoardSettingsOpen(true)}/>);
 
-    const startButton = useIconText(<Checkerboard/>, 'Start game', () => setGameSettingsOpen(true));
-    const undoButton = useIconText(<Undo/>, 'Undo', () => handleUndoClick());
-    const stopButton = useIconText(<CloseOne/>, 'Stop', () => handleStopClick());
+    const startButton = useIconText(<Checkerboard/>, t('ui.game.startGame'), () => setGameSettingsOpen(true));
+    const undoButton = useIconText(<Undo/>, t('ui.game.undo'), () => handleUndoClick());
+    const stopButton = useIconText(<CloseOne/>, t('ui.game.stop'), () => handleStopClick());
 
     const handleUndoClick = () => {
         dispatch(undo());

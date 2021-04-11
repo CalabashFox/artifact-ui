@@ -3,18 +3,21 @@ import {useSelector} from 'react-redux';
 import {KatagoState, SGFState, StoreState} from 'models/StoreState';
 import SGFAnalysisTable from "components/sgf/SGFAnalysisTable";
 import { KatagoMoveInfo } from "models/Katago";
+import useValidSGF from "components/hook/validSGF";
+import useCurrentSnapshot from "components/hook/currentSnapshot";
 
 const SGFAnalysisTableContainer: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const katagoState = useSelector<StoreState, KatagoState>(state => state.katagoState);
+    const validSGF = useValidSGF();
+    const snapshot = useCurrentSnapshot();
 
     let data: Array<KatagoMoveInfo> = [];
-    if (sgfState.hasSGF && sgfState.analyzedSGF.isValid) {
-        const snapshot = sgfState.analyzedSGF.snapshotList[sgfState.sgfProperties.currentMove];
+    if (validSGF) {
         if (sgfState.sgfProperties.liveMode) {
             data = katagoState.katagoResult.moveInfos;
-        } else if (snapshot.katagoResults.length > 0) {
-            data = snapshot.katagoResults[0].moveInfos;
+        } else if (snapshot !== null && snapshot.katagoResult !== null) {
+            data = snapshot.katagoResult.moveInfos;
         }
     }
 /*

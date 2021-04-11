@@ -1,0 +1,196 @@
+{
+    "snapshotList": [
+      {
+        "stones": [],
+        "index": 0,
+        "katagoResults": []
+      },
+      {
+        "stones": [
+          [
+            "B",
+            "A1"
+          ]
+        ],
+        "index": 1,
+        "katagoResults": []
+      },
+      {
+        "stones": [
+          [
+            "B",
+            "A1"
+          ],
+          [
+            "W",
+            "B2"
+          ]
+        ],
+        "index": 2,
+        "katagoResults": []
+      },
+      {
+        "stones": [
+          [
+            "B",
+            "A1"
+          ],
+          [
+            "W",
+            "B2"
+          ],
+          [
+            "B",
+            "C3"
+          ]
+        ],
+        "index": 3,
+        "katagoResults": []
+      },
+      {
+        "stones": [
+          [
+            "B",
+            "A1"
+          ],
+          [
+            "W",
+            "B2"
+          ],
+          [
+            "B",
+            "C3"
+          ],
+          [
+            "W",
+            "D4"
+          ]
+        ],
+        "index": 4,
+        "katagoResults": []
+      },
+      {
+        "stones": [
+          [
+            "B",
+            "A1"
+          ],
+          [
+            "W",
+            "B2"
+          ],
+          [
+            "B",
+            "C3"
+          ],
+          [
+            "W",
+            "D4"
+          ],
+          [
+            "B",
+            "A4"
+          ]
+        ],
+        "index": 5,
+        "katagoResults": []
+      },
+      {
+        "stones": [
+          [
+            "B",
+            "A1"
+          ],
+          [
+            "W",
+            "B2"
+          ],
+          [
+            "B",
+            "C3"
+          ],
+          [
+            "W",
+            "D4"
+          ],
+          [
+            "B",
+            "A4"
+          ],
+          [
+            "W",
+            "B4"
+          ]
+        ],
+        "index": 6,
+        "katagoResults": []
+      }
+    ],
+    "snapShotsAnalyzed": 0,
+    "isValid": true,
+    "fileName": "/Users/io/projects/katago_config/var_1.sgf",
+    "komi": 0.0,
+    "fileFormat": "4",
+    "moves": [
+      {
+        "color": "BLACK",
+        "index": 1,
+        "branchList": [],
+        "signedMoveList": [],
+        "col": 0,
+        "row": 0,
+        "sgfLocation": "aa",
+        "gtpLocation": "A1"
+      },
+      {
+        "color": "WHITE",
+        "index": 2,
+        "branchList": [],
+        "signedMoveList": [],
+        "col": 1,
+        "row": 1,
+        "sgfLocation": "bb",
+        "gtpLocation": "B2"
+      },
+      {
+        "color": "BLACK",
+        "index": 3,
+        "branchList": [],
+        "signedMoveList": [],
+        "col": 2,
+        "row": 2,
+        "sgfLocation": "cc",
+        "gtpLocation": "C3"
+      },
+      {
+        "color": "WHITE",
+        "index": 4,
+        "branchList": [],
+        "signedMoveList": [],
+        "col": 3,
+        "row": 3,
+        "sgfLocation": "dd",
+        "gtpLocation": "D4"
+      },
+      {
+        "color": "BLACK",
+        "index": 5,
+        "branchList": [],
+        "signedMoveList": [],
+        "col": 0,
+        "row": 3,
+        "sgfLocation": "ad",
+        "gtpLocation": "A4"
+      },
+      {
+        "color": "WHITE",
+        "index": 6,
+        "branchList": [],
+        "signedMoveList": [],
+        "col": 1,
+        "row": 3,
+        "sgfLocation": "bd",
+        "gtpLocation": "B4"
+      }
+    ]
+  }

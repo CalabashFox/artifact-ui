@@ -11,6 +11,7 @@ import Divider from '@material-ui/core/Divider';
 import Hidden from '@material-ui/core/Hidden';
 import SGFComplexAnalysis from 'components/sgf/SGFComplexAnalysis';
 import useNavigation from "components/hook/navigation";
+import useCurrentSnapshot from "components/hook/currentSnapshot";
 
 const useStyles = makeStyles(() => ({
     graphButtons: {
@@ -49,6 +50,7 @@ const SGFBoardPanel: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const snapshot = useCurrentSnapshot();
 
     const totalMoves = sgfState.analyzedSGF.moves.length - 1;
     const currentMove = sgfState.sgfProperties.currentMove;
@@ -77,8 +79,7 @@ const SGFBoardPanel: React.FC = () => {
         setMoveText(currentMove);
     }, [currentMove]);
     
-    const snapshot = sgfState.analyzedSGF.snapshotList[sgfState.sgfProperties.currentMove];
-    const hasKatagoResult = sgfState.hasSGF && snapshot.katagoResults.length > 0;
+    const hasKatagoResult = sgfState.hasSGF && snapshot !== null && snapshot.katagoResult !== null;
 
     const backwardDisabled = currentMove === 0 || !hasKatagoResult;
     const forwardDisabled = currentMove === totalMoves || !hasKatagoResult;

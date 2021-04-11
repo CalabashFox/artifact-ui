@@ -26,7 +26,7 @@ const WinrateStatus: React.FC<WinrateStatusProps> = ({ color, winrate, winrateDi
 
     const statusClass = color === SGFColor.BLACK ? classes.blackStatus : classes.whiteStatus;
 
-    return <Box display="inline-block" width={winrate + '%'} style={{minWidth: '10%'}}>
+    return <Box display="inline-block" width={winrate + '%'} style={{minWidth: '10%', maxWidth: '90%'}}>
         <Typography variant="caption" align="center" className={statusClass} display="block" noWrap>
         {winrate.toFixed(1) + '%'} {winrateDiff > 0 ? '(+' + winrateDiff.toFixed(1) + '%)' : ''}
         </Typography>
