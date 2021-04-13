@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {SGFState, StoreState, ViewState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
 import {AnalyzedSGF} from 'models/SGF';
-import * as mock from 'assets/var-3.json'
+import * as mock from 'assets/var-5.json'
 import {receiveProgress, set} from 'actions/sgf';
 import { setTab } from 'actions/view';
 import AppBar from '@material-ui/core/AppBar';

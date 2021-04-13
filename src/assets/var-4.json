@@ -10,9 +10,9 @@
           "level": 0,
           "branchId": 0,
           "branchIndex": 0,
+          "rootBranchId": 0,
+          "nodeName": null,
           "katagoResult": null,
-          "moves": null,
-          "policy": null,
           "branches": []
         },
         {
@@ -27,9 +27,9 @@
           "level": 0,
           "branchId": 0,
           "branchIndex": 1,
+          "rootBranchId": 0,
+          "nodeName": null,
           "katagoResult": null,
-          "moves": null,
-          "policy": null,
           "branches": []
         },
         {
@@ -48,9 +48,9 @@
           "level": 0,
           "branchId": 0,
           "branchIndex": 2,
+          "rootBranchId": 0,
+          "nodeName": null,
           "katagoResult": null,
-          "moves": null,
-          "policy": null,
           "branches": [
             {
               "id": 1,
@@ -76,9 +76,9 @@
                   "level": 0,
                   "branchId": 1,
                   "branchIndex": 0,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 },
                 {
@@ -105,9 +105,9 @@
                   "level": 0,
                   "branchId": 1,
                   "branchIndex": 1,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": [
                     {
                       "id": 2,
@@ -141,9 +141,9 @@
                           "level": 0,
                           "branchId": 2,
                           "branchIndex": 0,
+                          "rootBranchId": 1,
+                          "nodeName": null,
                           "katagoResult": null,
-                          "moves": null,
-                          "policy": null,
                           "branches": []
                         },
                         {
@@ -178,9 +178,9 @@
                           "level": 0,
                           "branchId": 2,
                           "branchIndex": 1,
+                          "rootBranchId": 1,
+                          "nodeName": null,
                           "katagoResult": null,
-                          "moves": null,
-                          "policy": null,
                           "branches": []
                         }
                       ]
@@ -217,9 +217,9 @@
                           "level": 1,
                           "branchId": 3,
                           "branchIndex": 0,
+                          "rootBranchId": 1,
+                          "nodeName": null,
                           "katagoResult": null,
-                          "moves": null,
-                          "policy": null,
                           "branches": []
                         },
                         {
@@ -254,9 +254,9 @@
                           "level": 1,
                           "branchId": 3,
                           "branchIndex": 1,
+                          "rootBranchId": 1,
+                          "nodeName": null,
                           "katagoResult": null,
-                          "moves": null,
-                          "policy": null,
                           "branches": []
                         }
                       ]
@@ -289,9 +289,9 @@
                   "level": 1,
                   "branchId": 4,
                   "branchIndex": 0,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 },
                 {
@@ -318,9 +318,9 @@
                   "level": 1,
                   "branchId": 4,
                   "branchIndex": 1,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 }
               ]
@@ -352,148 +352,6 @@
     "charset": null,
     "overtime": null,
     "comment": null,
-    "moves": [
-      {
-        "color": "BLACK",
-        "index": 1,
-        "comment": null,
-        "branches": [],
-        "signedMoveList": [],
-        "nodeName": null,
-        "col": 0,
-        "row": 0,
-        "sgfLocation": "aa",
-        "gtpLocation": "A1"
-      },
-      {
-        "color": "WHITE",
-        "index": 2,
-        "comment": null,
-        "branches": [
-          {
-            "moves": [
-              {
-                "color": "BLACK",
-                "index": 3,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 2,
-                "row": 2,
-                "sgfLocation": "cc",
-                "gtpLocation": "C3"
-              },
-              {
-                "color": "WHITE",
-                "index": 4,
-                "comment": null,
-                "branches": [
-                  {
-                    "moves": [
-                      {
-                        "color": "BLACK",
-                        "index": 5,
-                        "comment": null,
-                        "branches": [],
-                        "signedMoveList": [],
-                        "nodeName": null,
-                        "col": 0,
-                        "row": 3,
-                        "sgfLocation": "ad",
-                        "gtpLocation": "A4"
-                      },
-                      {
-                        "color": "WHITE",
-                        "index": 6,
-                        "comment": null,
-                        "branches": [],
-                        "signedMoveList": [],
-                        "nodeName": null,
-                        "col": 1,
-                        "row": 3,
-                        "sgfLocation": "bd",
-                        "gtpLocation": "B4"
-                      }
-                    ],
-                    "nodeName": null
-                  },
-                  {
-                    "moves": [
-                      {
-                        "color": "BLACK",
-                        "index": 7,
-                        "comment": null,
-                        "branches": [],
-                        "signedMoveList": [],
-                        "nodeName": null,
-                        "col": 4,
-                        "row": 4,
-                        "sgfLocation": "ee",
-                        "gtpLocation": "E5"
-                      },
-                      {
-                        "color": "WHITE",
-                        "index": 8,
-                        "comment": null,
-                        "branches": [],
-                        "signedMoveList": [],
-                        "nodeName": null,
-                        "col": 5,
-                        "row": 5,
-                        "sgfLocation": "ff",
-                        "gtpLocation": "F6"
-                      }
-                    ],
-                    "nodeName": null
-                  }
-                ],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 3,
-                "row": 3,
-                "sgfLocation": "dd",
-                "gtpLocation": "D4"
-              }
-            ],
-            "nodeName": null
-          },
-          {
-            "moves": [
-              {
-                "color": "BLACK",
-                "index": 9,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 7,
-                "row": 7,
-                "sgfLocation": "hh",
-                "gtpLocation": "H8"
-              },
-              {
-                "color": "WHITE",
-                "index": 10,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 7,
-                "row": 6,
-                "sgfLocation": "hg",
-                "gtpLocation": "H7"
-              }
-            ],
-            "nodeName": null
-          }
-        ],
-        "signedMoveList": [],
-        "nodeName": null,
-        "col": 1,
-        "row": 1,
-        "sgfLocation": "bb",
-        "gtpLocation": "B2"
-      }
-    ]
+    "moves": []
   }
+  

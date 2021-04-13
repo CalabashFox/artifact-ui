@@ -11,6 +11,7 @@ import GameInformation from "./GameInformation";
 import { GameActionState } from "models/Game";
 import useIcon from "components/hook/icon";
 import SGFBoardSound from "components/SGFBoardSound";
+import useCurrentSnapshot from "components/hook/currentSnapshot";
 
 const useStyles = makeStyles((theme) => ({
     graphButtons: {
@@ -47,6 +48,7 @@ const GameView: React.FC = () => {
     const katagoState = useSelector<StoreState, KatagoState>(state => state.katagoState);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const snapshot = useCurrentSnapshot();
     const game = gameState.game;
     
     const stones = game.stones;
@@ -103,6 +105,7 @@ const GameView: React.FC = () => {
                 </Paper>}
                 <Paper>
                     <SGFBoard click={(x, y) => handleClick(x, y)} 
+                        snapshot={snapshot}
                         currentMove={currentMove}
                         policy={policy} 
                         moveInfos={moveInfos} 

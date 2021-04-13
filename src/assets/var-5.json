@@ -10,9 +10,9 @@
           "level": 0,
           "branchId": 0,
           "branchIndex": 0,
+          "rootBranchId": 0,
+          "nodeName": null,
           "katagoResult": null,
-          "moves": null,
-          "policy": null,
           "branches": []
         },
         {
@@ -27,9 +27,9 @@
           "level": 0,
           "branchId": 0,
           "branchIndex": 1,
+          "rootBranchId": 0,
+          "nodeName": null,
           "katagoResult": null,
-          "moves": null,
-          "policy": null,
           "branches": []
         },
         {
@@ -48,9 +48,9 @@
           "level": 0,
           "branchId": 0,
           "branchIndex": 2,
+          "rootBranchId": 0,
+          "nodeName": "C",
           "katagoResult": null,
-          "moves": null,
-          "policy": null,
           "branches": [
             {
               "id": 1,
@@ -76,9 +76,9 @@
                   "level": 0,
                   "branchId": 1,
                   "branchIndex": 0,
+                  "rootBranchId": 0,
+                  "nodeName": "A",
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 },
                 {
@@ -105,9 +105,9 @@
                   "level": 0,
                   "branchId": 1,
                   "branchIndex": 1,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 },
                 {
@@ -138,9 +138,9 @@
                   "level": 0,
                   "branchId": 1,
                   "branchIndex": 2,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 },
                 {
@@ -175,9 +175,9 @@
                   "level": 0,
                   "branchId": 1,
                   "branchIndex": 3,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 }
               ]
@@ -206,9 +206,9 @@
                   "level": 1,
                   "branchId": 2,
                   "branchIndex": 0,
+                  "rootBranchId": 0,
+                  "nodeName": "B",
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 },
                 {
@@ -235,9 +235,9 @@
                   "level": 1,
                   "branchId": 2,
                   "branchIndex": 1,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 }
               ]
@@ -266,9 +266,9 @@
                   "level": 2,
                   "branchId": 3,
                   "branchIndex": 0,
+                  "rootBranchId": 0,
+                  "nodeName": "C",
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 },
                 {
@@ -295,9 +295,9 @@
                   "level": 2,
                   "branchId": 3,
                   "branchIndex": 1,
+                  "rootBranchId": 0,
+                  "nodeName": null,
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
                   "branches": []
                 },
                 {
@@ -328,88 +328,138 @@
                   "level": 2,
                   "branchId": 3,
                   "branchIndex": 2,
+                  "rootBranchId": 0,
+                  "nodeName": "B",
                   "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
-                  "branches": []
-                },
-                {
-                  "stones": [
-                    [
-                      "B",
-                      "A1"
-                    ],
-                    [
-                      "W",
-                      "B2"
-                    ],
-                    [
-                      "B",
-                      "G7"
-                    ],
-                    [
-                      "W",
-                      "G8"
-                    ],
-                    [
-                      "B",
-                      "H8"
-                    ],
-                    [
-                      "W",
-                      "H7"
-                    ]
-                  ],
-                  "index": 12,
-                  "moveIndex": 6,
-                  "level": 2,
-                  "branchId": 3,
-                  "branchIndex": 3,
-                  "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
-                  "branches": []
-                },
-                {
-                  "stones": [
-                    [
-                      "B",
-                      "A1"
-                    ],
-                    [
-                      "W",
-                      "B2"
-                    ],
-                    [
-                      "B",
-                      "G7"
-                    ],
-                    [
-                      "W",
-                      "G8"
-                    ],
-                    [
-                      "B",
-                      "H8"
-                    ],
-                    [
-                      "W",
-                      "H7"
-                    ],
-                    [
-                      "B",
-                      "L11"
-                    ]
-                  ],
-                  "index": 13,
-                  "moveIndex": 7,
-                  "level": 2,
-                  "branchId": 3,
-                  "branchIndex": 4,
-                  "katagoResult": null,
-                  "moves": null,
-                  "policy": null,
-                  "branches": []
+                  "branches": [
+                    {
+                      "id": 4,
+                      "level": 2,
+                      "snapshotList": [
+                        {
+                          "stones": [
+                            [
+                              "B",
+                              "A1"
+                            ],
+                            [
+                              "W",
+                              "B2"
+                            ],
+                            [
+                              "B",
+                              "G7"
+                            ],
+                            [
+                              "W",
+                              "G8"
+                            ],
+                            [
+                              "B",
+                              "H8"
+                            ],
+                            [
+                              "W",
+                              "H7"
+                            ]
+                          ],
+                          "index": 12,
+                          "moveIndex": 6,
+                          "level": 2,
+                          "branchId": 4,
+                          "branchIndex": 0,
+                          "rootBranchId": 3,
+                          "nodeName": "A",
+                          "katagoResult": null,
+                          "branches": []
+                        },
+                        {
+                          "stones": [
+                            [
+                              "B",
+                              "A1"
+                            ],
+                            [
+                              "W",
+                              "B2"
+                            ],
+                            [
+                              "B",
+                              "G7"
+                            ],
+                            [
+                              "W",
+                              "G8"
+                            ],
+                            [
+                              "B",
+                              "H8"
+                            ],
+                            [
+                              "W",
+                              "H7"
+                            ],
+                            [
+                              "B",
+                              "L11"
+                            ]
+                          ],
+                          "index": 13,
+                          "moveIndex": 7,
+                          "level": 2,
+                          "branchId": 4,
+                          "branchIndex": 1,
+                          "rootBranchId": 3,
+                          "nodeName": null,
+                          "katagoResult": null,
+                          "branches": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": 5,
+                      "level": 3,
+                      "snapshotList": [
+                        {
+                          "stones": [
+                            [
+                              "B",
+                              "A1"
+                            ],
+                            [
+                              "W",
+                              "B2"
+                            ],
+                            [
+                              "B",
+                              "G7"
+                            ],
+                            [
+                              "W",
+                              "G8"
+                            ],
+                            [
+                              "B",
+                              "H8"
+                            ],
+                            [
+                              "W",
+                              "L12"
+                            ]
+                          ],
+                          "index": 14,
+                          "moveIndex": 6,
+                          "level": 3,
+                          "branchId": 5,
+                          "branchIndex": 0,
+                          "rootBranchId": 3,
+                          "nodeName": "B",
+                          "katagoResult": null,
+                          "branches": []
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -419,7 +469,7 @@
     },
     "isValid": true,
     "useAnalysis": false,
-    "totalSnapshots": 13,
+    "totalSnapshots": 14,
     "analyzedSnapshots": 0,
     "fileName": "/Users/io/projects/artifact/target/test-classes/var_5.sgf",
     "annotation": null,
@@ -436,182 +486,9 @@
     "result": null,
     "place": null,
     "rules": null,
-    "fileFormat": "4",
+    "fileFormat": null,
     "charset": null,
     "overtime": null,
     "comment": null,
-    "moves": [
-      {
-        "color": "BLACK",
-        "index": 1,
-        "comment": null,
-        "branches": [],
-        "signedMoveList": [],
-        "nodeName": null,
-        "col": 0,
-        "row": 0,
-        "sgfLocation": "aa",
-        "gtpLocation": "A1"
-      },
-      {
-        "color": "WHITE",
-        "index": 2,
-        "comment": null,
-        "branches": [
-          {
-            "moves": [
-              {
-                "color": "BLACK",
-                "index": 3,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": "Var A",
-                "col": 2,
-                "row": 2,
-                "sgfLocation": "cc",
-                "gtpLocation": "C3"
-              },
-              {
-                "color": "WHITE",
-                "index": 4,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 3,
-                "row": 3,
-                "sgfLocation": "dd",
-                "gtpLocation": "D4"
-              },
-              {
-                "color": "BLACK",
-                "index": 5,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 0,
-                "row": 3,
-                "sgfLocation": "ad",
-                "gtpLocation": "A4"
-              },
-              {
-                "color": "WHITE",
-                "index": 6,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 1,
-                "row": 3,
-                "sgfLocation": "bd",
-                "gtpLocation": "B4"
-              }
-            ],
-            "nodeName": "Var A"
-          },
-          {
-            "moves": [
-              {
-                "color": "BLACK",
-                "index": 7,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": "Var B",
-                "col": 7,
-                "row": 7,
-                "sgfLocation": "hh",
-                "gtpLocation": "H8"
-              },
-              {
-                "color": "WHITE",
-                "index": 8,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 7,
-                "row": 6,
-                "sgfLocation": "hg",
-                "gtpLocation": "H7"
-              }
-            ],
-            "nodeName": "Var B"
-          },
-          {
-            "moves": [
-              {
-                "color": "BLACK",
-                "index": 9,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": "Var C",
-                "col": 6,
-                "row": 6,
-                "sgfLocation": "gg",
-                "gtpLocation": "G7"
-              },
-              {
-                "color": "WHITE",
-                "index": 10,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 6,
-                "row": 7,
-                "sgfLocation": "gh",
-                "gtpLocation": "G8"
-              },
-              {
-                "color": "BLACK",
-                "index": 11,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 7,
-                "row": 7,
-                "sgfLocation": "hh",
-                "gtpLocation": "H8"
-              },
-              {
-                "color": "WHITE",
-                "index": 12,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": "Var A",
-                "col": 7,
-                "row": 6,
-                "sgfLocation": "hg",
-                "gtpLocation": "H7"
-              },
-              {
-                "color": "BLACK",
-                "index": 13,
-                "comment": null,
-                "branches": [],
-                "signedMoveList": [],
-                "nodeName": null,
-                "col": 10,
-                "row": 10,
-                "sgfLocation": "kk",
-                "gtpLocation": "L11"
-              }
-            ],
-            "nodeName": "Var C"
-          }
-        ],
-        "signedMoveList": [],
-        "nodeName": null,
-        "col": 1,
-        "row": 1,
-        "sgfLocation": "bb",
-        "gtpLocation": "B2"
-      }
-    ]
+    "moves": []
   }

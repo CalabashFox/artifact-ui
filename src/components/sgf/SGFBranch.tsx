@@ -51,14 +51,15 @@ const getColor = (sgfColor: SGFColor): Color => sgfColor === SGFColor.BLACK ? Co
 const getOppositeColor = (sgfColor: SGFColor): Color => sgfColor === SGFColor.BLACK ? Color.WHITE : Color.BLACK;
 
 interface BranchNode {
-    adjustedLevel: number
-    branchHead: boolean
-    index: number
-    moveIndex: number
-    color: SGFColor
-    label: string
-    branchId: number
-    level: number
+    adjustedLevel: number // adjusted level in graph
+    branchHead: boolean // node is head of branch
+    index: number // global unique index
+    moveIndex: number // move number 
+    color: SGFColor // stone color
+    label: string // stone text
+    branchId: number // id of branch
+    level: number // original branch level
+    rootBranchId: number // branch root id
 }
 
 const createSGFBranchMap = (snapshots: Array<SGFSnapshot>): BranchNode[][] => {
@@ -96,6 +97,7 @@ const createSGFBranchMap = (snapshots: Array<SGFSnapshot>): BranchNode[][] => {
             adjustedLevel: adjustedLevel,
             branchId: snapshot.branchId,
             branchHead: snapshot.branchIndex === 0,
+            rootBranchId: snapshot.rootBranchId
         };
         previousBranch = snapshot.branchId;
     }
@@ -138,38 +140,48 @@ const SGFBranch: React.FC = () => {
                 array.push(<text key={`move-br-${node.index}`} x={x} y={y + Dimensions.LABEL_OFFSET} stroke={labelColor}>{node.label}</text>);
                 if (node.branchHead && node.adjustedLevel !== 0) {
                     let root = null;
-                    for (let r = i - 1; r >= 0 && j - 1 >= 0; r--) {
+                    const log = node.label === 'H7' && node.branchHead;
+                    for (let r = i; r >= 0 && j - 1 >= 0; r--) {
                         root = nodeGraph[r][j - 1];
                         if (root === null) {
                             continue;
                         }
-                        if (root.moveIndex === node.moveIndex - 1) {
+                        if (log) {
+                            console.log(root, node, root.moveIndex === node.moveIndex - 1 && node.rootBranchId === root.branchId);
+                        }
+                        if (root.moveIndex === node.moveIndex - 1 && node.rootBranchId === root.branchId) {    
                             break;
                         }
                     }
                     if (root === null) {
                         continue;
                     }
-                    const [rootX, rootY] = calculateSVGLocation(root.moveIndex, root.adjustedLevel);
-                    const p1x = rootX + Dimensions.RADIUS * Math.cos(45);
-                    const p1y = rootY + Dimensions.RADIUS * Math.sin(45);
-                    const p2x = x - Dimensions.RADIUS;
-                    const p2y = y;
-        
-                    // mid-point of line:
-                    const mpx = (p2x + p1x) * 0.5;
-                    const mpy = (p2y + p1y) * 0.5;
-                    // angle of perpendicular to line:
-                    const theta = Math.atan2(p2y - p1y, p2x - p1x) - Math.PI / 2;
-                    // distance of control point from mid-point of line:
-                    const offset = -10;
-                    // location of control point:
-                    const c1x = mpx + offset * Math.cos(theta);
-                    const c1y = mpy + offset * Math.sin(theta);
-        
-                    // construct the command to draw a quadratic curve
-                    const curve = `M${p1x} ${p1y} Q${c1x} ${c1y} ${p2x} ${p2y}`;
-                    array.push(<path d={curve} stroke={Color.BLACK} strokeLinecap="round" fill="transparent"></path>);
+                    // branch in same level
+                    if (root.adjustedLevel === node.adjustedLevel) {
+                        const [rootX, rootY] = calculateSVGLocation(root.moveIndex, root.adjustedLevel);
+                        array.push(<line key={`line-br-${node.index}`} x1={rootX + Dimensions.RADIUS} x2={rootX + Dimensions.X_OFFSET - Dimensions.RADIUS} y1={rootY} y2={rootY} stroke={Color.BLACK}/>);
+                    } else {
+                        const [rootX, rootY] = calculateSVGLocation(root.moveIndex, root.adjustedLevel);
+                        const p1x = rootX + Dimensions.RADIUS * Math.cos(45);
+                        const p1y = rootY + Dimensions.RADIUS * Math.sin(45);
+                        const p2x = x - Dimensions.RADIUS;
+                        const p2y = y;
+            
+                        // mid-point of line:
+                        const mpx = (p2x + p1x) * 0.5;
+                        const mpy = (p2y + p1y) * 0.5;
+                        // angle of perpendicular to line:
+                        const theta = Math.atan2(p2y - p1y, p2x - p1x) - Math.PI / 2;
+                        // distance of control point from mid-point of line:
+                        const offset = -10;
+                        // location of control point:
+                        const c1x = mpx + offset * Math.cos(theta);
+                        const c1y = mpy + offset * Math.sin(theta);
+            
+                        // construct the command to draw a quadratic curve
+                        const curve = `M${p1x} ${p1y} Q${c1x} ${c1y} ${p2x} ${p2y}`;
+                        array.push(<path d={curve} stroke={Color.BLACK} strokeLinecap="round" fill="transparent"></path>);
+                    }
                 }
             }
         }

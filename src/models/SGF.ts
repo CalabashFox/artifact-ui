@@ -74,6 +74,8 @@ export interface SGFSnapshot {
     level: number
     branchId: number
     branchIndex: number
+    nodeName: string
+    rootBranchId: number
     katagoResult: KatagoResult | null
     analysisData: SnapshotAnalysisData
     branches: Array<SGFSnapshotBranch>

@@ -4,7 +4,7 @@ import {SGFState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
 import SgfUtils from 'utils/sgfUtils';
 import SvgRenderer from 'utils/svgRenderer';
-import { SGFColor, SGFStone } from "models/SGF";
+import { SGFColor, SGFSnapshot, SGFStone } from "models/SGF";
 import { KatagoMoveInfo } from "models/Katago";
 import { ClassNameMap } from "@material-ui/core/styles/withStyles";
 import useMoveColor from "./hook/moveColor";
@@ -58,6 +58,7 @@ const svgProps = {
 
 interface SGFBoardProps {
     click: (x: number, y: number) => void
+    snapshot: SGFSnapshot | null
     currentMove: number
     stones: Array<SGFStone>
     policy: Array<number>
@@ -104,6 +105,23 @@ const createSVGStones = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor
         occupiedCoordinates[i][j] = sgfColor;
     });
     return svgStones;
+}
+
+const createSVGBranch = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[][], snapshot: SGFSnapshot | null, classes: ClassNameMap<string>): Array<React.SVGProps<SVGRectElement>> => {
+    const svgBranch = new Array<React.SVGProps<SVGRectElement>>();
+    if (snapshot === null) {
+        return svgBranch;
+    }
+    snapshot.branches.forEach((branch, index) => {
+        const branchSnapshot = branch.snapshotList[0];
+        const stone = branchSnapshot.stones[branchSnapshot.stones.length - 1];
+        const [i, j] = SgfUtils.translateToCoordinate(stone[1]);
+        const [x, y] = svgRenderer.loc([i, j]);
+        svgBranch.push(<rect key={`stone-holder-br-${stone[1]}`} x={x - svgProps.stoneHolderOffset} y={y - svgProps.stoneHolderOffset} width={svgProps.stoneHolderDim} height={svgProps.stoneHolderDim} fill={svgProps.boardColor} className={classes.stoneHolder}/>);
+        svgBranch.push(<text key={`snapshot-text-br-${index}`} x={x - svgProps.stoneTextOffset} y={y + svgProps.stoneTextOffsetY} stroke={svgRenderer.color('B')}>{branchSnapshot.nodeName}</text>);
+        occupiedCoordinates[i][j] = SGFColor.BLACK;
+    });
+    return svgBranch;
 }
 
 const createSVGPoliy = (svgRenderer: SvgRenderer, occupiedCoordinates: SGFColor[][], policy: Array<number>): Array<React.SVGProps<SVGRectElement>> => {
@@ -227,7 +245,7 @@ interface HoverStone {
     y: number
 }
 
-const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, moveInfos, hoverEffect, currentMove}) => {
+const SGFBoard: React.FC<SGFBoardProps> = ({click, snapshot, stones, policy, ownership, moveInfos, hoverEffect, currentMove}) => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const sgfProperties = sgfState.sgfProperties;
@@ -300,6 +318,7 @@ const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, mo
 
     const svgBoardDecorations = createSVGBoard(svgRenderer);
     const svgStones = createSVGStones(svgRenderer, occupiedCoordinates, stones, classes);
+    const svgBranches = createSVGBranch(svgRenderer, occupiedCoordinates, snapshot, classes);
     const svgHoverStones = createHoverStone(svgRenderer, occupiedCoordinates, hoverStone, hoverEffect);
     const svgMoves = createSVGMoves(svgRenderer, occupiedCoordinates, moveInfos);
     const svgOwnership = createSVGOwnership(svgRenderer, occupiedCoordinates, ownership, moveColor, sgfProperties.minimumOwnershipValue);
@@ -313,6 +332,7 @@ const SGFBoard: React.FC<SGFBoardProps> = ({click, stones, policy, ownership, mo
         <rect width={svgProps.dim} height={svgProps.dim} fill={svgProps.boardColor} pointerEvents={'all'}/>
         {svgBoardDecorations}
         {svgStones}
+        {svgBranches}
         {svgMoves}
         {svgHoverStones}
         {svgOwnership}
