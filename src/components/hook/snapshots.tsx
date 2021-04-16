@@ -19,7 +19,13 @@ const useSnapshots = (): Array<SGFSnapshot> => {
         if (validSGF) {
             const array = new Array<SGFSnapshot>();
             flatten(array, sgfState.analyzedSGF.mainBranch);
-            return array.sort((s1, s2) => s1.index - s2.index);
+            return array.sort((s1, s2) => {
+                const branchDiff = s1.branchId - s2.branchId;
+                if (branchDiff !== 0) {
+                    return branchDiff;
+                }
+                return s1.moveIndex - s2.moveIndex;
+            });
         }
         return [];
     }, [validSGF, sgfState.analyzedSGF]);

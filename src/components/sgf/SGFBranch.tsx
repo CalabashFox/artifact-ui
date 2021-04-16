@@ -27,12 +27,13 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Dimensions = {
-    RADIUS: 10,
-    X_OFFSET: 30,
-    Y_OFFSET: 30,
+    RADIUS: 12,
+    X_OFFSET: 32,
+    Y_OFFSET: 32,
     LABEL_OFFSET: 3,
     STROKE_WIDTH: 2,
-    HEIGHT: 40
+    HEIGHT: 40,
+    LINE_WIDTH: 2
 };
 
 enum Color {
@@ -60,48 +61,73 @@ interface BranchNode {
     branchId: number // id of branch
     level: number // original branch level
     rootBranchId: number // branch root id
+    rootNode: BranchNode | undefined // root node reference
+    previousNode: BranchNode | undefined // previous node reference
 }
 
-const createSGFBranchMap = (snapshots: Array<SGFSnapshot>): BranchNode[][] => {
-    const map: BranchNode[][] = new Array(MAX_BRANCH_LEVEL)
+const createSGFBranchGraph = (snapshots: Array<SGFSnapshot>): {graph: BranchNode[][], levels: number, moves: number} => {
+    const graph: BranchNode[][] = new Array(MAX_BRANCH_LEVEL)
         .fill(null)
         .map(() => new Array(snapshots.length).fill(null));
-    let previousBranch = -1;
-    let previousAdjustedLevel = -1;
-    for (let i = snapshots.length - 1; i > 0; i--) { 
+    const moveIndexMap = new Map<number, Array<SGFSnapshot>>();
+    const branchRootMap = new Map<number, BranchNode>();
+    const coordinateMap = new Map<string, BranchNode>();
+    let levels = 0;
+    let moves = 0;
+    // ignore empty board
+    for (let i = 1; i < snapshots.length; i++) { 
         const snapshot = snapshots[i];
-        let adjustedLevel = snapshot.level;
-        // lift branch to upper row
-        while (map[snapshot.level][snapshot.moveIndex] !== null) {
-            adjustedLevel++;
+        if (!moveIndexMap.has(snapshot.moveIndex)) {
+            moveIndexMap.set(snapshot.moveIndex, new Array<SGFSnapshot>());
         }
-        // level adjusted
-        if (adjustedLevel > snapshot.level) {
-            previousAdjustedLevel = adjustedLevel;
-        } 
-        // set adjusted level for nodes in same branch
-        if (previousBranch === snapshot.branchId) {
-            // use adjusted level 
-            if (previousAdjustedLevel !== -1) {
-                adjustedLevel = previousAdjustedLevel;
-            } else {
-                previousAdjustedLevel = -1;
-            }
-        }
-        map[adjustedLevel][snapshot.moveIndex] = {
-            level: snapshot.level,
-            index: snapshot.index,
-            moveIndex: snapshot.moveIndex,
-            color: getCurrentSGFColor(snapshot.stones),
-            label: snapshot.stones[snapshot.stones.length - 1][1],
-            adjustedLevel: adjustedLevel,
-            branchId: snapshot.branchId,
-            branchHead: snapshot.branchIndex === 0,
-            rootBranchId: snapshot.rootBranchId
-        };
-        previousBranch = snapshot.branchId;
+        moveIndexMap.get(snapshot.moveIndex)?.push(snapshot);
     }
-    return map;
+    const branchLevelMap = new Map<number, number>();
+    for (let i = 0; i <= moveIndexMap.size; i++) {
+        const snapshots = moveIndexMap.get(i) ?? new Array<SGFSnapshot>();
+        snapshots.forEach(snapshot => {
+            let adjustedLevel = branchLevelMap.get(snapshot.branchId) ?? snapshot.level;
+            while (graph[adjustedLevel][snapshot.moveIndex] !== null) {
+                adjustedLevel++;
+            }
+            branchLevelMap.set(snapshot.branchId, adjustedLevel);
+            const node: BranchNode = {
+                level: snapshot.level,
+                index: snapshot.index,
+                moveIndex: snapshot.moveIndex,
+                color: getCurrentSGFColor(snapshot.stones),
+                label: snapshot.stones[snapshot.stones.length - 1][1],
+                adjustedLevel: adjustedLevel,
+                branchId: snapshot.branchId,
+                branchHead: snapshot.branchIndex === 0,
+                rootBranchId: snapshot.rootBranchId,
+                rootNode: undefined,
+                previousNode: undefined
+            };
+            graph[adjustedLevel][snapshot.moveIndex] = node;
+            if (snapshot.branches.length > 0) {
+                branchRootMap.set(snapshot.branchId, node);
+            }
+            if (snapshot.branchIndex === 0) {
+                node.rootNode = branchRootMap.get(snapshot.rootBranchId);
+                node.previousNode = coordinateMap.get(`coord-${snapshot.rootBranchId}-${snapshot.moveIndex - 1}`);
+            } else {
+                node.previousNode = coordinateMap.get(`coord-${snapshot.branchId}-${snapshot.moveIndex - 1}`);
+            }
+            coordinateMap.set(`coord-${snapshot.branchId}-${snapshot.moveIndex}`, node);
+            if (adjustedLevel > levels) {
+                levels = adjustedLevel;
+            }
+            if (snapshot.moveIndex > moves) {
+                moves = snapshot.moveIndex;
+            }
+        });
+    }
+    return {
+        graph: graph,
+        levels: levels + 1,
+        moves: moves + 1
+    };
 }
 
 const SGFBranch: React.FC = () => {
@@ -112,19 +138,12 @@ const SGFBranch: React.FC = () => {
     const snapshots = useSnapshots();
 
     const currentMove = sgfState.sgfProperties.currentMove;
-    const nodeGraph = useMemo(() => createSGFBranchMap(snapshots), [snapshots]);
-    const levels = useMemo(() => {
-        let maxLevel = 0;
-        for (let i = 0; i < MAX_BRANCH_LEVEL; i++) {
-            maxLevel = Math.max(...nodeGraph[i].filter(node => node !== null).map(node => node.adjustedLevel + 1), maxLevel);
-        }
-        return maxLevel;
-    }, [nodeGraph]);
+    const { graph, levels, moves } = useMemo(() => createSGFBranchGraph(snapshots), [snapshots]);
 
     const svgElements = useMemo(() => {
         const array = new Array<React.SVGProps<SVGRectElement>>();
         for (let i = 0; i < MAX_BRANCH_LEVEL; i++) {
-            const row = nodeGraph[i];
+            const row = graph[i];
             for (let j = 0; j < row.length; j++) {
                 const node = row[j];
                 if (node === null) {
@@ -133,67 +152,29 @@ const SGFBranch: React.FC = () => {
                 const circleColor = getColor(node.color);
                 const labelColor = getOppositeColor(node.color);
                 const [x, y] = calculateSVGLocation(node.moveIndex, node.adjustedLevel);
-                if (j + 1 < row.length && nodeGraph[i][j + 1] !== null && (nodeGraph[i][j + 1].branchId === node.branchId || node.level === 0)) {
-                    array.push(<line key={`line-br-${node.index}`} x1={x + Dimensions.RADIUS} x2={x + Dimensions.X_OFFSET - Dimensions.RADIUS} y1={y} y2={y} stroke={Color.BLACK}/>);
+                const prev = node.previousNode;
+                if (prev !== undefined) {   
+                    const [prevX, prevY] = calculateSVGLocation(prev.moveIndex, prev.adjustedLevel);
+                    const newLevel = prev.adjustedLevel !== node.adjustedLevel;
+                    const x1 = newLevel ? prevX + Dimensions.RADIUS * Math.cos(120) : prevX + Dimensions.RADIUS;
+                    const y1 = newLevel ? prevY + Dimensions.RADIUS * Math.sin(120) : prevY;
+                    const x2 = newLevel ? x - Dimensions.RADIUS * Math.cos(120) : x - Dimensions.RADIUS;
+                    const y2 = newLevel ? y - Dimensions.RADIUS * Math.sin(120) : y;
+                    array.push(<line key={`line-br-${node.index}`} x1={x1} x2={x2} y1={y1} y2={y2} strokeWidth={Dimensions.LINE_WIDTH} stroke={Color.BLACK}/>);
                 }
                 array.push(<circle key={`stone-br-${node.index}`} cx={x} cy={y} r={Dimensions.RADIUS} fill={circleColor}/>);
-                array.push(<text key={`move-br-${node.index}`} x={x} y={y + Dimensions.LABEL_OFFSET} stroke={labelColor}>{node.label}</text>);
-                if (node.branchHead && node.adjustedLevel !== 0) {
-                    let root = null;
-                    const log = node.label === 'H7' && node.branchHead;
-                    for (let r = i; r >= 0 && j - 1 >= 0; r--) {
-                        root = nodeGraph[r][j - 1];
-                        if (root === null) {
-                            continue;
-                        }
-                        if (log) {
-                            console.log(root, node, root.moveIndex === node.moveIndex - 1 && node.rootBranchId === root.branchId);
-                        }
-                        if (root.moveIndex === node.moveIndex - 1 && node.rootBranchId === root.branchId) {    
-                            break;
-                        }
-                    }
-                    if (root === null) {
-                        continue;
-                    }
-                    // branch in same level
-                    if (root.adjustedLevel === node.adjustedLevel) {
-                        const [rootX, rootY] = calculateSVGLocation(root.moveIndex, root.adjustedLevel);
-                        array.push(<line key={`line-br-${node.index}`} x1={rootX + Dimensions.RADIUS} x2={rootX + Dimensions.X_OFFSET - Dimensions.RADIUS} y1={rootY} y2={rootY} stroke={Color.BLACK}/>);
-                    } else {
-                        const [rootX, rootY] = calculateSVGLocation(root.moveIndex, root.adjustedLevel);
-                        const p1x = rootX + Dimensions.RADIUS * Math.cos(45);
-                        const p1y = rootY + Dimensions.RADIUS * Math.sin(45);
-                        const p2x = x - Dimensions.RADIUS;
-                        const p2y = y;
-            
-                        // mid-point of line:
-                        const mpx = (p2x + p1x) * 0.5;
-                        const mpy = (p2y + p1y) * 0.5;
-                        // angle of perpendicular to line:
-                        const theta = Math.atan2(p2y - p1y, p2x - p1x) - Math.PI / 2;
-                        // distance of control point from mid-point of line:
-                        const offset = -10;
-                        // location of control point:
-                        const c1x = mpx + offset * Math.cos(theta);
-                        const c1y = mpy + offset * Math.sin(theta);
-            
-                        // construct the command to draw a quadratic curve
-                        const curve = `M${p1x} ${p1y} Q${c1x} ${c1y} ${p2x} ${p2y}`;
-                        array.push(<path d={curve} stroke={Color.BLACK} strokeLinecap="round" fill="transparent"></path>);
-                    }
-                }
+                array.push(<text key={`move-br-${node.index}`} x={x} y={y + Dimensions.LABEL_OFFSET} stroke={labelColor}>{node.label}</text>);    
             }
         }
         return array;
-    }, [nodeGraph]);
+    }, [graph]);
 
     const currentMoveElement = useMemo(() => {
         const array = new Array<React.SVGProps<SVGRectElement>>();
         if (currentMove === 0) {
             return array;
         }
-        const node = nodeGraph.flatMap(row => row).find(node => node !== null && node.index === currentMove);
+        const node = graph.flatMap(row => row).find(node => node !== null && node.index === currentMove);
         if (node === undefined) {
             return array;
         }
@@ -204,9 +185,9 @@ const SGFBranch: React.FC = () => {
         array.push(<circle key={`stone-curr-br-${currentMove}`} cx={x} cy={y} r={Dimensions.RADIUS} strokeWidth={Dimensions.STROKE_WIDTH} stroke={labelColor} fill={circleColor}/>);
         array.push(<text key={`move-index-curr-br-${currentMove}`} x={x} y={y + Dimensions.LABEL_OFFSET} stroke={labelColor}>{node.label}</text>);
         return array;
-    }, [nodeGraph, currentMove]);
+    }, [graph, currentMove]);
 
-    const width = useMemo(() => Dimensions.X_OFFSET * (snapshots.length + 1), [snapshots]);
+    const width = useMemo(() => Math.max(Dimensions.X_OFFSET * (moves + 1), 500), [moves]);
     const height = useMemo(() => Dimensions.Y_OFFSET * (levels + 1), [levels]);
     const viewBox = useMemo(() => `0 0 ${width} ${height}`, [width, height]);
 
@@ -232,14 +213,14 @@ const SGFBranch: React.FC = () => {
 
     const handleClick = useCallback((event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
         const [x, y] = translateLocation(...transformLocation(event));
-        if (y < 0 || y > levels - 1 || x < 0 || x > nodeGraph[0].length) {
+        if (y < 0 || y > levels - 1 || x < 0 || x > graph[0].length) {
             return;
         }
-        const node = nodeGraph[y][x];
+        const node = graph[y][x];
         if (node !== null) {
             dispatch(setMove(node.index));
         }
-    }, [dispatch, nodeGraph, levels]);
+    }, [dispatch, graph, levels]);
 
     return <svg ref={svgBranchElement} viewBox={viewBox} preserveAspectRatio="xMidYMid meet" className={classes.svg} 
         width={width} height={height}
