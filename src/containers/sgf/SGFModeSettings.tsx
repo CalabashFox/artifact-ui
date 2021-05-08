@@ -18,7 +18,7 @@ const SGFModeSettings: React.FC = () => {
     const sgfProperty = sgfState.sgfProperties;
 
     const handleLiveModeClick = () => {
-        dispatch(toggleLiveMode(!sgfProperty.liveMode, sgfProperty.currentMove));
+        dispatch(toggleLiveMode(!sgfProperty.liveMode, sgfState.navigation.index));
     };
 
     const toggleProperty = (properties: SGFProperties) => {

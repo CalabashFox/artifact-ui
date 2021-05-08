@@ -102,8 +102,30 @@ export interface SGFCoordinate {
     gtpLocation: string
 }
 
+export interface SGFBranchNode {
+    adjustedLevel: number // adjusted level in graph
+    branchHead: boolean // node is head of branch
+    index: number // global unique index
+    moveIndex: number // move number 
+    color: SGFColor // stone color
+    label: string // stone text
+    branchId: number // id of branch
+    level: number // original branch level
+    rootBranchId: number // branch root id
+    previousNode: SGFBranchNode | undefined // previous node reference
+}
+
+// map of navigation
+export interface SGFBranchNavigation {
+    navigationGraph: SGFSnapshot[][]
+    branchGraph: SGFBranchNode[][]
+    row: number
+    col: number
+    rootCol: number
+    total: number
+}
+
 export interface SGFProperties {
-    currentMove: number
     displayRecommendations: boolean
     displayOwnership: boolean
     displayPolicy: boolean
@@ -121,6 +143,12 @@ export interface SGFProperties {
     editMode: boolean
     situationAnalysisMode: boolean
     maxVisits: number
+}
+
+export interface SGFNavigation {
+    index: number
+    row: number
+    col: number
 }
 
 export enum WinrateReport {
@@ -189,7 +217,6 @@ export const InitialSGFState: SGFState = {
     },
     error: '',
     sgfProperties: {
-        currentMove: 2,
         displayOwnership: true,
         displayPolicy: true,
         displayMoves: true,
@@ -209,5 +236,18 @@ export const InitialSGFState: SGFState = {
         situationAnalysisMode: false
     },
     uploading: false,
-    uploadProgress: 0
+    uploadProgress: 0,
+    branchNavigation: {
+        navigationGraph: new Array<SGFSnapshot[]>(),
+        branchGraph: new Array<SGFBranchNode[]>(),
+        row: 0,
+        col: 0,
+        rootCol: 0,
+        total: 0
+    },
+    navigation: {
+        index: 0,
+        row: 0,
+        col: 0
+    }
 };

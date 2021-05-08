@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {SGFState, StoreState} from "models/StoreState";
 import {makeStyles, withStyles} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import {setMove, setSGFProperties} from 'actions/sgf';
+import {setSGFProperties} from 'actions/sgf';
 import TextField from '@material-ui/core/TextField';
 import {Left, DoubleLeft, ToLeft, Right, DoubleRight, ToRight, BalanceTwo, ChartHistogram, Analysis, Download} from '@icon-park/react'
 import useIcon from "components/hook/icon";
@@ -52,45 +52,34 @@ const SGFBoardPanel: React.FC = () => {
     const dispatch = useDispatch();
     const snapshot = useCurrentSnapshot();
 
-    const totalMoves = sgfState.analyzedSGF.moves.length - 1;
-    const currentMove = sgfState.sgfProperties.currentMove;
+    const moves = sgfState.navigation.col;
     
     const [analysisDrawer, setAnalysisDrawer] = useState(false);
-    const [moveText, setMoveText] = useState(currentMove);
-    const [navigateBackward, navigateForward] = useNavigation();
+    const [moveText, setMoveText] = useState(moves);
+    const { rootIncremental, rootNavigation } = useNavigation();
 
     const updateMoveText = (event: React.ChangeEvent<HTMLInputElement>) => {
         const move = Number.parseInt(event.target.value);
-        if (!isNaN(move) && move >= 0 && move < totalMoves) {
-            setMoveText(moveText);
-            dispatch(setMove(move));
-        }
-        if (isNaN(move)) {
-            setMoveText(0);
-            dispatch(setMove(0));
-        }
+        const index = rootNavigation(move);
+        setMoveText(index);
     };
 
-    const updateMove = (move: number) => {
-        dispatch(setMove(move));
-    }
-
     useEffect(() => {
-        setMoveText(currentMove);
-    }, [currentMove]);
+        setMoveText(moves);
+    }, [moves]);
     
     const hasKatagoResult = sgfState.hasSGF && snapshot !== null && snapshot.katagoResult !== null;
 
-    const backwardDisabled = currentMove === 0 || !hasKatagoResult;
-    const forwardDisabled = currentMove === totalMoves || !hasKatagoResult;
+    const backwardDisabled = moves === 0;
+    const forwardDisabled = moves >= sgfState.branchNavigation.rootCol;
     
-    const toStartIcon = useIcon(<ToLeft onClick={() => updateMove(0)}/>, backwardDisabled);
-    const fastBackwardIcon = useIcon(<DoubleLeft onClick={() => navigateBackward(10)}/>, backwardDisabled);
-    const backwardIcon = useIcon(<Left onClick={() => navigateBackward(1)}/>, backwardDisabled);
+    const toStartIcon = useIcon(<ToLeft onClick={() => rootNavigation(0)}/>, backwardDisabled);
+    const fastBackwardIcon = useIcon(<DoubleLeft onClick={() => rootIncremental(-10)}/>, backwardDisabled);
+    const backwardIcon = useIcon(<Left onClick={() => rootIncremental(-1)}/>, backwardDisabled);
 
-    const forwardIcon = useIcon(<Right onClick={() => navigateForward(1)}/>, forwardDisabled);
-    const fastForwardIcon = useIcon(<DoubleRight onClick={() => navigateForward(10)}/>, forwardDisabled);
-    const toEndIcon = useIcon(<ToRight onClick={() => updateMove(totalMoves)}/>, forwardDisabled);
+    const forwardIcon = useIcon(<Right onClick={() => rootIncremental(1)}/>, forwardDisabled);
+    const fastForwardIcon = useIcon(<DoubleRight onClick={() => rootIncremental(10)}/>, forwardDisabled);
+    const toEndIcon = useIcon(<ToRight onClick={() => rootIncremental(sgfState.branchNavigation.col)}/>, forwardDisabled);
 
     const situationIcon = useIcon(<BalanceTwo onClick={() => dispatch(setSGFProperties({
         ...sgfState.sgfProperties, situationAnalysisMode: !sgfState.sgfProperties.situationAnalysisMode

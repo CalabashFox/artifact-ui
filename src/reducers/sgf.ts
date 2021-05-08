@@ -1,10 +1,8 @@
 import {
-    BROWSE_MOVE,
     RECALCULATE_ANALYSIS_DATA,
     RECEIVE_PROGRESS,
     RECEIVE_PROGRESS_FAIL,
     SET,
-    SET_MOVE,
     SGFAction,
     UPLOAD_FAIL,
     UPLOAD_SUCCESS,
@@ -12,7 +10,8 @@ import {
     SET_IMAGE,
     UPDATE_IMAGE_RESULT,
     SET_SGF_PROPERTIES,
-    SET_LIVE_MODE
+    SET_LIVE_MODE,
+    NAVIGATE
 } from 'actions/sgf';
 import { EmptyResult } from 'models/Katago';
 import { InitialSGFState } from 'models/SGF';
@@ -36,22 +35,18 @@ export function sgfReducer(state: SGFState = initialState, action: SGFAction): S
             return {
                 ...state, analyzedSGF: SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, state.analyzedSGF!)
             }
-        case BROWSE_MOVE:
-            return {...state, sgfProperties: {
-                    ...state.sgfProperties, currentMove: state.sgfProperties.currentMove + action.payload.diff
-                }
-            };
-        case SET_MOVE:
-            return {...state, sgfProperties: {
-                    ...state.sgfProperties, currentMove: action.payload.move
-                }
+        case NAVIGATE:
+            return {
+                ...state, navigation: action.payload.navigation
             };
         case SET:
             let sgf = SgfUtils.calculateSGFAnalysisData(state.sgfProperties, action.payload.analyzedSGF)!;
             sgf = SgfUtils.recalculateSnapshotAnalysisData(state.sgfProperties, sgf);
             sgf = SgfUtils.calculateSGFMatchAnalysisData(state.sgfProperties, sgf);
+            const branchNavigation = SgfUtils.renderBranchNavigation(action.payload.analyzedSGF)
             return {
                 ...state, analyzedSGF: sgf, hasSGF: true,
+                branchNavigation: branchNavigation,
                 sgfProperties: {
                     ...state.sgfProperties/*, currentMove: 0*/
                 }

@@ -53,7 +53,7 @@ const SGFView: React.FC<WithWidth> = ({width}) => {
     
     const classes = useStyles();
 
-    const [navigateBackward, navigateForward] = useNavigation();
+    const { rootIncremental } = useNavigation();
 
     const handleClick = (x: number, y: number) => {
         if (!sgfState.sgfProperties.editMode) {
@@ -67,24 +67,18 @@ const SGFView: React.FC<WithWidth> = ({width}) => {
             return;
         }
         const delta = event.deltaY;
-        const steps = Math.abs(Math.floor(delta / 2));
-        if (delta < 0) {
-            navigateBackward(steps);
-        } else {
-            navigateForward(steps);
-        }
+        const steps = Math.floor(delta / 2);
+        rootIncremental(steps);
     };
 
     if (sgfState.sgfProperties.useSound) {
         SGFBoardSound(gameState.actionState);
     }
-    let currentMove = 0;
     let stones: Array<SGFStone> = [];
     let ownership: Array<number> = [];
     let policy: Array<number> = [];
     let moveInfos: Array<KatagoMoveInfo> = [];
     if (validSGF && snapshot !== null) {
-        currentMove = sgfState.sgfProperties.currentMove;
         stones = snapshot.stones;
         if (sgfState.sgfProperties.liveMode) {
             ownership = katagoState.katagoResult.ownership;
@@ -109,7 +103,7 @@ const SGFView: React.FC<WithWidth> = ({width}) => {
                 <Paper onWheel={e => scroll(e)}>
                     <SGFBoard click={(x, y) => handleClick(x, y)}
                         snapshot={snapshot}
-                        currentMove={currentMove}
+                        currentMove={sgfState.navigation.index}
                         policy={policy} 
                         moveInfos={moveInfos} 
                         stones={stones}

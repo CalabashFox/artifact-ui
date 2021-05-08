@@ -63,7 +63,7 @@ const SGFGraph: React.FC<SGFGraphProps> = ({identifier, percentage, data, color,
                 margin={{
                     left: hMargin, top: vMargin, right: hMargin, bottom: vMargin
                 }}>
-                <ReferenceLine x={sgfState.sgfProperties.currentMove} stroke={color}/>
+                <ReferenceLine x={sgfState.navigation.col} stroke={color}/>*
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis stroke={chartColor} dataKey="label" minTickGap={50}/>
                 <YAxis stroke={chartColor} width={40}/>

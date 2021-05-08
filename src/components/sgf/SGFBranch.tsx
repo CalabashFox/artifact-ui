@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {SGFState, StoreState} from 'models/StoreState';
 import {makeStyles} from '@material-ui/core/styles';
 import { SGFColor, SGFSnapshot, SGFStone } from 'models/SGF';
-import { setMove } from 'actions/sgf';
 import useSnapshots from 'components/hook/snapshots';
+import useNavigation from 'components/hook/navigation';
 
 const useStyles = makeStyles(() => ({
     svg: {
@@ -134,11 +134,12 @@ const SGFBranch: React.FC = () => {
     const sgfState = useSelector<StoreState, SGFState>(state => state.sgfState);
     const classes = useStyles();
     const svgBranchElement = useRef<SVGSVGElement>(null);
-    const dispatch = useDispatch();
     const snapshots = useSnapshots();
 
-    const currentMove = sgfState.sgfProperties.currentMove;
+    const index = sgfState.navigation.index;
     const { graph, levels, moves } = useMemo(() => createSGFBranchGraph(snapshots), [snapshots]);
+
+    const {coordinateNavigation} = useNavigation();
 
     const svgElements = useMemo(() => {
         const array = new Array<React.SVGProps<SVGRectElement>>();
@@ -171,10 +172,10 @@ const SGFBranch: React.FC = () => {
 
     const currentMoveElement = useMemo(() => {
         const array = new Array<React.SVGProps<SVGRectElement>>();
-        if (currentMove === 0) {
+        if (index === 0) {
             return array;
         }
-        const node = graph.flatMap(row => row).find(node => node !== null && node.index === currentMove);
+        const node = graph.flatMap(row => row).find(node => node !== null && node.index === index);
         if (node === undefined) {
             return array;
         }
@@ -182,10 +183,10 @@ const SGFBranch: React.FC = () => {
         const labelColor = getOppositeColor(node.color);
         const [x, y] = calculateSVGLocation(node.moveIndex, node.adjustedLevel);
 
-        array.push(<circle key={`stone-curr-br-${currentMove}`} cx={x} cy={y} r={Dimensions.RADIUS} strokeWidth={Dimensions.STROKE_WIDTH} stroke={labelColor} fill={circleColor}/>);
-        array.push(<text key={`move-index-curr-br-${currentMove}`} x={x} y={y + Dimensions.LABEL_OFFSET} stroke={labelColor}>{node.label}</text>);
+        array.push(<circle key={`stone-curr-br-${index}`} cx={x} cy={y} r={Dimensions.RADIUS} strokeWidth={Dimensions.STROKE_WIDTH} stroke={labelColor} fill={circleColor}/>);
+        array.push(<text key={`move-index-curr-br-${index}`} x={x} y={y + Dimensions.LABEL_OFFSET} stroke={labelColor}>{node.label}</text>);
         return array;
-    }, [graph, currentMove]);
+    }, [graph, index]);
 
     const width = useMemo(() => Math.max(Dimensions.X_OFFSET * (moves + 1), 500), [moves]);
     const height = useMemo(() => Dimensions.Y_OFFSET * (levels + 1), [levels]);
@@ -218,9 +219,9 @@ const SGFBranch: React.FC = () => {
         }
         const node = graph[y][x];
         if (node !== null) {
-            dispatch(setMove(node.index));
+            coordinateNavigation(y, x);
         }
-    }, [dispatch, graph, levels]);
+    }, [graph, levels, coordinateNavigation]);
 
     return <svg ref={svgBranchElement} viewBox={viewBox} preserveAspectRatio="xMidYMid meet" className={classes.svg} 
         width={width} height={height}

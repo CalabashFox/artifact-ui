@@ -9,10 +9,19 @@
         "scannerView": "棋盘扫描",
         "gameView": "对局",
         "sgfView": "分析",
+        "recordingView": "录制",
+        "monitorView": "监控",
         "game": {
             "startGame": "开始游戏",
             "undo": "悔棋",
             "stop": "结束游戏"
+        },
+        "recording": {
+            "calibrate": "校准",
+            "capture": "开始录像",
+            "stopCapture": "结束",
+            "confirmCalibrate": "确认校准",
+            "undoCalibrate": "重新校准"
         },
         "sgf": {
             "upload": "上传",

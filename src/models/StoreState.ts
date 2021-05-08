@@ -1,8 +1,9 @@
 import {User} from 'models/User';
-import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFProperties} from 'models/SGF';
+import {AnalysisProgress, AnalyzedSGF, SGFBranchNavigation, SGFImage, SGFProperties, SGFNavigation} from 'models/SGF';
 import {Game, GameActionState, GameProperties} from 'models/Game';
 import { KatagoLog, KatagoResult } from './Katago';
 import { SocketConnectionState } from './view';
+import { CalibrationBoundary } from './Recording';
 
 export type Nullable<T> = T | null;
 export type NullableString = Nullable<string>;
@@ -29,6 +30,7 @@ export interface StoreState {
     viewState: ViewState
     gameState: GameState
     katagoState: KatagoState
+    recordingState: RecordingState
 }
 
 export interface KatagoState {
@@ -44,6 +46,11 @@ export interface GameState {
     actionState: GameActionState
 }
 
+export interface RecordingState {
+    calibrationBoundaries: Array<CalibrationBoundary>
+    calibrated: boolean
+}
+
 export interface SGFState {
     analyzedSGF: AnalyzedSGF
     analysisProgress: AnalysisProgress
@@ -53,4 +60,6 @@ export interface SGFState {
     uploading: boolean
     uploadProgress: number
     sgfImage: SGFImage
+    branchNavigation: SGFBranchNavigation
+    navigation: SGFNavigation
 }

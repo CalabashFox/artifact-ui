@@ -14,7 +14,7 @@ const SGFPlayers: React.FC = () => {
     const [playerBlack, playerWhite, rankBlack, rankWhite] = usePlayerTitle();
     const analyzedSGF = sgfState.analyzedSGF;
 
-    const index = sgfState.sgfProperties.currentMove;
+    const index = sgfState.navigation.index;
     const blackTurn = index % 2 === 0;
     const winrateList = !analyzedSGF.useAnalysis ? [] : (blackTurn ? analyzedSGF.analysisData.blackWinrate : analyzedSGF.analysisData.whiteWinrate);
     const winrate = !analyzedSGF.useAnalysis ? 0 : winrateList[index].value ?? 0;

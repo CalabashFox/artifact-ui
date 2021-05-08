@@ -12,6 +12,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
+    "strictPropertyInitialization": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,

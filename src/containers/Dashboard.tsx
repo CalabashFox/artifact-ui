@@ -19,12 +19,14 @@ import Container from '@material-ui/core/Container';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import SocketHandler from "utils/socketHandler";
-import { TAB_VIEW_GAME, TAB_VIEW_IMAGE, TAB_VIEW_SGF } from 'models/view';
+import { TAB_VIEW_GAME, TAB_VIEW_IMAGE, TAB_VIEW_RECORDING, TAB_VIEW_SGF, TAB_VIEW_MONITOR } from 'models/view';
 import {ImageFiles} from '@icon-park/react'
 import useIcon from "components/hook/icon";
 import Snackbar from '@material-ui/core/Snackbar';
 import ConnectionStatus from 'components/ConnectionStatus';
 import { useTranslation } from 'react-i18next';
+import RecordingView from './recording/RecordingView';
+import MonitorView from './monitor/MonitorView';
 
 const useStyles = makeStyles((theme) => ({
     desktopAppBar: {
@@ -145,6 +147,8 @@ const Dashboard: React.FC = () => {
                             <Tab label={t('ui.scannerView')} className={classes.tab}/>
                             <Tab label={t('ui.gameView')} className={classes.tab}/>
                             <Tab label={t('ui.sgfView')} className={classes.tab}/>
+                            <Tab label={t('ui.recordingView')} className={classes.tab}/>
+                            <Tab label={t('ui.monitorView')} className={classes.tab}/>
                         </Tabs>
                     </Grid>
                     <Grid item xs={3} className={classes.connectionState}>
@@ -156,11 +160,15 @@ const Dashboard: React.FC = () => {
         {tabIndex === TAB_VIEW_IMAGE && <Container><ImageView/></Container>}
         {tabIndex === TAB_VIEW_GAME && <Container><GameView/></Container>}
         {tabIndex === TAB_VIEW_SGF && <Container><SGFView/></Container>}
+        {tabIndex === TAB_VIEW_RECORDING && <Container><RecordingView/></Container>}
+        {tabIndex === TAB_VIEW_MONITOR && <Container><MonitorView/></Container>}
         <Hidden smUp>
              <BottomNavigation value={tabIndex} onChange={(e, v) => handleTabChange(v)} className={classes.navigation}>
                  <BottomNavigationAction label={t('ui.scannerView')} value={TAB_VIEW_IMAGE} icon={uploadIcon} />
                  <BottomNavigationAction label={t('ui.gameView')} value={TAB_VIEW_GAME} />
                  <BottomNavigationAction label={t('ui.sgfView')} value={TAB_VIEW_SGF} />
+                 <BottomNavigationAction label={t('ui.recordingView')} value={TAB_VIEW_RECORDING} />
+                 <BottomNavigationAction label={t('ui.monitorView')} value={TAB_VIEW_MONITOR} />
             </BottomNavigation>
         </Hidden>
     </Container>;

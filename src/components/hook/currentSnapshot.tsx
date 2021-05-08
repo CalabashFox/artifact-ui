@@ -11,10 +11,10 @@ const useCurrentSnapshot = (): SGFSnapshot | null => {
     const snapshotList = useSnapshots();
 
     return useMemo(() => {
-        if (validSGF && sgfState.sgfProperties.currentMove < snapshotList.length) {
-            return snapshotList[sgfState.sgfProperties.currentMove];
+        if (validSGF && sgfState.navigation.index < snapshotList.length) {
+            return snapshotList[sgfState.navigation.index];
         }
         return null;
-    }, [validSGF, sgfState.sgfProperties.currentMove, snapshotList]);
+    }, [validSGF, sgfState.navigation.index, snapshotList]);
 }
 export default useCurrentSnapshot;

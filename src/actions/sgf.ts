@@ -2,7 +2,7 @@ import {ThunkAction, ThunkDispatch} from 'redux-thunk';
 import {SGFState} from 'models/StoreState';
 import {ApiResponse, get, post, upload} from '../api/api';
 import {AxiosError, AxiosResponse} from 'axios';
-import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFProperties, SGFStone} from 'models/SGF';
+import {AnalysisProgress, AnalyzedSGF, SGFImage, SGFNavigation, SGFProperties, SGFStone} from 'models/SGF';
 import { KatagoResult } from 'models/Katago';
 import { loadingComplete, setLoading, ViewAction } from './view';
 
@@ -30,12 +30,6 @@ export type UPLOADING = typeof UPLOADING;
 export const SET = 'SET';
 export type SET = typeof SET;
 
-export const SET_MOVE = 'SET_MOVE';
-export type SET_MOVE = typeof SET_MOVE;
-
-export const BROWSE_MOVE = 'BROWSE_MOVE';
-export type BROWSE_MOVE = typeof BROWSE_MOVE;
-
 export const RECALCULATE_ANALYSIS_DATA = 'RECALCULATE_ANALYSIS_DATA';
 export type RECALCULATE_ANALYSIS_DATA = typeof RECALCULATE_ANALYSIS_DATA;
 
@@ -59,6 +53,16 @@ export type SET_LIVE_MODE = typeof SET_LIVE_MODE
 
 export const GET_ANALYZED_SGF = "GET_ANALYZED_SGF"
 export type GET_ANALYZED_SGF = typeof GET_ANALYZED_SGF
+
+export const NAVIGATE = "NAVIGATE"
+export type NAVIGATE = typeof NAVIGATE
+
+export interface Navigate {
+    type: NAVIGATE,
+    payload: {
+        navigation: SGFNavigation
+    }
+}
 
 export interface GetAnalyzedSGF {
     type: GET_ANALYZED_SGF,
@@ -115,20 +119,6 @@ export interface SetAction {
     }
 }
 
-export interface BrowseMoveAction {
-    type: BROWSE_MOVE,
-    payload: {
-        diff: number
-    }
-}
-
-export interface SetMoveAction {
-    type: SET_MOVE,
-    payload: {
-        move: number
-    }
-}
-
 export interface UploadSGFFileAction {
     type: UPLOAD_SGF_FILE;
     payload: {
@@ -181,14 +171,23 @@ export interface UploadingAction {
 export type SGFAction = RecalculateAnalysisDataAction | LoadProgressAction 
     | UploadSGFFileAction | UploadingAction | UploadSuccess 
     | UploadFail | ReceiveProgress | ReceiveProgressFail | SetAction 
-    | SetMoveAction | BrowseMoveAction | SetImage | UpdateImageResult
-    | SetSGFProperties | ToggleLiveMode | SetLiveMode
+    | SetImage | UpdateImageResult
+    | SetSGFProperties | ToggleLiveMode | SetLiveMode | Navigate
+
 
 export const setSGFProperties = (sgfProperties: SGFProperties): SGFAction => {
     return {
         type: SET_SGF_PROPERTIES,
         payload: {
             sgfProperties: sgfProperties
+        }
+    };
+}    
+export const navigate = (navigation: SGFNavigation): SGFAction => {
+    return {
+        type: NAVIGATE,
+        payload: {
+            navigation: navigation
         }
     };
 }
@@ -341,24 +340,6 @@ export const set = (analyzedSGF: AnalyzedSGF): SGFAction => {
     };
 }
 
-export const browseMove = (diff: number): SGFAction => {
-    return {
-        type: BROWSE_MOVE,
-        payload: {
-            diff
-        }
-    };
-}
-
-
-export const setMove = (move: number): SGFAction => {
-    return {
-        type: SET_MOVE,
-        payload: {
-            move
-        }
-    };
-}
 
 export const receiveProgress = (analysisProgress: AnalysisProgress): SGFAction => {
     return {

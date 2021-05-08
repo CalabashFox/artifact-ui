@@ -16,6 +16,7 @@ import { InitialAuthState } from 'models/User';
 import { InitialViewState } from 'models/view';
 import { InitialKatagoState } from 'models/Katago';
 import './i18n/config';
+import { InitialRecordingState } from 'models/Recording';
 
 const history: History = createBrowserHistory();
 export const routerMiddleware = createRouterMiddleware(history);
@@ -32,7 +33,8 @@ const store = configureStore({
     gameState: InitialGameState,
     viewState: InitialViewState,
     authState: InitialAuthState,
-    katagoState: InitialKatagoState
+    katagoState: InitialKatagoState,
+    recordingState: InitialRecordingState
 });
 
 

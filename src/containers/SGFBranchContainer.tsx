@@ -20,15 +20,15 @@ const SGFBranchContainer: React.FC = () => {
     const svgElement = useRef<HTMLDivElement>(null);
     const middle = 200;
 
-    const currentMove = sgfState.sgfProperties.currentMove;
+    const total = sgfState.branchNavigation.total;
 
     useEffect(() => {
         if (snapshot !== null) {
             if (snapshot.moveIndex * 30 > middle) {
-                svgElement.current?.scrollTo(snapshot.moveIndex * 30 - middle, 20);
+                svgElement.current?.scrollTo(snapshot.moveIndex * 30 / 2, 20);
             }
         }
-    }, [currentMove, snapshot]);
+    }, [total, snapshot]);
 
     return <Paper className={classes.container} ref={svgElement}>
         <SGFBranch/>

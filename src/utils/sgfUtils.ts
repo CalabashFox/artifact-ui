@@ -1,4 +1,4 @@
-import {AnalyzedSGF, MovePriority, SGFProperties, SGFStackGraphValue, WinrateReport} from 'models/SGF';
+import {AnalyzedSGF, MovePriority, SGFBranchNavigation, SGFBranchNode, SGFColor, SGFProperties, SGFSnapshot, SGFSnapshotBranch, SGFStackGraphValue, SGFStone, WinrateReport} from 'models/SGF';
 import {KatagoMoveInfo} from 'models/Katago';
 
 type Point = [number, number];
@@ -9,8 +9,139 @@ const hoshi = [[3, 3], [3, 9], [3, 15],
     [15, 3], [15, 9], [15, 15]
 ];
 
+const MAX_BRANCH_LEVEL = 15;
+
 export default class SgfUtils {
     
+    static renderBranchNavigation(analyzedSGF: AnalyzedSGF): SGFBranchNavigation {
+        const snapshots = this.flattenSnapshotList(analyzedSGF, false);
+        const { branchGraph, row, col, rootCol, total } = this.renderBranchNodeGraph(snapshots);
+        const navigationGraph = this.renderNavigationGraph(branchGraph, snapshots);
+        return {
+            branchGraph: branchGraph,
+            navigationGraph: navigationGraph,
+            row: row,
+            col: col,
+            rootCol: rootCol,
+            total: total
+        }
+    }
+
+    private static renderBranchNodeGraph(snapshots: Array<SGFSnapshot>)
+        : { branchGraph: SGFBranchNode[][], row: number, col: number, rootCol: number, total: number } {
+        const graph: SGFBranchNode[][] = new Array(MAX_BRANCH_LEVEL)
+            .fill(null)
+            .map(() => new Array(snapshots.length).fill(null));
+        const moveIndexMap = new Map<number, Array<SGFSnapshot>>();
+        const coordinateMap = new Map<string, SGFBranchNode>();
+        let levels = 0;
+        let moves = 0;
+        // ignore empty board
+        for (let i = 1; i < snapshots.length; i++) { 
+            const snapshot = snapshots[i];
+            if (!moveIndexMap.has(snapshot.moveIndex)) {
+                moveIndexMap.set(snapshot.moveIndex, new Array<SGFSnapshot>());
+            }
+            moveIndexMap.get(snapshot.moveIndex)?.push(snapshot);
+        }
+        const branchLevelMap = new Map<number, number>();
+        for (let i = 0; i <= moveIndexMap.size; i++) {
+            const snapshots = moveIndexMap.get(i) ?? new Array<SGFSnapshot>();
+            snapshots.forEach(snapshot => {
+                let adjustedLevel = branchLevelMap.get(snapshot.branchId) ?? snapshot.level;
+                while (graph[adjustedLevel][snapshot.moveIndex] !== null) {
+                    adjustedLevel++;
+                }
+                branchLevelMap.set(snapshot.branchId, adjustedLevel);
+                const node: SGFBranchNode = {
+                    level: snapshot.level,
+                    index: snapshot.index,
+                    moveIndex: snapshot.moveIndex,
+                    color: this.getCurrentSGFColor(snapshot.stones),
+                    label: snapshot.stones[snapshot.stones.length - 1][1],
+                    adjustedLevel: adjustedLevel,
+                    branchId: snapshot.branchId,
+                    branchHead: snapshot.branchIndex === 0,
+                    rootBranchId: snapshot.rootBranchId,
+                    previousNode: undefined
+                };
+                graph[adjustedLevel][snapshot.moveIndex] = node;
+                if (snapshot.branchIndex === 0) {
+                    node.previousNode = coordinateMap.get(`coord-${snapshot.rootBranchId}-${snapshot.moveIndex - 1}`);
+                } else {
+                    node.previousNode = coordinateMap.get(`coord-${snapshot.branchId}-${snapshot.moveIndex - 1}`);
+                }
+                coordinateMap.set(`coord-${snapshot.branchId}-${snapshot.moveIndex}`, node);
+                if (adjustedLevel > levels) {
+                    levels = adjustedLevel;
+                }
+                if (snapshot.moveIndex > moves) {
+                    moves = snapshot.moveIndex;
+                }
+            });
+        }
+        const result: SGFBranchNode[][] = new Array(levels + 1)
+            .fill(null)
+            .map(() => new Array(moves + 1).fill(null));
+
+        // strip graph
+        for (let i = 0; i <= levels; i++) {
+            for (let j = 0; j <= moves; j++) {
+                result[i][j] = graph[i][j];
+            }
+        }
+        return { 
+            branchGraph: result,
+            row: levels + 1,
+            col: moves + 1,
+            rootCol: result[0].filter(node => node !== null).length,
+            total: snapshots.length
+         };
+    }
+
+    private static renderNavigationGraph(graph: SGFBranchNode[][], snapshots: Array<SGFSnapshot>): SGFSnapshot[][] {
+        const sorted = snapshots.sort((s1, s2) => s1.index - s2.index);
+        const result: SGFSnapshot[][] = new Array(graph.length)
+            .fill(null)
+            .map(() => new Array(graph[0].length).fill(null));
+        for (let i = 0; i < graph.length; i++) {
+            for (let j = 0; j < graph[0].length; j++) {
+                if (graph[i][j] !== null) {
+                    result[i][j] = sorted[graph[i][j].index];
+                }
+            }
+        }
+        return result;
+    }
+
+    private static getCurrentSGFColor(stones: Array<SGFStone>): SGFColor {
+        return stones[stones.length - 1][0] === 'B' ? SGFColor.BLACK : SGFColor.WHITE;
+    }
+
+    static flattenSnapshotList(analyzedSGF: AnalyzedSGF, sortByIndex: boolean): Array<SGFSnapshot> {
+        const array = new Array<SGFSnapshot>();
+        const flatten = (array: Array<SGFSnapshot>, branch: SGFSnapshotBranch): void => {
+            array.push(...branch.snapshotList);
+            branch.snapshotList.forEach((snapshot: SGFSnapshot) => {
+                snapshot.branches.forEach(snapshotBranch => flatten(array, snapshotBranch));
+            })
+        };
+        flatten(array, analyzedSGF.mainBranch);
+        const branchSorter = (s1: SGFSnapshot, s2 : SGFSnapshot) => {
+            const branchDiff = s1.branchId - s2.branchId;
+            if (branchDiff !== 0) {
+                return branchDiff;
+            }
+            return s1.moveIndex - s2.moveIndex;
+        };
+        const indexSorter = (s1: SGFSnapshot, s2 : SGFSnapshot) => s1.index - s2.index;
+        if (sortByIndex) {
+            return array.sort(indexSorter);
+        } else {
+            return array.sort(branchSorter);
+        }
+    }
+
     static translateToCoordinate(gtpLocation: string): Point {
         let col = gtpLocation.charCodeAt(0);
         if (col >= 'I'.charCodeAt(0)) {
