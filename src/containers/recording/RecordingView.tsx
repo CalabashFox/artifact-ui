@@ -6,7 +6,7 @@ import {Monitor, MonitorOff, Selected, Undo, Check} from '@icon-park/react'
 import useIcon from "components/hook/icon";
 import RTCConnection from "utils/rtcConnection";
 import { useTranslation } from 'react-i18next';
-import { Box, Typography } from "@material-ui/core";
+import { Box, Hidden, Typography } from "@material-ui/core";
 import { CalibrationBoundary } from "models/Recording";
 import { useDispatch, useSelector } from "react-redux";
 import { RecordingState, StoreState } from "models/StoreState";
@@ -29,7 +29,11 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     video: {
-        width: '100%'
+        width: '100%',
+        [theme.breakpoints.down('xs')]: {
+            width: '350px',
+            height: '150px'
+        }
     },
 }));
 
@@ -54,6 +58,10 @@ const order = (array: Array<CalibrationBoundary>, center: CalibrationBoundary): 
     ]
 }
 
+const isMobile = () => {
+    return true;
+    //return /(android|bb\d+|meego).+mobile|armv7l|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent);
+}
 
 const RecordingView: React.FC = () => {
     const recordingState = useSelector<StoreState, RecordingState>(state => state.recordingState);
@@ -62,7 +70,7 @@ const RecordingView: React.FC = () => {
     const { t } = useTranslation();
 
     const [capturing, setCapturing] = useState<boolean>(false);
-    const [rtc] = useState(new RTCConnection());
+    const [rtc] = useState(new RTCConnection(isMobile()));
     const [iceGatheringState, setIceGatheringState] = useState<string>('');
     const [blocking, setBlocking] = useState<boolean>(false);
     const [iceConnectionState, setIceConnectionState] = useState<string>('');
@@ -107,18 +115,26 @@ const RecordingView: React.FC = () => {
 
     const connectRTC = (stream: MediaStream) => {
         rtc.connect(() => {
-            rtc.initIceGatheringListener(iceGatheringState, setIceGatheringState);
-            rtc.initIceConnectionListener(iceConnectionState, setIceConnectionState);
-            rtc.initSignalingListener(signalingState, setSignalingStateState);
-            rtc.init(stream, playback.current);
+            try {
+                rtc.initIceGatheringListener(iceGatheringState, setIceGatheringState);
+                rtc.initIceConnectionListener(iceConnectionState, setIceConnectionState);
+                rtc.initSignalingListener(signalingState, setSignalingStateState);
+                rtc.init(stream, playback.current);
+            } catch(exception) {
+                alert(exception);
+            }
         });
     };
 
     const constraints = {
         audio: false,
         video: {
-            //facingMode: 'environment', // user
-            facingMode: 'user',
+            facingMode: 'environment',
+            //facingMode: 'user',
+            //width: 1920,
+            //height: 1080,
+            width: 1280,
+            height: 720,
             frameRate: 15,
         }
     };
@@ -270,11 +286,22 @@ const RecordingView: React.FC = () => {
                 {calibrating && <canvas ref={canvas} onClick={(e) => handleCanvasClick(e)}></canvas>}
             </Grid>
             <Grid item sm={2} xs={12} className={classes.buttonContainer}>
-                <Box pl={0.5} pr={0.5}><Paper>{captureIcon}</Paper></Box>
-                <Box pl={0.5} pr={0.5}><Paper>{stopIcon}</Paper></Box>
-                <Box pl={0.5} pr={0.5}><Paper>{calibrateIcon}</Paper></Box>
-                <Box pl={0.5} pr={0.5}><Paper>{confirmCalibrateIcon}</Paper></Box>
-                <Box pl={0.5} pr={0.5}><Paper>{undoCalibrateIcon}</Paper></Box>
+                <Hidden smUp>
+                    <Paper>
+                        {captureIcon}
+                        {stopIcon}
+                        {calibrateIcon}
+                        {confirmCalibrateIcon}
+                        {undoCalibrateIcon}
+                    </Paper>
+                </Hidden>
+                <Hidden xsDown>
+                    <Box pl={0.5} pr={0.5}><Paper>{captureIcon}</Paper></Box>
+                    <Box pl={0.5} pr={0.5}><Paper>{stopIcon}</Paper></Box>
+                    <Box pl={0.5} pr={0.5}><Paper>{calibrateIcon}</Paper></Box>
+                    <Box pl={0.5} pr={0.5}><Paper>{confirmCalibrateIcon}</Paper></Box>
+                    <Box pl={0.5} pr={0.5}><Paper>{undoCalibrateIcon}</Paper></Box>
+                </Hidden>   
                 <Box pl={0.5} pr={0.5}>
                     <Paper>
                         <video autoPlay={true} playsInline={true} ref={camera} className={classes.video}></video>
@@ -282,6 +309,7 @@ const RecordingView: React.FC = () => {
                 </Box>
                 <Box pl={0.5} pr={0.5}>
                     <Paper>
+                        <Typography><span id="test"></span></Typography>
                         <Typography>ICE gathering: {iceGatheringState}</Typography>
                         <Typography>ICE connection: {iceConnectionState}</Typography>
                         <Typography>Signaling: {signalingState}</Typography>

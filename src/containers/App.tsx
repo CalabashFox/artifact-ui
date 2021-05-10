@@ -5,10 +5,6 @@ import Dashboard from './Dashboard';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { createMuiTheme, MuiThemeProvider, responsiveFontSizes } from '@material-ui/core/styles';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { authorize } from 'actions/auth';
-import TokenUtils from 'utils/tokenUtils';
 import { IconProvider, DEFAULT_ICON_CONFIGS } from '@icon-park/react';
 import { IIconConfig } from '@icon-park/react/lib/runtime';
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
@@ -226,14 +222,6 @@ let theme = createMuiTheme({
 theme = responsiveFontSizes(theme);
 
 const App: React.FC = () => {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        if (TokenUtils.hasToken()) {
-            const auth = TokenUtils.getToken() || '';
-            const token = TokenUtils.getRefreshToken() || '';
-            dispatch(authorize(auth, token));
-        }
-    });
 
     const iconConfig: IIconConfig = {
         ...DEFAULT_ICON_CONFIGS,

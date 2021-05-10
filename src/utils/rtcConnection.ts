@@ -7,30 +7,51 @@ interface Point {
 
 export default class RTCConnection {
 
+    private host: string;
     private peerConnection!: RTCPeerConnection;
     private dataChannel!: RTCDataChannel;
+    private mobileTestMode: boolean;
+    private codec: string;
 
-    public constructor() {}
+    public constructor(mobileTestMode: boolean) {
+        if (mobileTestMode) {
+            this.host = 'https://192.168.31.63:8090';
+            //this.host = 'https://firekeeper.local:8090';
+        } else {
+            this.host = 'https://localhost:8090';
+        }
+        this.codec = 'H264/90000';
+        //this.codec = 'VP8/90000';
+        this.mobileTestMode = mobileTestMode;
+    }
 
     public connect(callback: () => void): void {
-        const configuration: RTCConfiguration = {
-            iceServers: [
-                {
-                    urls: "stun:stun2.1.google.com:19302"
-                }
-            ]
-        };
-        this.peerConnection = new RTCPeerConnection(configuration);
-        this.dataChannel = this.peerConnection.createDataChannel('recorder', {
-            ordered: true
-        });
-        this.dataChannel.onerror = this.onError;
-        this.dataChannel.onclose = this.onClose;
-        callback();
+        try {
+            const configuration: RTCConfiguration = {
+                iceServers: [
+                    {
+                        urls: "stun:stun2.1.google.com:19302"
+                    }
+                ]
+            };
+            this.peerConnection = new RTCPeerConnection(configuration);
+            this.dataChannel = this.peerConnection.createDataChannel('recorder', {
+                ordered: true
+            });
+            this.dataChannel.onerror = this.onError;
+            this.dataChannel.onclose = this.onClose;
+            callback();
+        } catch (exception) {
+            this.test(exception);
+            const test = document.getElementById('test');
+            if (test !== null) {
+                test.innerHTML = exception;
+            }
+        }
     }
 
     public submitCalibration(boundaries: Array<CalibrationBoundary>): void {
-        fetch('http://localhost:8090/calibration', {
+        fetch(this.host + '/calibration', {
             body: JSON.stringify({
                 boundaries: boundaries.map(tuple => [tuple.x, tuple.y])
             }),
@@ -44,8 +65,10 @@ export default class RTCConnection {
     public init(stream: MediaStream, videoElement: HTMLVideoElement): void {
         this.addStream(stream);
         this.peerConnection.addEventListener('track', function(evt) {
-            console.log('track');
+            console.log(evt.track.kind);
             if (evt.track.kind == 'video') {
+                console.log(evt);
+                console.log(evt.streams[0]);
                 videoElement.srcObject = evt.streams[0];
             }
         });
@@ -84,14 +107,16 @@ export default class RTCConnection {
             .then(() => {
                 return new Promise<number>((resolve) => {
                     if (pc.iceGatheringState === 'complete') {
-                        console.log('gather completed');
+                        this.test('gather completed');
                         resolve(1);
                     } else {
                         const checkState = () => {
                             if (pc.iceGatheringState === 'complete') {
-                                console.log('gather completed remove listener');
+                                this.test('gather completed remove listener');
                                 pc.removeEventListener('icegatheringstatechange', checkState);
                                 resolve(1);
+                            } else {
+                                this.test(pc.iceGatheringState);
                             }
                         };
                         pc.addEventListener('icegatheringstatechange', checkState);
@@ -100,10 +125,17 @@ export default class RTCConnection {
             })
             .then(() => {
                 const offer = pc.localDescription;
-                return fetch('http://localhost:8090/offer', {
+                if (offer === null) {
+                    throw Error('offer null');
+                }
+                this.test('fetch');
+                const sdp = this.sdpFilterCodec('video', this.codec, offer.sdp);
+                const type = offer.type;
+                return fetch(this.host + '/offer', {
                     body: JSON.stringify({
-                        sdp: offer?.sdp,
-                        type: offer?.type,
+                        sdp: sdp,
+                        type: type,
+                        //video_transform: 'board'
                         video_transform: 'bgr'
                     }),
                     headers: {
@@ -114,7 +146,7 @@ export default class RTCConnection {
             })
             .then(response => response.json())
             .then(answer => pc.setRemoteDescription(answer))
-            .catch(error => console.log('offer error', error));
+            .catch(error => alert('offer error' + error));
     }
 
     public stop(): void {
@@ -202,6 +234,15 @@ export default class RTCConnection {
         }
     
         return sdp;
+    }
+
+    private test(message: string): void {
+        if (this.mobileTestMode) {
+            //alert(message);
+            console.log(message);
+        } else {
+            console.log(message);
+        }
     }
     
     private escapeRegExp(text: string): string {
