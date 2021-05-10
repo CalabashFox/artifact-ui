@@ -65,10 +65,7 @@ export default class RTCConnection {
     public init(stream: MediaStream, videoElement: HTMLVideoElement): void {
         this.addStream(stream);
         this.peerConnection.addEventListener('track', function(evt) {
-            console.log(evt.track.kind);
             if (evt.track.kind == 'video') {
-                console.log(evt);
-                console.log(evt.streams[0]);
                 videoElement.srcObject = evt.streams[0];
             }
         });

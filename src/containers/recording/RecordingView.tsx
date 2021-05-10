@@ -59,7 +59,7 @@ const order = (array: Array<CalibrationBoundary>, center: CalibrationBoundary): 
 }
 
 const isMobile = () => {
-    return true;
+    return false;
     //return /(android|bb\d+|meego).+mobile|armv7l|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent);
 }
 
@@ -133,9 +133,22 @@ const RecordingView: React.FC = () => {
             //facingMode: 'user',
             //width: 1920,
             //height: 1080,
+
+            width: {
+                min: 1280,
+                ideal: 3840,
+                max: 3840
+            },
+            height: {
+                min: 720,
+                ideal: 2160,
+                max: 2160
+            },
+            /*
             width: 1280,
             height: 720,
-            frameRate: 15,
+            */
+            frameRate: 5,
         }
     };
 
@@ -166,11 +179,11 @@ const RecordingView: React.FC = () => {
                 })
                 .catch(function(err) {
                     console.log(err.name + ": " + err.message);
+                    console.log(err);
                     setBlocking(false);
                 });
         } catch(e) {
             console.log(e);
-            console.log(recordingState.calibrated);
             setBlocking(false);
         }
     };
