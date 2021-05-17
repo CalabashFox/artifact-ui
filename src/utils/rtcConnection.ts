@@ -1,52 +1,160 @@
 import { CalibrationBoundary } from "models/Recording";
-
+// TODO no devices: toggle camera settings, clear camera data and restart chrome
 interface Point {
     x: number
     y: number
 }
 
+export interface WSMessage {
+    command: string
+    content: string
+}
+
 export default class RTCConnection {
 
-    private host: string;
-    private peerConnection!: RTCPeerConnection;
-    private dataChannel!: RTCDataChannel;
-    private mobileTestMode: boolean;
-    private codec: string;
+    protected host: string;
+    protected wshost: string;
+    protected peerConnection!: RTCPeerConnection;
+    protected dataChannel!: RTCDataChannel;
+    protected mobileTestMode: boolean;
+    protected codec: string;
+    protected channel: string;
+    protected websocket: WebSocket;
 
-    public constructor(mobileTestMode: boolean) {
+    public constructor(mobileTestMode: boolean, channel: string) {
         if (mobileTestMode) {
             this.host = 'https://192.168.31.63:8090';
+            this.wshost = 'wss://192.168.31.63:8090/ws?transceiver_type=' + channel + "&id=" + channel;
             //this.host = 'https://firekeeper.local:8090';
         } else {
             this.host = 'https://localhost:8090';
+            this.wshost = 'wss://localhost:8090/ws?transceiver_type=' + channel + "&id=" + channel;
         }
         this.codec = 'H264/90000';
         //this.codec = 'VP8/90000';
         this.mobileTestMode = mobileTestMode;
+        this.channel = channel;
+        this.log('websocket', 'created');
+        this.websocket = new WebSocket(this.wshost);
+        this.websocket.addEventListener('open', () => this.log('websocket', 'opened'));
+        this.websocket.addEventListener('error', (error) => this.log('websocket', error));
     }
 
-    public connect(callback: () => void): void {
+    protected log(component: string, content: any): void {
+        console.log('[' + this.channel.toUpperCase() + '][' + component + ']:' + content);
+    }
+
+    protected parseWSMessage(ev: MessageEvent): WSMessage {
+        this.log('websocket', ' <= ' + ev.data);
+        return JSON.parse(ev.data);
+    }
+
+    protected negotiate(): void {
+        const pc = this.peerConnection;
+        const obj = this;
+        this.log('pc', 'create offer');
+        pc.createOffer()
+            .then(offer => {
+                this.log('pc', 'set local description');
+                return pc.setLocalDescription(offer);
+            })
+            .then(() => {
+                return new Promise<void>((resolve) => {
+                    if (pc.iceGatheringState === 'complete') {
+                        resolve();
+                    } else {
+                        const checkState = () => {
+                            this.log('pc', 'check ice state ' + pc.iceGatheringState);
+                            if (pc.iceGatheringState === 'complete') {
+                                pc.removeEventListener('icegatheringstatechange', checkState);
+                                resolve();
+                            } else {
+                                this.log('pc', 'ice state ' + pc.iceGatheringState);
+                            }
+                        };
+                        pc.addEventListener('icegatheringstatechange', checkState);
+                    }
+                });
+            })
+            .then(() => {
+                this.log('pc', 'offer request');
+                const offer = pc.localDescription;
+                if (offer === null) {
+                    return Promise.reject('offer null');
+                }
+                return this.fetch('/offer', JSON.stringify({
+                    id: obj.channel,
+                    sdp: obj.sdpFilterCodec('video', this.codec, offer.sdp),
+                    type: offer.type,
+                    video_transform: 'bgr',
+                    transceiver_type: obj.channel
+                }));
+            })
+            .then(response => response.json())
+            .then(answer => {
+                this.log('pc', 'receive answer');
+                return pc.setRemoteDescription(answer);
+            })
+            .catch(error => this.log('pc', error));
+    }
+
+    protected id(): string {
+        return Math.random().toString(36).substring(7);
+    }
+
+    protected fetch(action: string, body: string): Promise<Response> {
+        return fetch(this.host + action, {
+            body: body,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST'
+        });
+    }
+
+    public establishConnection(): Promise<void> {
         try {
             const configuration: RTCConfiguration = {
                 iceServers: [
                     {
                         urls: "stun:stun2.1.google.com:19302"
+                        //urls: "stun:stun.l.google.com:19302"
                     }
-                ]
+                ],
             };
+            this.log(this.channel, 'connect');
             this.peerConnection = new RTCPeerConnection(configuration);
-            this.dataChannel = this.peerConnection.createDataChannel('recorder', {
+            this.dataChannel = this.peerConnection.createDataChannel('dc.' + this.channel, {
                 ordered: true
             });
             this.dataChannel.onerror = this.onError;
             this.dataChannel.onclose = this.onClose;
-            callback();
+            this.dataChannel.addEventListener('message', (ev) => {
+                this.log('dc', ev.data);
+            });
+            this.peerConnection.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
+                //console.log(e.candidate);
+                //pc.addIceCandidate(e.candidate!);
+            });
+            this.peerConnection.addEventListener('icegatheringstatechange', () => {
+                this.log('pc', 'iceGatheringState => ' + this.peerConnection.iceGatheringState);
+            });
+
+            this.peerConnection.addEventListener('iceconnectionstatechange', () => {
+                this.log('pc', 'iceConnectionState => ' + this.peerConnection.iceConnectionState);
+            });
+
+            this.peerConnection.addEventListener('signalingstatechange', () => {
+                this.log('pc', 'signalingState => ' + this.peerConnection.signalingState);
+            });
+            return Promise.resolve();
         } catch (exception) {
             this.test(exception);
             const test = document.getElementById('test');
             if (test !== null) {
                 test.innerHTML = exception;
             }
+            return Promise.reject(exception);
         }
     }
 
@@ -62,121 +170,47 @@ export default class RTCConnection {
         });
     }
 
-    public init(stream: MediaStream, videoElement: HTMLVideoElement): void {
-        this.addStream(stream);
-        this.peerConnection.addEventListener('track', function(evt) {
-            if (evt.track.kind == 'video') {
-                videoElement.srcObject = evt.streams[0];
-            }
-        });
-    }
-
-    public initIceGatheringListener(val: string, setter: (value: string) => void) {
-        this.initListener('icegatheringstatechange', val, setter, this.peerConnection.iceGatheringState);
-    }
-
-    public initIceConnectionListener(val: string, setter: (value: string) => void) {
-        this.initListener('iceconnectionstatechange', val, setter, this.peerConnection.iceConnectionState);
-    }
-
-    public initSignalingListener(val: string, setter: (value: string) => void) {
-        this.initListener('signalingstatechange', val, setter, this.peerConnection.signalingState);
-    }
-
-    private initListener(event: string, val: string, setter: (value: string) => void, state: string): void {
-        const pc = this.peerConnection;
-        setter(state);
-        pc.addEventListener(event, function() {
-            setter(val + ' -> ' + state);
-        }, false);
-    }
-
-    private addStream(stream: MediaStream) {
+    public stop(): void {
         const obj = this;
         const pc = this.peerConnection;
-        stream.getTracks().forEach(function(track) {
-            obj.peerConnection.addTrack(track, stream);
-        });
-        pc.createOffer()
-            .then(offer => {
-                pc.setLocalDescription(offer);
-            })
-            .then(() => {
-                return new Promise<number>((resolve) => {
-                    if (pc.iceGatheringState === 'complete') {
-                        this.test('gather completed');
-                        resolve(1);
-                    } else {
-                        const checkState = () => {
-                            if (pc.iceGatheringState === 'complete') {
-                                this.test('gather completed remove listener');
-                                pc.removeEventListener('icegatheringstatechange', checkState);
-                                resolve(1);
-                            } else {
-                                this.test(pc.iceGatheringState);
-                            }
-                        };
-                        pc.addEventListener('icegatheringstatechange', checkState);
-                    }
-                });
-            })
-            .then(() => {
-                const offer = pc.localDescription;
-                if (offer === null) {
-                    throw Error('offer null');
-                }
-                this.test('fetch');
-                const sdp = this.sdpFilterCodec('video', this.codec, offer.sdp);
-                const type = offer.type;
-                return fetch(this.host + '/offer', {
-                    body: JSON.stringify({
-                        sdp: sdp,
-                        type: type,
-                        //video_transform: 'board'
-                        video_transform: 'bgr'
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    method: 'POST'
-                });
-            })
-            .then(response => response.json())
-            .then(answer => pc.setRemoteDescription(answer))
-            .catch(error => alert('offer error' + error));
-    }
-
-    public stop(): void {
-        const pc = this.peerConnection;
         this.dataChannel.close();
-        console.log('dc close');
+        console.log(this.channel + '.dc close');
 
         if (pc.getTransceivers) {
             pc.getTransceivers().forEach(transceiver => {
                 transceiver.stop();
-                console.log('transceiver stop');
+                console.log(this.channel + '.transceiver stop');
             });
         }
         pc.getSenders().forEach(sender => {
             sender.track?.stop();
-            console.log('sender track stop');
+            console.log(this.channel + '.sender track stop');
         });
 
         setTimeout(function() {
             pc.close();
-            console.log('pc close');
+            console.log(obj.channel + '.pc close');
         }, 500);
     }
 
-    private onClose(): void {
-        console.log('datachannel closed');
+    protected onClose(): void {
+        console.log(this.channel + '.datachannel closed');
     }
 
-    private onError(error: RTCErrorEvent): void {
-        console.log('datachannel error', error);
+    protected onError(error: RTCErrorEvent): void {
+        console.log(this.channel + '.datachannel error', error);
     }
 
-    private sdpFilterCodec(kind: string, codec: string, realSdp: string): string {
+    protected test(message: string): void {
+        if (this.mobileTestMode) {
+            //alert(message);
+            console.log(message);
+        } else {
+            console.log(message);
+        }
+    }
+
+    protected sdpFilterCodec(kind: string, codec: string, realSdp: string): string {
         var allowed = [];
         var rtxRegex = new RegExp('a=fmtp:(\\d+) apt=(\\d+)\r$');
         var codecRegex = new RegExp('a=rtpmap:([0-9]+) ' + this.escapeRegExp(codec));
@@ -233,15 +267,6 @@ export default class RTCConnection {
         return sdp;
     }
 
-    private test(message: string): void {
-        if (this.mobileTestMode) {
-            //alert(message);
-            console.log(message);
-        } else {
-            console.log(message);
-        }
-    }
-    
     private escapeRegExp(text: string): string {
         return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }

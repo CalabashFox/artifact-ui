@@ -4,13 +4,13 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import {Monitor, MonitorOff, Selected, Undo, Check} from '@icon-park/react'
 import useIcon from "components/hook/icon";
-import RTCConnection from "utils/rtcConnection";
 import { useTranslation } from 'react-i18next';
-import { Box, Hidden, Typography } from "@material-ui/core";
+import { Box, Hidden } from "@material-ui/core";
 import { CalibrationBoundary } from "models/Recording";
-import { useDispatch, useSelector } from "react-redux";
-import { RecordingState, StoreState } from "models/StoreState";
+import { useDispatch } from "react-redux";
 import { setCalibrationBoundaries, setCalibrated } from "actions/recording";
+import RTCTransmitter from "utils/rtcTransmitter";
+import RTCReceiver from "utils/rtcReceiver";
 
 const useStyles = makeStyles((theme) => ({
     recordingContainer: {
@@ -58,33 +58,30 @@ const order = (array: Array<CalibrationBoundary>, center: CalibrationBoundary): 
     ]
 }
 
-const isMobile = () => {
-    return false;
-    //return /(android|bb\d+|meego).+mobile|armv7l|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent);
-}
+/*const isMobile = () => {
+    return /(android|bb\d+|meego).+mobile|armv7l|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent);
+}*/
 
 const RecordingView: React.FC = () => {
-    const recordingState = useSelector<StoreState, RecordingState>(state => state.recordingState);
     const dispatch = useDispatch();
     const classes = useStyles();
     const { t } = useTranslation();
 
     const [capturing, setCapturing] = useState<boolean>(false);
-    const [rtc] = useState(new RTCConnection(isMobile()));
-    const [iceGatheringState, setIceGatheringState] = useState<string>('');
-    const [blocking, setBlocking] = useState<boolean>(false);
-    const [iceConnectionState, setIceConnectionState] = useState<string>('');
-    const [signalingState, setSignalingStateState] = useState<string>('');
-    const [calibrating, setCalibrating] = useState<boolean>(false);
-    const [boundaries, setBoundaries] = useState<Array<CalibrationBoundary>>(new Array<CalibrationBoundary>());
-    const camera = useRef<HTMLVideoElement>(document.createElement('video'));
     const playback = useRef<HTMLVideoElement>(document.createElement('video'));
+    const camera = useRef<HTMLVideoElement>(document.createElement('video'));
+
+    const [receiver] = useState<RTCReceiver>(() => new RTCReceiver(false, playback));
+    const [transmitter] = useState<RTCTransmitter>(() => new RTCTransmitter(false, setCapturing, camera, playback));
+    const [blocking, setBlocking] = useState<boolean>(false);
+    const [calibrating, setCalibrating] = useState<boolean>(false);
+    const [boundaries, setBoundaries] = useState<Array<CalibrationBoundary>>(() => new Array<CalibrationBoundary>());
     const canvas = useRef<HTMLCanvasElement>(document.createElement('canvas'));
     const [timer, setTimer] = useState<number>(0);
 
     const interval = 50;
 
-    const refreshCanvas = () => {
+    const refreshCanvas = useCallback(() => {
         if (!calibrating) {
             return;
         }
@@ -107,50 +104,11 @@ const RecordingView: React.FC = () => {
         if (calibrating) {
             setTimeout(() => setTimer(timer + 1), interval);
         }
-    };// eslint-disable-line react-hooks/exhaustive-deps
+    }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         refreshCanvas();
-    }, [timer]);
-
-    const connectRTC = (stream: MediaStream) => {
-        rtc.connect(() => {
-            try {
-                rtc.initIceGatheringListener(iceGatheringState, setIceGatheringState);
-                rtc.initIceConnectionListener(iceConnectionState, setIceConnectionState);
-                rtc.initSignalingListener(signalingState, setSignalingStateState);
-                rtc.init(stream, playback.current);
-            } catch(exception) {
-                alert(exception);
-            }
-        });
-    };
-
-    const constraints = {
-        audio: false,
-        video: {
-            facingMode: 'environment',
-            //facingMode: 'user',
-            //width: 1920,
-            //height: 1080,
-
-            width: {
-                min: 1280,
-                ideal: 3840,
-                max: 3840
-            },
-            height: {
-                min: 720,
-                ideal: 2160,
-                max: 2160
-            },
-            /*
-            width: 1280,
-            height: 720,
-            */
-            frameRate: 5,
-        }
-    };
+    }, [timer]);// eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (calibrating && capturing) {
@@ -163,25 +121,11 @@ const RecordingView: React.FC = () => {
         if (blocking) {
             return;
         }
-        setBlocking(true);
         try {
-            navigator.mediaDevices.enumerateDevices()
-                .then(function(devices) {
-                    devices.forEach(function(device) {
-                        if (device.kind === 'videoinput') {
-                            console.log(device.kind + ": " + device.label + " = " + device.deviceId);
-                        }                        
-                    });
-                    navigator.mediaDevices
-                        .getUserMedia(constraints)
-                        .then(captureSuccess)
-                        .catch(captureError);
-                })
-                .catch(function(err) {
-                    console.log(err.name + ": " + err.message);
-                    console.log(err);
-                    setBlocking(false);
-                });
+            setBlocking(true);
+            //transmitter.connect();
+            receiver.connect();
+            setBlocking(false);
         } catch(e) {
             console.log(e);
             setBlocking(false);
@@ -194,7 +138,8 @@ const RecordingView: React.FC = () => {
         }
         setBlocking(true);
         const stream = camera.current.srcObject;
-        rtc.stop();
+        transmitter.stop();
+        receiver.stop();
         if (stream instanceof MediaStream) {
             stream.getTracks().forEach(track => track.stop());
             camera.current.srcObject = null;
@@ -247,7 +192,7 @@ const RecordingView: React.FC = () => {
         setBoundaries(new Array<CalibrationBoundary>());
         dispatch(setCalibrationBoundaries(orderedBoundaries));
         dispatch(setCalibrated(true));
-        rtc.submitCalibration(orderedBoundaries);
+        transmitter.submitCalibration(orderedBoundaries);
         setBlocking(false);
     };
 
@@ -272,18 +217,6 @@ const RecordingView: React.FC = () => {
         setBoundaries(array);
         setBlocking(false);
     };
-
-    const captureSuccess = (stream: MediaStream) => {
-        camera.current.srcObject = stream;
-        setCapturing(true);
-        connectRTC(stream);
-        setBlocking(false);
-    }
-
-    function captureError(error: Error) {
-        console.error("Error: ", error);
-        setBlocking(false);
-    }
         
     const captureIcon = useIcon(<Monitor title={t('ui.recording.capture')} onClick={() => handleCaptureVideo()}/>, capturing);
     const stopIcon = useIcon(<MonitorOff title={t('ui.recording.stopCapture')} onClick={() => handleStopCapture()}/>, !capturing);
@@ -294,8 +227,9 @@ const RecordingView: React.FC = () => {
     return <React.Fragment>
         <Grid container>
             <Grid item sm={10} xs={12} className={classes.recordingContainer} >
-                <video autoPlay={true} playsInline={true} ref={playback} className={classes.video}
-                    style={{display: calibrating ? 'none' : 'block' }}></video>
+                {/*<video autoPlay={true} playsInline={true} ref={playback} className={classes.video}
+                    style={{display: calibrating ? 'none' : 'block' }}></video>*/}
+                <video autoPlay={true} playsInline={true} ref={playback} className={classes.video}></video>
                 {calibrating && <canvas ref={canvas} onClick={(e) => handleCanvasClick(e)}></canvas>}
             </Grid>
             <Grid item sm={2} xs={12} className={classes.buttonContainer}>
@@ -318,14 +252,6 @@ const RecordingView: React.FC = () => {
                 <Box pl={0.5} pr={0.5}>
                     <Paper>
                         <video autoPlay={true} playsInline={true} ref={camera} className={classes.video}></video>
-                    </Paper>
-                </Box>
-                <Box pl={0.5} pr={0.5}>
-                    <Paper>
-                        <Typography><span id="test"></span></Typography>
-                        <Typography>ICE gathering: {iceGatheringState}</Typography>
-                        <Typography>ICE connection: {iceConnectionState}</Typography>
-                        <Typography>Signaling: {signalingState}</Typography>
                     </Paper>
                 </Box>
             </Grid>

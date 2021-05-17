@@ -4,7 +4,7 @@ import { GameActionState } from "models/Game";
 import { actionStateUpdate } from "actions/game";
 
 const useSound = (src: string, actionState: GameActionState, activationState: GameActionState): void => {
-    const [audio] = useState(new Audio(src));
+    const [audio] = useState(() => new Audio(src));
     const dispatch = useDispatch();
     
     useEffect(() => {
