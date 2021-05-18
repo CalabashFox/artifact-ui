@@ -163,7 +163,7 @@ const Dashboard: React.FC = () => {
         {tabIndex === TAB_VIEW_SGF && <Container><SGFView/></Container>}
         {tabIndex === TAB_VIEW_RECORDING && <Container><RecordingView/></Container>}
         {tabIndex === TAB_VIEW_MONITOR && <Container><MonitorView/></Container>}
-        <Hidden smUp>
+        {tabIndex !== TAB_VIEW_RECORDING && <Hidden smUp>
              <BottomNavigation value={tabIndex} onChange={(e, v) => handleTabChange(v)} className={classes.navigation}>
                  <BottomNavigationAction label={t('ui.scannerView')} value={TAB_VIEW_IMAGE} icon={uploadIcon} />
                  <BottomNavigationAction label={t('ui.gameView')} value={TAB_VIEW_GAME} />
@@ -171,7 +171,7 @@ const Dashboard: React.FC = () => {
                  <BottomNavigationAction label={t('ui.recordingView')} value={TAB_VIEW_RECORDING} />
                  <BottomNavigationAction label={t('ui.monitorView')} value={TAB_VIEW_MONITOR} />
             </BottomNavigation>
-        </Hidden>
+        </Hidden>}
     </Container>;
 }
 

@@ -10,21 +10,27 @@ export interface WSMessage {
     content: string
 }
 
+export enum Transceiver {
+    TRANSMITTER, RECEIVER
+}
+
 export default class RTCConnection {
 
     protected host: string;
     protected wshost: string;
     protected peerConnection!: RTCPeerConnection;
     protected dataChannel!: RTCDataChannel;
-    protected mobileTestMode: boolean;
     protected codec: string;
     protected channel: string;
     protected websocket: WebSocket;
 
-    public constructor(mobileTestMode: boolean, channel: string) {
-        if (mobileTestMode) {
-            this.host = 'https://192.168.31.63:8090';
-            this.wshost = 'wss://192.168.31.63:8090/ws?transceiver_type=' + channel + "&id=" + channel;
+    public constructor(transceiver: Transceiver) {
+        const channel = transceiver == Transceiver.TRANSMITTER ? 'transmitter' : 'receiver';
+        if (transceiver == Transceiver.TRANSMITTER) {
+            //this.host = 'https://192.168.31.63:8090';
+            //this.wshost = 'wss://192.168.31.63:8090/ws?transceiver_type=' + channel + "&id=" + channel;
+            this.host = 'https://localhost:8090';
+            this.wshost = 'wss://localhost:8090/ws?transceiver_type=' + channel + "&id=" + channel;
             //this.host = 'https://firekeeper.local:8090';
         } else {
             this.host = 'https://localhost:8090';
@@ -32,7 +38,6 @@ export default class RTCConnection {
         }
         this.codec = 'H264/90000';
         //this.codec = 'VP8/90000';
-        this.mobileTestMode = mobileTestMode;
         this.channel = channel;
         this.log('websocket', 'created');
         this.websocket = new WebSocket(this.wshost);
@@ -41,7 +46,7 @@ export default class RTCConnection {
     }
 
     protected log(component: string, content: any): void {
-        console.log('[' + this.channel.toUpperCase() + '][' + component + ']:' + content);
+        console.log('[' + new Date().toLocaleTimeString() + '][' + this.channel.toUpperCase() + '][' + component + ']:' + content);
     }
 
     protected parseWSMessage(ev: MessageEvent): WSMessage {
@@ -64,12 +69,9 @@ export default class RTCConnection {
                         resolve();
                     } else {
                         const checkState = () => {
-                            this.log('pc', 'check ice state ' + pc.iceGatheringState);
                             if (pc.iceGatheringState === 'complete') {
                                 pc.removeEventListener('icegatheringstatechange', checkState);
                                 resolve();
-                            } else {
-                                this.log('pc', 'ice state ' + pc.iceGatheringState);
                             }
                         };
                         pc.addEventListener('icegatheringstatechange', checkState);
@@ -149,7 +151,7 @@ export default class RTCConnection {
             });
             return Promise.resolve();
         } catch (exception) {
-            this.test(exception);
+            this.log('pc', exception);
             const test = document.getElementById('test');
             if (test !== null) {
                 test.innerHTML = exception;
@@ -199,15 +201,6 @@ export default class RTCConnection {
 
     protected onError(error: RTCErrorEvent): void {
         console.log(this.channel + '.datachannel error', error);
-    }
-
-    protected test(message: string): void {
-        if (this.mobileTestMode) {
-            //alert(message);
-            console.log(message);
-        } else {
-            console.log(message);
-        }
     }
 
     protected sdpFilterCodec(kind: string, codec: string, realSdp: string): string {

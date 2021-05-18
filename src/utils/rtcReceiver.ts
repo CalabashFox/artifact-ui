@@ -1,15 +1,19 @@
 import { CalibrationBoundary } from "models/Recording";
-import RTCConnection, { WSMessage } from "./rtcConnection";
-
+import RTCConnection, { Transceiver, WSMessage } from "./rtcConnection";
 
 export default class RTCReceiver extends RTCConnection {
 
     private receiverRef: React.MutableRefObject<HTMLVideoElement>;
+    private setCapturing: (capturing: boolean) => void;
+    private canvasRef: React.MutableRefObject<HTMLCanvasElement>;
 
-    public constructor(mobileTestMode: boolean, receiverRef: React.MutableRefObject<HTMLVideoElement>) {
-        super(mobileTestMode, 'receiver');
+    public constructor(receiverRef: React.MutableRefObject<HTMLVideoElement>,
+        setCapturing: (capturing: boolean) => void, canvasRef: React.MutableRefObject<HTMLCanvasElement>) {
+        super(Transceiver.RECEIVER);
         this.websocket.addEventListener('message', (ev) => this.handleWebsocketMessage(super.parseWSMessage(ev)));
         this.receiverRef = receiverRef;
+        this.setCapturing = setCapturing;
+        this.canvasRef = canvasRef;
     }
 
     private handleWebsocketMessage(message: WSMessage): void {
@@ -32,19 +36,7 @@ export default class RTCReceiver extends RTCConnection {
     }
 
     private handleOffer(offer: RTCSessionDescriptionInit): void {
-        this.log('dc', 'offer received');
-        super.establishConnection()
-            .then(() => {
-                this.dataChannel.onopen = ev => {
-                    this.log('dc', 'open');
-                    this.dataChannel.send('complete');
-                };
-                this.init();
-                /*this.peerConnection.addTransceiver('video', {
-                    direction: 'recvonly'
-                });*/
-            })     
-            .catch(err => console.log(err));
+        this.connect();
     }
 
     private handleAnswer(message: string): void {
@@ -61,11 +53,12 @@ export default class RTCReceiver extends RTCConnection {
 
     public connect(): void {
         /*
-        this.peerConnection.addTransceiver('video', {
-            direction: 'recvonly'
-        });*/
+        ;*/
         this.log('dc', 'connect');
         super.establishConnection()
+            .then(() => this.peerConnection.addTransceiver('video', {
+                direction: 'recvonly'
+            }))
             .then(() => {
                 this.dataChannel.onopen = ev => {
                     this.log('dc', 'open');
@@ -95,8 +88,23 @@ export default class RTCReceiver extends RTCConnection {
         this.log('pc', 'init');
         const obj = this;
         this.peerConnection.addEventListener('track', function(evt) {
-            obj.log('pc', 'receive stream track' + evt.streams[0]);
+            obj.log('pc', 'receive stream track');
             obj.receiverRef.current.srcObject = evt.streams[0];
+            /*const track = evt.streams[0].getTracks()[0];
+            const capture = new ImageCapture(track);
+            setInterval(() => { 
+                capture.grabFrame()
+                    .then((frame) => {
+                        const canvas = obj.canvasRef.current;
+                        canvas.width = frame.width;
+                        canvas.height = frame.height;
+                        const context = canvas.getContext('2d');
+                        if (context !== null) {
+                            context.drawImage(frame, 0, 0);
+                        }
+                    });
+              }, 1000);*/
+            obj.setCapturing(true);
         });
         super.negotiate();
     }

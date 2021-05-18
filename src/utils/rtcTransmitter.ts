@@ -1,23 +1,18 @@
-import { CalibrationBoundary } from "models/Recording";
-import RTCConnection, { WSMessage } from "./rtcConnection";
+import RTCConnection, { Transceiver, WSMessage } from "./rtcConnection";
 
 export default class RTCTransmitter extends RTCConnection {
 
     private setCapturing: (state: boolean) => void;
     private transmitterRef: React.MutableRefObject<HTMLVideoElement>;
-    private receiverRef: React.MutableRefObject<HTMLVideoElement>;
     private socketReady: boolean;
 
-    public constructor(mobileTestMode: boolean
-            , setCapturing: (state: boolean) => void
-            , transmitterRef: React.MutableRefObject<HTMLVideoElement>
-            , receiverRef: React.MutableRefObject<HTMLVideoElement>) {
-        super(mobileTestMode, 'transmitter');
+    public constructor(transmitterRef: React.MutableRefObject<HTMLVideoElement>,
+            setCapturing: (state: boolean) => void) {
+        super(Transceiver.TRANSMITTER);
         this.websocket.addEventListener('message', (ev) => this.handleWebsocketMessage(super.parseWSMessage(ev)));
         this.setCapturing = setCapturing;
         this.transmitterRef = transmitterRef;
         this.socketReady = false;
-        this.receiverRef = receiverRef;
     }
 
     private handleWebsocketMessage(message: WSMessage): void {
@@ -41,7 +36,7 @@ export default class RTCTransmitter extends RTCConnection {
         return {
             audio: false,
             video: {
-                facingMode: 'user', // environment
+                facingMode: 'environment', // user
                 width: {
                     min: 1280,
                     ideal: 3840,
@@ -100,29 +95,11 @@ export default class RTCTransmitter extends RTCConnection {
         this.log('media', error);
     }
 
-    public submitCalibration(boundaries: Array<CalibrationBoundary>): void {
-        fetch(this.host + '/calibration', {
-            body: JSON.stringify({
-                boundaries: boundaries.map(tuple => [tuple.x, tuple.y])
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: 'POST'
-        });
-    }
-
     public init(stream: MediaStream): void {
         const obj = this;
         stream.getTracks().forEach((track) => {
             obj.peerConnection.addTrack(track, stream);
             obj.log('pc', 'add stream track');
-        });
-        this.peerConnection.addEventListener('track', (evt) => {
-            if (evt.track.kind == 'video') {
-                obj.receiverRef.current.srcObject = evt.streams[0];
-                obj.log('pc', 'receive stream track' + evt.streams[0]);
-            }
         });
         super.negotiate();
     }
