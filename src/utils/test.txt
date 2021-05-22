@@ -1,0 +1,54 @@
+[22:38:58][RECEIVER][websocket]: <= {"command": "video-offer", "content": "{\"type\": \"answer\", \"sdp\": \"v=0\\r\\no=- 3830683133 3830683133 IN IP4 0.0.0.0\\r\\ns=-\\r\\nt=0 0\\r\\na=group:BUNDLE 0 1\\r\\na=msid-semantic:WMS *\\r\\nm=video 9 UDP/TLS/RTP/SAVPF 102 121 125 107\\r\\nc=IN IP4 0.0.0.0\\r\\na=recvonly\\r\\na=extmap:2 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\\r\\na=extmap:9 urn:ietf:params:rtp-hdrext:sdes:mid\\r\\na=mid:0\\r\\na=msid:0924a658-e4e9-4fab-9bee-b77e33be5237 ae700f33-f9e5-4cba-9644-60f41d961635\\r\\na=rtcp:9 IN IP4 0.0.0.0\\r\\na=rtcp-mux\\r\\na=ssrc-group:FID 4159209188 3503955754\\r\\na=ssrc:4159209188 cname:2407cbe1-5ff2-411b-aa9c-eba595fd3c9d\\r\\na=ssrc:3503955754 cname:2407cbe1-5ff2-411b-aa9c-eba595fd3c9d\\r\\na=rtpmap:102 H264/90000\\r\\na=rtcp-fb:102 nack\\r\\na=rtcp-fb:102 nack pli\\r\\na=rtcp-fb:102 goog-remb\\r\\na=fmtp:102 packetization-mode=1;level-asymmetry-allowed=1;profile-level-id=42001f\\r\\na=rtpmap:121 rtx/90000\\r\\na=fmtp:121 apt=102\\r\\na=rtpmap:125 H264/90000\\r\\na=rtcp-fb:125 nack\\r\\na=rtcp-fb:125 nack pli\\r\\na=rtcp-fb:125 goog-remb\\r\\na=fmtp:125 packetization-mode=1;level-asymmetry-allowed=1;profile-level-id=42e01f\\r\\na=rtpmap:107 rtx/90000\\r\\na=fmtp:107 apt=125\\r\\na=ice-ufrag:afKV\\r\\na=ice-pwd:l3slWT0LHVClm822QTWcdD\\r\\na=fingerprint:sha-256 56:05:AC:8B:09:08:C2:53:78:AC:19:2C:63:21:24:87:3D:33:C6:33:9C:08:23:31:12:65:69:F5:F2:06:74:F6\\r\\na=setup:active\\r\\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\\r\\nc=IN IP4 0.0.0.0\\r\\na=mid:1\\r\\na=sctp-port:5000\\r\\na=max-message-size:65536\\r\\na=ice-ufrag:afKV\\r\\na=ice-pwd:l3slWT0LHVClm822QTWcdD\\r\\na=fingerprint:sha-256 56:05:AC:8B:09:08:C2:53:78:AC:19:2C:63:21:24:87:3D:33:C6:33:9C:08:23:31:12:65:69:F5:F2:06:74:F6\\r\\na=setup:active\\r\\n\"}"}
+[22:38:58][RECEIVER][dc]:connect
+[22:38:58][RECEIVER][receiver]:connect
+[22:38:58][RECEIVER][pc]:init
+[22:38:58][RECEIVER][pc]:create offer
+[22:38:58][RECEIVER][pc]:set local description
+[22:38:58][RECEIVER][pc]:signalingState => have-local-offer
+[22:38:58][RECEIVER][pc]:iceGatheringState => gathering
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:38:58][RECEIVER][pc]:iceGatheringState => complete
+[22:38:58][RECEIVER][pc]:offer request to https://firekeeper.local:8090
+[22:38:58][RECEIVER][pc]:ice candidate received
+[22:39:03][RECEIVER][pc]:iceConnectionState => checking
+[22:39:03][RECEIVER][pc]:receive answer
+[22:39:03][RECEIVER][pc]:signalingState => stable
+[22:39:03][RECEIVER][pc]:receive stream track
+0x0
+MediaStream {id: "c733683f-f2dc-4c50-8673-dcf9aff65d1a", active: true, onaddtrack: null, onremovetrack: null, onactive: null, …}
+[22:39:03][RECEIVER][pc]:iceConnectionState => connected
+[22:39:03][RECEIVER][dc]:open
+data loaded:  Event {isTrusted: true, type: "loadeddata", target: video.jss10, currentTarget: video.jss10, eventPhase: 2, …}
+
+[22:38:52][TRANSMITTER][transmitter]:connect
+[22:38:53][TRANSMITTER][media]:iNpKE0pZVmN0xZyrjHed635exPUSo66If1f3
+[22:38:53][TRANSMITTER][pc]:add stream track
+[22:38:53][TRANSMITTER][pc]:create offer
+[22:38:53][TRANSMITTER][pc]:set local description
+[22:38:53][TRANSMITTER][pc]:signalingState => have-local-offer
+[22:38:53][TRANSMITTER][pc]:iceGatheringState => gathering
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:53][TRANSMITTER][pc]:iceGatheringState => complete
+[22:38:53][TRANSMITTER][pc]:offer request to https://firekeeper.local:8090
+[22:38:53][TRANSMITTER][pc]:ice candidate received
+[22:38:58][TRANSMITTER][pc]:iceConnectionState => checking
+[22:38:58][TRANSMITTER][pc]:receive answer
+[22:38:58][TRANSMITTER][pc]:signalingState => stable
+[22:38:58][TRANSMITTER][pc]:iceConnectionState => connected
+[22:38:58][TRANSMITTER][dc]:open
+[22:38:58][TRANSMITTER][dc]:{"command": "setup", "channel": "server", "content": "dc track added"}
+

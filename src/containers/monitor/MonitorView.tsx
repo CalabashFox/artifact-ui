@@ -70,6 +70,8 @@ const MonitorView: React.FC = () => {
 
     const interval = 50;
 
+    console.log(playback.current.srcObject);
+
     const refreshCalibrationCanvas = useCallback(() => {
         if (!calibrating) {
             return;

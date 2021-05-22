@@ -1,0 +1,50 @@
+[22:45:27][RECEIVER][websocket]: <= {"command": "video-offer", "content": "{\"type\": \"answer\", \"sdp\": \"v=0\\r\\no=- 3830683522 3830683522 IN IP4 0.0.0.0\\r\\ns=-\\r\\nt=0 0\\r\\na=group:BUNDLE 0 1\\r\\na=msid-semantic:WMS *\\r\\nm=video 9 UDP/TLS/RTP/SAVPF 98 99\\r\\nc=IN IP4 0.0.0.0\\r\\na=recvonly\\r\\na=extmap:2 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\\r\\na=extmap:9 urn:ietf:params:rtp-hdrext:sdes:mid\\r\\na=mid:0\\r\\na=msid:2f006c97-7d7e-42b2-93df-8330f280f8da 68383267-2a60-4184-a350-8dbe1bbefb80\\r\\na=rtcp:9 IN IP4 0.0.0.0\\r\\na=rtcp-mux\\r\\na=ssrc-group:FID 1785853648 2507512074\\r\\na=ssrc:1785853648 cname:7132e139-4db0-43f6-924b-34d47c515b2f\\r\\na=ssrc:2507512074 cname:7132e139-4db0-43f6-924b-34d47c515b2f\\r\\na=rtpmap:98 H264/90000\\r\\na=rtcp-fb:98 nack\\r\\na=rtcp-fb:98 nack pli\\r\\na=rtcp-fb:98 goog-remb\\r\\na=fmtp:98 packetization-mode=1;level-asymmetry-allowed=1;profile-level-id=42e01f\\r\\na=rtpmap:99 rtx/90000\\r\\na=fmtp:99 apt=98\\r\\na=ice-ufrag:UjrJ\\r\\na=ice-pwd:p59BMPyGnXiW6iBHJ5gcck\\r\\na=fingerprint:sha-256 86:48:74:63:D7:1A:B8:95:86:70:4E:2A:97:65:35:0A:61:19:78:BA:34:6F:92:60:1A:2C:DF:95:FA:C4:69:1E\\r\\na=setup:active\\r\\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\\r\\nc=IN IP4 0.0.0.0\\r\\na=mid:1\\r\\na=sctp-port:5000\\r\\na=max-message-size:65536\\r\\na=ice-ufrag:UjrJ\\r\\na=ice-pwd:p59BMPyGnXiW6iBHJ5gcck\\r\\na=fingerprint:sha-256 86:48:74:63:D7:1A:B8:95:86:70:4E:2A:97:65:35:0A:61:19:78:BA:34:6F:92:60:1A:2C:DF:95:FA:C4:69:1E\\r\\na=setup:active\\r\\n\"}"}
+[22:45:27][RECEIVER][dc]:connect
+[22:45:27][RECEIVER][receiver]:connect
+[22:45:27][RECEIVER][pc]:init
+[22:45:27][RECEIVER][pc]:create offer
+[22:45:27][RECEIVER][pc]:set local description
+[22:45:27][RECEIVER][pc]:signalingState => have-local-offer
+[22:45:27][RECEIVER][pc]:iceGatheringState => gathering
+[22:45:27][RECEIVER][pc]:ice candidate received
+[22:45:27][RECEIVER][pc]:ice candidate received
+[22:45:27][RECEIVER][pc]:ice candidate received
+[22:45:27][RECEIVER][pc]:ice candidate received
+[22:45:28][RECEIVER][pc]:ice candidate received
+[22:45:28][RECEIVER][pc]:ice candidate received
+[22:45:28][RECEIVER][pc]:ice candidate received
+[22:45:28][RECEIVER][pc]:ice candidate received
+[22:45:28][RECEIVER][pc]:iceGatheringState => complete
+[22:45:28][RECEIVER][pc]:offer request to https://firekeeper.local:8090
+[22:45:28][RECEIVER][pc]:ice candidate received
+[22:45:33][RECEIVER][pc]:iceConnectionState => checking
+[22:45:33][RECEIVER][pc]:receive answer
+[22:45:33][RECEIVER][pc]:signalingState => stable
+[22:45:33][RECEIVER][pc]:receive stream track
+0x0
+MediaStream {id: "6dc5d027-7ddc-4d86-b9d2-b3a2a04a3cb4", active: true, onaddtrack: null, onremovetrack: null, onactive: null, …}
+[22:45:33][RECEIVER][pc]:iceConnectionState => connected
+[22:45:33][RECEIVER][dc]:open
+
+
+[下午10:45:20][TRANSMITTER][transmitter]:connect
+[下午10:45:22][TRANSMITTER][media]:1e7895ce-3ae6-4996-b367-47a7ebfa1f4d
+[下午10:45:22][TRANSMITTER][pc]:signalingState => have-local-offer
+[下午10:45:22][TRANSMITTER][pc]:iceGatheringState => gathering
+[下午10:45:22][TRANSMITTER][pc]:add stream track
+[下午10:45:22][TRANSMITTER][pc]:ice candidate received
+[下午10:45:22][TRANSMITTER][pc]:create offer
+[下午10:45:22][TRANSMITTER][pc]:set local description
+[下午10:45:22][TRANSMITTER][pc]:ice candidate received
+[下午10:45:22][TRANSMITTER][pc]:ice candidate received
+[下午10:45:22][TRANSMITTER][pc]:ice candidate received
+[下午10:45:22][TRANSMITTER][pc]:ice candidate received
+[下午10:45:22][TRANSMITTER][pc]:iceGatheringState => complete
+[下午10:45:22][TRANSMITTER][pc]:offer request to https://firekeeper.local:8090
+[下午10:45:27][TRANSMITTER][pc]:receive answer
+[下午10:45:27][TRANSMITTER][pc]:signalingState => stable
+[下午10:45:27][TRANSMITTER][pc]:iceConnectionState => checking
+[下午10:45:27][TRANSMITTER][pc]:iceConnectionState => connected
+[下午10:45:27][TRANSMITTER][pc]:iceConnectionState => completed
+[下午10:45:27][TRANSMITTER][dc]:open
+[下午10:45:27][TRANSMITTER][dc]:{"command": "setup", "channel": "server", "content": "dc track added"}

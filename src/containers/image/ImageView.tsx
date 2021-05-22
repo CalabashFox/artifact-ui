@@ -101,8 +101,7 @@ const ImageView: React.FC = () => {
             frameRate: 15
         }
     };
-
-    // http://192.168.0.1:4000
+    
     const handleCaptureVideo = () => {
         try {
             navigator.mediaDevices.enumerateDevices()

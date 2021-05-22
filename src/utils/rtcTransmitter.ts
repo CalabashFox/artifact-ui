@@ -1,4 +1,4 @@
-import RTCConnection, { Transceiver, WSMessage } from "./rtcConnection";
+import RTCConnection, { Transceiver, Message } from "./rtcConnection";
 
 export default class RTCTransmitter extends RTCConnection {
 
@@ -9,27 +9,23 @@ export default class RTCTransmitter extends RTCConnection {
     public constructor(transmitterRef: React.MutableRefObject<HTMLVideoElement>,
             setCapturing: (state: boolean) => void) {
         super(Transceiver.TRANSMITTER);
-        this.websocket.addEventListener('message', (ev) => this.handleWebsocketMessage(super.parseWSMessage(ev)));
         this.setCapturing = setCapturing;
         this.transmitterRef = transmitterRef;
         this.socketReady = false;
     }
 
-    private handleWebsocketMessage(message: WSMessage): void {
+    protected handleWebsocketMessage(message: Message): boolean {
+        if (super.handleWebsocketMessage(message)) {
+            return true;
+        }
         switch (message.command) {
             case 'socket-ready':
                 this.socketReady = true;
                 break;
-            case 'video-offer':
-                this.handleOffer(JSON.parse(message.content));
-                break;
             default:
-                this.log('websocket', 'unknown ' + message);
+                this.log('websocket', 'unknown ' + JSON.stringify(message));
         }
-    }
-
-    private handleOffer(offer: RTCSessionDescriptionInit): void {
-        this.connect();
+        return true;
     }
 
     private getConstraints(): MediaStreamConstraints {
@@ -53,9 +49,6 @@ export default class RTCTransmitter extends RTCConnection {
     }
 
     public connect(): void {
-        if (!this.socketReady) {
-            this.log('websocket', 'socket not ready');
-        }
         super.establishConnection()
             .then(() => {
                 this.dataChannel.onopen = ev => {
@@ -99,6 +92,9 @@ export default class RTCTransmitter extends RTCConnection {
         const obj = this;
         stream.getTracks().forEach((track) => {
             obj.peerConnection.addTrack(track, stream);
+            obj.peerConnection.ontrack = (ev) => {
+                console.log(ev);
+            }
             obj.log('pc', 'add stream track');
         });
         super.negotiate();

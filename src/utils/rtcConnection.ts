@@ -5,9 +5,10 @@ interface Point {
     y: number
 }
 
-export interface WSMessage {
+export interface Message {
     command: string
-    content: string
+    channel: string
+    content: any
 }
 
 export enum Transceiver {
@@ -26,30 +27,79 @@ export default class RTCConnection {
 
     public constructor(transceiver: Transceiver) {
         const channel = transceiver == Transceiver.TRANSMITTER ? 'transmitter' : 'receiver';
-        if (transceiver == Transceiver.TRANSMITTER) {
-            //this.host = 'https://192.168.31.63:8090';
-            //this.wshost = 'wss://192.168.31.63:8090/ws?transceiver_type=' + channel + "&id=" + channel;
-            this.host = 'https://localhost:8090';
-            this.wshost = 'wss://localhost:8090/ws?transceiver_type=' + channel + "&id=" + channel;
-            //this.host = 'https://firekeeper.local:8090';
-        } else {
-            this.host = 'https://localhost:8090';
-            this.wshost = 'wss://localhost:8090/ws?transceiver_type=' + channel + "&id=" + channel;
-        }
-        this.codec = 'H264/90000';
-        //this.codec = 'VP8/90000';
+        const host = 'firekeeper.local';
+        const port = 8090;
+        /**
+        this.host = 'https://192.168.31.63:8090';
+        this.wshost = 'wss://192.168.31.63:8090/ws?transceiver_type=' + channel + "&id=" + channel;
+        */
+        this.host = `https://${host}:${port}`;
+        this.wshost = `wss://${host}:${port}/ws?transceiver_type=${channel}&id=${channel}`;
+
+        this.codec = 'H264/90000'; //'VP8/90000';
         this.channel = channel;
-        this.log('websocket', 'created');
+        this.log('websocket', 'connecting to ' + this.wshost);
         this.websocket = new WebSocket(this.wshost);
-        this.websocket.addEventListener('open', () => this.log('websocket', 'opened'));
-        this.websocket.addEventListener('error', (error) => this.log('websocket', error));
+        this.websocket.addEventListener('message', (ev) => this.handleWebsocketMessage(this.parseWSMessage(ev)));
+        this.websocket.onopen = () => this.log('websocket', 'opened');
+        this.websocket.onerror = ev => this.log('websocket', JSON.stringify(ev));
+        const bindWebSocketClosed = this.webSocketClosed.bind(this);
+        this.websocket.onclose = bindWebSocketClosed;
+    }
+    
+    protected handleWebsocketMessage(message: Message): boolean {
+        switch (message.command) {
+            case 'answer':
+                this.handleAnswer(message.content);
+                return true;
+            case 'ice-candidate':
+                this.handleIceCandidate(message.content);
+                return true;
+            case 'cancel':
+                this.handleCancel();
+                return true;
+        }
+        return false;
+    }
+
+    private handleAnswer(message: string): void {
+
+    }
+
+    private handleIceCandidate(iceCandidate: RTCIceCandidateInit): void {
+        var candidate = new RTCIceCandidate(iceCandidate);
+        try {
+            this.peerConnection.addIceCandidate(candidate)
+            this.log('pc', 'add ice candidate');
+        } catch(err) {
+            this.log('pc', 'ice candidate error ' + err);
+        }
+    }
+
+    private handleCancel(): void {
+
+    }
+
+    protected webSocketClosed(closeEvent: CloseEvent): void {
+        this.log('websocket', closeEvent.code + ':' + closeEvent.reason)
+    }
+
+    private isMobile(): boolean {
+        return /(android|bb\d+|meego).+mobile|armv7l|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent);
     }
 
     protected log(component: string, content: any): void {
-        console.log('[' + new Date().toLocaleTimeString() + '][' + this.channel.toUpperCase() + '][' + component + ']:' + content);
+        const text = '[' + new Date().toLocaleTimeString() + '][' + this.channel.toUpperCase() + '][' + component + ']:' + content;
+        if (this.isMobile()) {
+            this.fetch('/logging', JSON.stringify({
+                log: text
+            }));
+        } else {
+            console.log(text);
+        }        
     }
 
-    protected parseWSMessage(ev: MessageEvent): WSMessage {
+    protected parseWSMessage(ev: MessageEvent): Message {
         this.log('websocket', ' <= ' + ev.data);
         return JSON.parse(ev.data);
     }
@@ -62,7 +112,7 @@ export default class RTCConnection {
             .then(offer => {
                 this.log('pc', 'set local description');
                 return pc.setLocalDescription(offer);
-            })
+            }, (error) => console.log(error))
             .then(() => {
                 return new Promise<void>((resolve) => {
                     if (pc.iceGatheringState === 'complete') {
@@ -79,7 +129,7 @@ export default class RTCConnection {
                 });
             })
             .then(() => {
-                this.log('pc', 'offer request');
+                this.log('pc', 'offer request to ' + this.host);
                 const offer = pc.localDescription;
                 if (offer === null) {
                     return Promise.reject('offer null');
@@ -114,29 +164,61 @@ export default class RTCConnection {
         });
     }
 
+    private rtcConfig(): RTCConfiguration {
+        return {
+            iceServers: [
+                {
+                    urls: []
+                    //urls: "stun:stun2.1.google.com:19302"
+                    //urls: "stun:stun.l.google.com:19302"
+                }
+            ]
+        };
+            /*iceServers: [
+                {
+                    urls: [ "stun:eu-turn4.xirsys.com" ]
+                }, 
+                {   
+                    username: "hjOh2Vxrf-bcDpi-NjswWnx-MOakJ-j_caG0STSuQq_6ziVSCOSrUpixJvwt8sp1AAAAAGCowJVjYWxhYmFzaGZveA==",
+                    credential: "a15b6d0c-bad7-11eb-a468-0242ac140004",
+                    urls: [
+                        "turn:eu-turn4.xirsys.com:80?transport=udp", 
+                        "turn:eu-turn4.xirsys.com:3478?transport=udp",
+                        "turn:eu-turn4.xirsys.com:80?transport=tcp",
+                        "turn:eu-turn4.xirsys.com:3478?transport=tcp",
+                        "turns:eu-turn4.xirsys.com:443?transport=tcp",
+                        "turns:eu-turn4.xirsys.com:5349?transport=tcp"]
+                    }
+                ]
+            };*/
+    }
+
+    private identifier(): string {
+        return this.channel;
+    }
+
+    private oppositeIdentifier(): string {
+        return this.channel === 'transmitter' ? 'receiver' : this.channel;
+    }
+
     public establishConnection(): Promise<void> {
         try {
-            const configuration: RTCConfiguration = {
-                iceServers: [
-                    {
-                        urls: "stun:stun2.1.google.com:19302"
-                        //urls: "stun:stun.l.google.com:19302"
-                    }
-                ],
-            };
             this.log(this.channel, 'connect');
-            this.peerConnection = new RTCPeerConnection(configuration);
+            this.peerConnection = new RTCPeerConnection(this.rtcConfig());
             this.dataChannel = this.peerConnection.createDataChannel('dc.' + this.channel, {
                 ordered: true
             });
             this.dataChannel.onerror = this.onError;
-            this.dataChannel.onclose = this.onClose;
-            this.dataChannel.addEventListener('message', (ev) => {
-                this.log('dc', ev.data);
-            });
+            this.dataChannel.onclose = this.onClose; 
+            const bindHandleDataChannelMessage = this.handleDataChannelMessage.bind(this);
+            this.dataChannel.onmessage = bindHandleDataChannelMessage;
             this.peerConnection.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
-                //console.log(e.candidate);
-                //pc.addIceCandidate(e.candidate!);
+                this.log('pc', 'ice candidate received');
+                this.sendWSMessage({
+                    command: 'ice-candidate',
+                    channel: this.oppositeIdentifier(),
+                    content: e.candidate
+                });
             });
             this.peerConnection.addEventListener('icegatheringstatechange', () => {
                 this.log('pc', 'iceGatheringState => ' + this.peerConnection.iceGatheringState);
@@ -160,6 +242,38 @@ export default class RTCConnection {
         }
     }
 
+    private handleDataChannelMessage(ev: MessageEvent): void {
+        this.log('dc', ev.data);
+        const message: Message = JSON.parse(ev.data);
+        if (message.channel !== this.channel) {
+            return;
+        }
+        switch (message.command) {
+            case 'ice-candidate':
+                const iceCandidate = JSON.parse(message.content);
+                this.setIceCandidate(iceCandidate);
+                return;
+        }
+    }
+
+    private sendWSMessage(message: Message): void {
+        this.websocket.send(JSON.stringify(message));
+    }
+
+    private sendDCMessage(message: Message): void {
+        this.dataChannel.send(JSON.stringify(message));
+    }
+
+    private setIceCandidate(iceCandidate: RTCIceCandidateInit): void {
+        var candidate = new RTCIceCandidate(iceCandidate);
+        try {
+            this.peerConnection.addIceCandidate(candidate)
+            this.log('pc', 'add ice candidate');
+        } catch(err) {
+            this.log('pc', 'ice candidate error ' + err);
+        }
+    }
+
     public submitCalibration(boundaries: Array<CalibrationBoundary>): void {
         fetch(this.host + '/calibration', {
             body: JSON.stringify({
@@ -176,22 +290,22 @@ export default class RTCConnection {
         const obj = this;
         const pc = this.peerConnection;
         this.dataChannel.close();
-        console.log(this.channel + '.dc close');
+        this.log('dc', 'close');
 
         if (pc.getTransceivers) {
             pc.getTransceivers().forEach(transceiver => {
                 transceiver.stop();
-                console.log(this.channel + '.transceiver stop');
+                this.log('stream', 'receiver stop');
             });
         }
         pc.getSenders().forEach(sender => {
             sender.track?.stop();
-            console.log(this.channel + '.sender track stop');
+            obj.log('stream', 'track stop');
         });
 
         setTimeout(function() {
             pc.close();
-            console.log(obj.channel + '.pc close');
+            obj.log('pc', 'close');
         }, 500);
     }
 

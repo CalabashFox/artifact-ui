@@ -4,7 +4,7 @@
   "description": "  ",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --https --cert /Users/io/projects/artifact-processor/server.crt --key /Users/io/projects/artifact-processor/server.key",
+    "start": "webpack serve --https --cert /Users/io/projects/artifact/artifact-processor/server.crt --key /Users/io/projects/artifact/artifact-processor/server.key",
     "build": "webpack --mode production"
   },
   "author": "FireKeeper",
