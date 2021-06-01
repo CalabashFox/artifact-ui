@@ -90,8 +90,21 @@ export default class RTCTransmitter extends RTCConnection {
 
     public init(stream: MediaStream): void {
         const obj = this;
+        
         stream.getTracks().forEach((track) => {
             obj.peerConnection.addTrack(track, stream);
+/*
+            const capture = new ImageCapture(track);
+            setInterval(() => { 
+                capture.grabFrame()
+                    .then((frame) => {
+                        if (frame === undefined) {
+                            console.log('frame undefined');
+                            return;
+                        }
+                        console.log('frame:', frame.width, frame.height);
+                    });
+            }, 1000);*/
             obj.peerConnection.ontrack = (ev) => {
                 console.log(ev);
             }

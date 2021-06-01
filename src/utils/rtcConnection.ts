@@ -168,16 +168,9 @@ export default class RTCConnection {
         return {
             iceServers: [
                 {
-                    urls: []
-                    //urls: "stun:stun2.1.google.com:19302"
+                    urls: "stun:stun2.1.google.com:19302"
                     //urls: "stun:stun.l.google.com:19302"
-                }
-            ]
-        };
-            /*iceServers: [
-                {
-                    urls: [ "stun:eu-turn4.xirsys.com" ]
-                }, 
+                }/*,
                 {   
                     username: "hjOh2Vxrf-bcDpi-NjswWnx-MOakJ-j_caG0STSuQq_6ziVSCOSrUpixJvwt8sp1AAAAAGCowJVjYWxhYmFzaGZveA==",
                     credential: "a15b6d0c-bad7-11eb-a468-0242ac140004",
@@ -187,10 +180,11 @@ export default class RTCConnection {
                         "turn:eu-turn4.xirsys.com:80?transport=tcp",
                         "turn:eu-turn4.xirsys.com:3478?transport=tcp",
                         "turns:eu-turn4.xirsys.com:443?transport=tcp",
-                        "turns:eu-turn4.xirsys.com:5349?transport=tcp"]
-                    }
-                ]
-            };*/
+                        "turns:eu-turn4.xirsys.com:5349?transport=tcp"
+                    ]
+                }*/
+            ]
+        };
     }
 
     private identifier(): string {
@@ -220,17 +214,11 @@ export default class RTCConnection {
                     content: e.candidate
                 });
             });
-            this.peerConnection.addEventListener('icegatheringstatechange', () => {
-                this.log('pc', 'iceGatheringState => ' + this.peerConnection.iceGatheringState);
-            });
-
-            this.peerConnection.addEventListener('iceconnectionstatechange', () => {
-                this.log('pc', 'iceConnectionState => ' + this.peerConnection.iceConnectionState);
-            });
-
-            this.peerConnection.addEventListener('signalingstatechange', () => {
-                this.log('pc', 'signalingState => ' + this.peerConnection.signalingState);
-            });
+            this.peerConnection.onicegatheringstatechange = () => this.log('pc', `iceGatheringState => ${this.peerConnection.iceGatheringState}`);
+            this.peerConnection.oniceconnectionstatechange = () => this.log('pc', `iceConnectionState => ${this.peerConnection.iceConnectionState}`);
+            this.peerConnection.onsignalingstatechange = () => this.log('pc', `signalingState => ${this.peerConnection.signalingState}`);
+            this.peerConnection.onicecandidateerror = (error) => this.log('pc', 'iceCandidateError => ' + error);
+            this.peerConnection.onnegotiationneeded = () => this.log('pc', 'negotiationNeeded');
             return Promise.resolve();
         } catch (exception) {
             this.log('pc', exception);

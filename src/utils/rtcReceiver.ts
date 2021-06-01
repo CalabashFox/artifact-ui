@@ -85,7 +85,7 @@ export default class RTCReceiver extends RTCConnection {
         this.receiverRef.current.srcObject
         console.log(this.receiverRef.current.videoWidth + 'x' + this.receiverRef.current.videoHeight);
         this.setCapturing(true);
-        this.debug(stream);
+        //this.debug(stream);
     }
 
     public debug(stream: MediaStream): void {
