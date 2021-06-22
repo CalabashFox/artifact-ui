@@ -1,7 +1,7 @@
 import axios, {AxiosPromise} from 'axios';
 import TokenUtils from 'utils/tokenUtils';
 
-const BASE_URL = 'https://localhost:8080/api';
+const BASE_URL = 'https://localhost:8443/api';
 
 export interface ApiResponse<T> {
     status: number

@@ -1,6 +1,6 @@
 import { ApiResponse, post } from "../api/api"
 import { AxiosError, AxiosResponse } from "axios"
-import { Color, Game, GameActionState } from "models/Game"
+import { Color, Game, GameActionState, GameProperties } from "models/Game"
 import { GameState } from "models/StoreState"
 import { ThunkAction, ThunkDispatch } from "redux-thunk"
 import { EmptyResult, KatagoLog, KatagoResult } from "models/Katago"
@@ -52,6 +52,16 @@ export type KATAGO_TURN = typeof KATAGO_TURN
 
 export const ACTION_ENDED = "ACTION_ENDED"
 export type ACTION_ENDED = typeof ACTION_ENDED
+
+export const SET_GAME_PROPERTIES = "SET_GAME_PROPERTIES"
+export type SET_GAME_PROPERTIES = typeof SET_GAME_PROPERTIES
+
+export interface SetGameProperties {
+    type: SET_GAME_PROPERTIES,
+    payload: {
+        properties: GameProperties
+    }
+}
 
 export interface ActionEnded {
     type: ACTION_ENDED,
@@ -155,7 +165,7 @@ export type GameAction = StartGameAction | PlaceStoneAction
     | ActionCompleted | ActionFailed | PlaceStoneSuccess | ActionPending
     | SetGameState | ActionStateUpdate | AppendLogAction
     | SetKatagoAnalysis | Undo | StopGame | StopGameSuccess | Reconnect
-    | SetKatagoTurn | ActionEnded
+    | SetKatagoTurn | ActionEnded | SetGameProperties
 
 
 export const stopGame = ()
@@ -178,19 +188,20 @@ export const stopGame = ()
     };
 };
 
-export const startGame = ()
+export const startGame = (blackHuman: boolean, whiteHuman: boolean, dimension: number)
     : ThunkAction<Promise<GameAction>, GameState, null, GameAction> => {
+    const gameProperties = {
+        blackHumanPlayer: blackHuman,
+        whiteHumanPlayer: whiteHuman,
+        komi: 7.5,
+        dimension: dimension,
+        handicap: 0
+    };
     return (dispatch: ThunkDispatch<GameState, null, GameAction>) => {
         dispatch(actionStateUpdate(GameActionState.PENDING));
-        return post<Game>('game/startGame',
-            {
-                blackHumanPlayer: true,
-                whiteHumanPlayer: true,
-                komi: 7.5,
-                dimension: 19,
-                handicap: 0
-            })
+        return post<Game>('game/startGame', gameProperties)
             .then((res: AxiosResponse<ApiResponse<Game>>) => {
+                dispatch(setGameProperties(gameProperties));
                 //dispatch(actionStateUpdate(GameActionState.SUCCESS));
                 dispatch(setGameState(res.data.content));
             })
@@ -373,5 +384,14 @@ export const actionEnded = (): GameAction => {
     return {
         type: ACTION_ENDED,
         payload: {}
+    };
+}
+
+export const setGameProperties = (properties: GameProperties): GameAction => {
+    return {
+        type: SET_GAME_PROPERTIES,
+        payload: {
+            properties: properties
+        }
     };
 }

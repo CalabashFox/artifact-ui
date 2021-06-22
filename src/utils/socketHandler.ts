@@ -23,7 +23,7 @@ export default class SocketHandler {
         }
         dispatch(setSocketConnectionState(SocketConnectionState.CONNECTING));
         try {
-            const socket = new WebSocket('ws://localhost:8080');
+            const socket = new WebSocket('wss://localhost:8443');
             socket.onopen = () => {
                 dispatch(setSocketConnectionState(SocketConnectionState.CONNECTED));
             };

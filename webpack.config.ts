@@ -1,11 +1,16 @@
 import path from 'path';
-import webpack from 'webpack';
+import { Configuration as WebpackConfiguration } from "webpack";
+import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
+
+interface Configuration extends WebpackConfiguration {
+  devServer?: WebpackDevServerConfiguration;
+}
 
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 const SRC = path.resolve(__dirname, 'src/main/js');
 
-const config: webpack.Configuration = {
+const config: Configuration = {
     entry: './src/index.tsx',
     module: {
         rules: [

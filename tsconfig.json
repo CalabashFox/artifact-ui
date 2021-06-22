@@ -4,6 +4,9 @@
       "dom",
       "dom.iterable",
       "esnext"
+    ], 
+    "types": [
+        "node"
     ],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,

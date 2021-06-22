@@ -9,25 +9,18 @@ import { CalibrationBoundary } from "models/Recording";
 import { useDispatch } from "react-redux";
 import { setCalibrationBoundaries, setCalibrated } from "actions/recording";
 import RTCReceiver from "utils/rtcReceiver";
+import SGFBoard from "components/SGFBoard";
+import useCurrentSnapshot from "components/hook/currentSnapshot";
+import { SGFStone } from "models/SGF";
+import { KatagoMoveInfo } from "models/Katago";
+import { Box } from "@material-ui/core";
 
-const useStyles = makeStyles((theme) => ({
-    recordingContainer: {
-        alignContent: 'baseline',
-        order: 1,
-        border: '2px solid',
-        borderColor: theme.palette.primary.main,
-        height: 'auto',
-        maxHeight: '90vh',
-        overflow: 'auto'
-    },
-    buttonContainer: {
-        order: 2
+const useStyles = makeStyles(() => ({
+    buttons: {
+        textAlign: 'left'
     },
     video: {
         width: '100%'
-    },
-    button: {
-        margin: 0
     }
 }));
 
@@ -69,8 +62,6 @@ const MonitorView: React.FC = () => {
     const [timer, setTimer] = useState<number>(0);
 
     const interval = 50;
-
-    console.log(playback.current.srcObject);
 
     const refreshCalibrationCanvas = useCallback(() => {
         if (!calibrating) {
@@ -180,18 +171,52 @@ const MonitorView: React.FC = () => {
     const calibrateIcon = useIcon(<Selected title={t('ui.recording.calibrate')} onClick={() => handleCalibration()}/>, !capturing);
     const confirmCalibrateIcon = useIcon(<Check title={t('ui.recording.confirmCalibrate')} onClick={() => handleConfirmCalibration()}/>, !capturing);
     const undoCalibrateIcon = useIcon(<Undo title={t('ui.recording.undoCalibrate')} onClick={() => handleUndoCalibrate()}/>, !capturing);
+
+
+    const handleClick = (x: number, y: number) => {
+        console.log(x, y);
+        return;
+    };
+    const snapshot = useCurrentSnapshot();
+    
+    const stones: Array<SGFStone> = [];
+    const ownership: Array<number> = [];
+    const policy: Array<number> = [];
+    const moveInfos: Array<KatagoMoveInfo> = [];
+
     return <React.Fragment>
         <Grid container>
-            <Grid item sm={10} xs={12} className={classes.recordingContainer} >
-                <video autoPlay={true} playsInline={true} ref={playback} className={classes.video}
-                    /*style={{display: calibrating ? 'none' : 'block' }}*/></video>
-                {/*calibrating && <canvas ref={canvas} onClick={(e) => handleCanvasClick(e)}></canvas>*/}
-                {<canvas ref={canvas} onClick={(e) => handleCanvasClick(e)}></canvas>}
+            <Grid container>
+                <Box width={1}>
+                    <Paper className={classes.buttons}>
+                        {calibrateIcon}
+                        {confirmCalibrateIcon}
+                        {undoCalibrateIcon}
+                    </Paper>
+                </Box>
             </Grid>
-            <Grid item sm={2} xs={12} className={classes.buttonContainer}>
-                <Paper className={classes.button}>{calibrateIcon}</Paper>
-                <Paper className={classes.button}>{confirmCalibrateIcon}</Paper>
-                <Paper className={classes.button}>{undoCalibrateIcon}</Paper>
+            <Grid container>
+                <Grid item sm={7} xs={12}>
+                    <Paper>
+                        <SGFBoard click={(x, y) => handleClick(x, y)}
+                            grids={19}
+                            snapshot={snapshot}
+                            currentMove={0}
+                            policy={policy} 
+                            moveInfos={moveInfos} 
+                            stones={stones}
+                            ownership={ownership}
+                            hoverEffect={false}/>
+                    </Paper>
+                </Grid>
+                <Grid item sm={5} xs={12}>
+                    <Paper>
+                        <video autoPlay={true} playsInline={true} ref={playback} className={classes.video}
+                            /*style={{display: calibrating ? 'none' : 'block' }}*/></video>
+                        {/*calibrating && <canvas ref={canvas} onClick={(e) => handleCanvasClick(e)}></canvas>*/}
+                        {<canvas ref={canvas} onClick={(e) => handleCanvasClick(e)}></canvas>}
+                    </Paper>
+                </Grid>
             </Grid>
         </Grid>
     </React.Fragment>;

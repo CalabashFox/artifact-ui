@@ -73,7 +73,8 @@ const GameView: React.FC = () => {
     SGFBoardSound(gameState.actionState);
 
     const handleClick = (x: number, y: number) => {
-        if (!gameState.game.inGame || (blackTurn && blackHuman) || (whiteTurn && whiteHuman)) {
+        console.log(gameState.game.inGame, blackTurn, blackHuman, whiteTurn, whiteHuman);
+        if (!gameState.game.inGame || (blackTurn && !blackHuman) || (whiteTurn && !whiteHuman)) {
             return;
         }
         dispatch(placeStone(blackTurn ? 'B' : 'W', x, y));  
@@ -95,9 +96,9 @@ const GameView: React.FC = () => {
             <Grid item sm={7} xs={12} className={classes.boardContainer}>
                 {game.inGame && <Paper>
                     <Grid container spacing={0}>
-                        <Grid item xs={6} spacing={0}>
+                        <Grid item xs={6}>
                         </Grid>
-                        <Grid item xs={6} spacing={0} className={classes.graphButtons}>
+                        <Grid item xs={6} className={classes.graphButtons}>
                             {chartIcon}
                             {analysisIcon}
                         </Grid>
@@ -105,6 +106,7 @@ const GameView: React.FC = () => {
                 </Paper>}
                 <Paper>
                     <SGFBoard click={(x, y) => handleClick(x, y)} 
+                        grids={gameState.gameProperties.dimension}
                         snapshot={snapshot}
                         currentMove={currentMove}
                         policy={policy} 

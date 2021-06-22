@@ -80,9 +80,9 @@ const Dashboard: React.FC = () => {
     const [socket] = useState<SocketHandler>(() => new SocketHandler());
 
     const initConnection = useCallback(() => {
-        //socket.connect(dispatch);
-    //}, [dispatch, socket]);
-    }, []);
+        socket.connect(dispatch);
+    }, [dispatch, socket]);
+    //}, []);
 
     useEffect(() => {
         initConnection();

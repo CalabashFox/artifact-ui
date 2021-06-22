@@ -41,7 +41,7 @@ const SGFPlayer: React.FC<SGFPlayerProps> = ({color, name, rank, turn}) => {
     return <React.Fragment>
         <img src={icon} className={classes.playerStoneImage} alt={name}/>
         <Typography className={classes.playerTitle} noWrap>
-            {name}({rank})
+            {name}{rank !== '' && '( ' + rank + ')'}
         </Typography>
     </React.Fragment>;
 }

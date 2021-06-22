@@ -14,7 +14,16 @@
         "game": {
             "startGame": "开始游戏",
             "undo": "悔棋",
-            "stop": "结束游戏"
+            "stop": "结束游戏",
+            "settings": {
+                "title": "游戏设置",
+                "dimension": "棋盘大小",
+                "ai": "AI",
+                "human": "人类",
+                "player1": "玩家1 黑子",
+                "player2": "玩家2 白子",
+                "start": "开始游戏"
+            }
         },
         "recording": {
             "calibrate": "校准",

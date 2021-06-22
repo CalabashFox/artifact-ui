@@ -90,7 +90,7 @@ export default class RTCReceiver extends RTCConnection {
 
     public debug(stream: MediaStream): void {
         const obj = this;
-        const track = stream.getTracks()[0];
+        const track = stream.getTracks()[0];/*
         const capture = new ImageCapture(track);
         this.timer = setInterval(() => { 
             capture.grabFrame()
@@ -106,7 +106,7 @@ export default class RTCReceiver extends RTCConnection {
                         context.drawImage(frame, 0, 0);
                     }
                 });
-          }, 1000);
+          }, 1000);*/
     }
 
     private clearTimer(): void {

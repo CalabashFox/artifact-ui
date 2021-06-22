@@ -3,12 +3,6 @@ import {KatagoMoveInfo} from 'models/Katago';
 
 type Point = [number, number];
 
-const tengen = [9, 9];
-const hoshi = [[3, 3], [3, 9], [3, 15],
-    [9, 3], [9, 15],
-    [15, 3], [15, 9], [15, 15]
-];
-
 const MAX_BRANCH_LEVEL = 15;
 
 export default class SgfUtils {
@@ -148,14 +142,6 @@ export default class SgfUtils {
             col--;
         }
         return [col - 65, Number.parseInt(gtpLocation.substr(1)) - 1];
-    }
-
-    static isTengen(point: [number, number]): boolean {
-        return tengen[0] === point[0] && tengen[1] === point[1];
-    }
-
-    static isHoshi(point: [number, number]): boolean {
-        return hoshi.some(p => p[0] === point[0] && p[1] === point[1]);
     }
     
     static calculateSGFAnalysisData(sgfProperties: SGFProperties, analyzedSGF: AnalyzedSGF | undefined): AnalyzedSGF | undefined {

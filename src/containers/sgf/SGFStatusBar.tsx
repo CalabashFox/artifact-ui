@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import useIconText from 'components/hook/iconText';
 import useIcon from 'components/hook/icon';
 import useTimer from 'components/hook/timer';
-import Progress from 'components/Progress';
+import Progress from 'components/progress';
 import {Upload, Info, Config} from '@icon-park/react'
 import Popover from '@material-ui/core/Popover';
 import { getAnalyzedSGF, loadProgress, uploading, uploadSGFFile } from 'actions/sgf';

@@ -12,7 +12,7 @@ import Popover from '@material-ui/core/Popover';
 import GameData from 'components/game/GameData';
 import { stopGame, undo } from 'actions/game';
 import SGFBoardSettings from 'components/SGFBoardSettings';
-import GameSettings from 'components/game/GameSettings';
+import GameSettingsDialog from 'components/game/GameSettingsDialog';
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(() => ({
@@ -57,7 +57,7 @@ const GameStatusBar: React.FC = () => {
     const infoIcon = useIcon(<Info onClick={handleOpenGameInfo} onMouseEnter={handleOpenGameInfo} onMouseLeave={handleCloseGameInfo}/>);
     const settingsIcon = useIcon(<Config onClick={() => setSGFBoardSettingsOpen(true)}/>);
 
-    const startButton = useIconText(<Checkerboard/>, t('ui.game.startGame'), () => setGameSettingsOpen(true));
+    const startButton = useIconText(<Checkerboard/>, t('ui.game.startGame'), () => handleGameDialog());
     const undoButton = useIconText(<Undo/>, t('ui.game.undo'), () => handleUndoClick());
     const stopButton = useIconText(<CloseOne/>, t('ui.game.stop'), () => handleStopClick());
 
@@ -69,9 +69,16 @@ const GameStatusBar: React.FC = () => {
         dispatch(stopGame());
     };
 
+    const handleGameDialog = () => {
+        if (gameState.game.inGame) {
+            return;
+        }
+        setGameSettingsOpen(true);
+    };
+
     return <React.Fragment>
         <SGFBoardSettings open={sgfBoardSettingsOpen} onClose={() => setSGFBoardSettingsOpen(false)}/>
-        <GameSettings open={gameSettingsOpen} onClose={() => setGameSettingsOpen(false)}/>
+        <GameSettingsDialog open={gameSettingsOpen} onClose={() => setGameSettingsOpen(false)}/>
         <Grid container className={classes.container}>
             <Grid item xs={6} className={classes.statusContainer}>
                 {!game.inGame && startButton}

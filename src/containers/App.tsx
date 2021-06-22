@@ -82,6 +82,11 @@ let theme = createMuiTheme({
                 }
             }
         },
+        MuiDialogContent: {
+            root: {
+                padding: 0
+            }
+        },
         MuiFormLabel: {
             root: {
                 "&$focused": {
@@ -89,6 +94,11 @@ let theme = createMuiTheme({
                 }
             },
             focused: {}
+        },
+        MuiFormGroup: {
+            root: {
+                flexDirection: 'row'
+            },
         },
         MuiTabs: {
             indicator: {
@@ -109,11 +119,12 @@ let theme = createMuiTheme({
                 "&:hover": {
                     backgroundColor: defaultTheme.palette.text.primary,
                     color: defaultTheme.palette.primary.main
+                },
+                '&$selected': {
+                    backgroundColor: defaultTheme.palette.text.primary,
+                    color: defaultTheme.palette.primary.main
                 }
-            },
-            selected: {
-                backgroundColor: defaultTheme.palette.text.primary,
-                color: defaultTheme.palette.primary.main
+
             }
         },
         MuiIconButton: {
@@ -139,11 +150,11 @@ let theme = createMuiTheme({
                 "&:hover": {
                     backgroundColor: defaultTheme.palette.text.primary,
                     color: defaultTheme.palette.primary.main
+                },
+                '&$selected': {
+                    backgroundColor: defaultTheme.palette.text.primary,
+                    color: defaultTheme.palette.primary.main
                 }
-            },
-            selected: {
-                backgroundColor: defaultTheme.palette.text.primary,
-                color: defaultTheme.palette.primary.main
             }
         },
         MuiSelect: {

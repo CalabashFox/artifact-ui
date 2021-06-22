@@ -165,6 +165,7 @@ const ImageView: React.FC = () => {
                 <Grid item xs={12} className={classes.boardGrid}>
                     <Paper className={classes.board} >
                     <SGFBoard click={(x, y) => handleClick(x, y)}
+                        grids={19}
                         snapshot={null}
                         currentMove={0}
                         policy={policy} 

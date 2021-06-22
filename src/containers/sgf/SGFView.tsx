@@ -102,6 +102,7 @@ const SGFView: React.FC<WithWidth> = ({width}) => {
                 </Paper>}
                 <Paper onWheel={e => scroll(e)}>
                     <SGFBoard click={(x, y) => handleClick(x, y)}
+                        grids={19}
                         snapshot={snapshot}
                         currentMove={sgfState.navigation.index}
                         policy={policy} 

@@ -33,7 +33,11 @@ export enum Color {
 }
 
 export interface GameProperties {
-
+    blackHumanPlayer: boolean
+    whiteHumanPlayer: boolean
+    komi: number
+    handicap: number
+    dimension: number
 }
 
 export interface SocketState {
@@ -70,6 +74,10 @@ export const InitialGameState = {
     logs: new Array<KatagoLog>(),
     currentResult: EmptyResult,
     gameProperties: {
-
+        blackHumanPlayer: true,
+        whiteHumanPlayer: false,
+        komi: 7.5,
+        handicap: 0,
+        dimension: 19
     }
 }

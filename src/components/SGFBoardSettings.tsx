@@ -117,7 +117,7 @@ export interface SGFBoardSettingsProps {
 function generateIntOptions(begin: number, end: number): Array<ReactElement> {
     const array = new Array<ReactElement>();
     for (let i = begin; i <= end; i++) {
-        array.push(<MenuItem value={i}>{i}</MenuItem>);
+        array.push(<MenuItem key={i} value={i}>{i}</MenuItem>);
     }
     return array;
 }
