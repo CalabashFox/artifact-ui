@@ -106,7 +106,6 @@ const GameSettingsDialog: React.FC<GameSettingsDialogProps> = ({ open, onClose }
 
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>, setter: (type: number) => void) => {
         setter(parseInt((event.target as HTMLInputElement).value));
-        console.log((event.target as HTMLInputElement).value);
     };
 
     const handleSelectChange = (value: string, setter: Dispatch<SetStateAction<number>>) => {

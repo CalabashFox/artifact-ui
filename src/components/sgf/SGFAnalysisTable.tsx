@@ -114,13 +114,14 @@ const EnhancedTableHead: React.FC<EnhancedTableProps> = ({ classes, order, order
     );
 }
 
-const translate = (move: string): string => {
-    const translatedIndex = 19 - parseInt(move.substring(1)) + 1;
+const translate = (grids: number, move: string): string => {
+    const translatedIndex = grids - parseInt(move.substring(1)) + 1;
     return move[0] + translatedIndex;
 }
 
 const SGFAnalysisTable: React.FC<Props> = ({ data }) => {
     const classes = useStyles();
+    const grids = 19;
     const rowsPerPage = 10;
 
     const [order, setOrder] = React.useState<Order>('desc');
@@ -158,7 +159,7 @@ const SGFAnalysisTable: React.FC<Props> = ({ data }) => {
                                     tabIndex={-1}
                                     key={row.move}>
                                     <TableCell component="th" id={labelId} scope="row" padding="none">
-                                        {translate(row.move)}
+                                        {translate(grids, row.move)}
                                     </TableCell>
                                     <TableCell align="right">{(row.winrate * 100).toFixed(2)}</TableCell>
                                     <TableCell align="right">{row.scoreLead.toFixed(2)}</TableCell>

@@ -30,7 +30,8 @@ export default class SocketHandler {
             socket.onmessage = (e: MessageEvent) => {
                 this.onMessage(dispatch, e);
             }
-            socket.onerror = () => {
+            socket.onerror = (e) => {
+                console.log(e);
                 dispatch(setSocketConnectionState(SocketConnectionState.CANNOT_CONNECT));
             };
             socket.onclose = () => {
@@ -42,6 +43,7 @@ export default class SocketHandler {
                 this.disconnect();
             };
         } catch(e: any) {
+            console.log(e);
             dispatch(setSocketConnectionState(SocketConnectionState.CANNOT_CONNECT));
         }
     }

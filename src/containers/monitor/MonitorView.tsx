@@ -6,7 +6,7 @@ import {Selected, Undo, Check} from '@icon-park/react'
 import useIcon from "components/hook/icon";
 import { useTranslation } from 'react-i18next';
 import { CalibrationBoundary } from "models/Recording";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCalibrationBoundaries, setCalibrated } from "actions/recording";
 import RTCReceiver from "utils/rtcReceiver";
 import SGFBoard from "components/SGFBoard";
@@ -14,6 +14,7 @@ import useCurrentSnapshot from "components/hook/currentSnapshot";
 import { SGFStone } from "models/SGF";
 import { KatagoMoveInfo } from "models/Katago";
 import { Box } from "@material-ui/core";
+import { GameState, StoreState } from "models/StoreState";
 
 const useStyles = makeStyles(() => ({
     buttons: {
@@ -47,6 +48,7 @@ const order = (array: Array<CalibrationBoundary>, center: CalibrationBoundary): 
 }
 
 const MonitorView: React.FC = () => {
+    const gameState = useSelector<StoreState, GameState>(state => state.gameState);
     const dispatch = useDispatch();
     const classes = useStyles();
     const { t } = useTranslation();
@@ -199,7 +201,7 @@ const MonitorView: React.FC = () => {
                 <Grid item sm={7} xs={12}>
                     <Paper>
                         <SGFBoard click={(x, y) => handleClick(x, y)}
-                            grids={19}
+                            grids={gameState.gameProperties.dimension}
                             snapshot={snapshot}
                             currentMove={0}
                             policy={policy} 

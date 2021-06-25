@@ -12,6 +12,7 @@ import { GameActionState } from "models/Game";
 import useIcon from "components/hook/icon";
 import SGFBoardSound from "components/SGFBoardSound";
 import useCurrentSnapshot from "components/hook/currentSnapshot";
+import SGFDisplaySettings from "containers/sgf/SGFDisplaySettings";
 
 const useStyles = makeStyles((theme) => ({
     graphButtons: {
@@ -103,6 +104,8 @@ const GameView: React.FC = () => {
                             {analysisIcon}
                         </Grid>
                     </Grid>
+                </Paper> && <Paper>
+                    <SGFDisplaySettings/>
                 </Paper>}
                 <Paper>
                     <SGFBoard click={(x, y) => handleClick(x, y)} 

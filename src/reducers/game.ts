@@ -11,7 +11,14 @@ export function gameReducer(state: GameState = initialState, action: GameAction)
         case START_GAME:
             return {...state};
         case SET_GAME_STATE:
-            return {...state, game: action.payload.game};
+            if (action.payload.game.dimension !== 19) {
+                return {...state, game: action.payload.game
+                    , gameProperties: {...state.gameProperties, dimension: action.payload.game.dimension}
+                };
+            } else {
+                return {...state, game: action.payload.game};
+            }
+            
         case PLACE_STONE_SUCCESS:
             return {...state, game: action.payload.game};
         case ACTION_STATE_UPDATE:

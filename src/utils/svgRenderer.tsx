@@ -132,6 +132,16 @@ export default class SvgRenderer {
             .map(() => new Array(grids).fill(SGFColor.NONE));
     }
 
+    private initCoordinates(): void {
+        this.occupiedCoordinates = new Array(this.grids)
+            .fill(SGFColor.NONE)
+            .map(() => new Array(this.grids).fill(SGFColor.NONE));
+    }
+
+    public updateRenderer(): void {
+        this.initCoordinates();
+    }
+
     public branchElements(snapshot: SGFSnapshot | null): Array<React.SVGProps<SVGRectElement>> {
         const elements = new Array<React.SVGProps<SVGRectElement>>();
         if (snapshot === null) {
@@ -171,7 +181,7 @@ export default class SvgRenderer {
 
     public ownershipElements(ownership: Array<number>, moveColor: SGFColor): Array<React.SVGProps<SVGRectElement>> {
         const elements = new Array<React.SVGProps<SVGRectElement>>();
-        if (this.sgfProperties.displayOwnership)  {
+        if (!this.sgfProperties.displayOwnership)  {
             return elements;
         }
         const ownershipDim = this.dimensionProps.analysis.ownership;
@@ -358,7 +368,7 @@ export default class SvgRenderer {
         const boardDim = this.dimensionProps.board;
         const blockDim = this.dimensionProps.block;
         return [boardDim.offset + blockDim.dimension * dim[0] + blockDim.offset,
-        boardDim.offset + blockDim.dimension * dim[1] + blockDim.offset];
+            boardDim.offset + blockDim.dimension * dim[1] + blockDim.offset];
     }
 
     public deloc(loc: Point): Point {
@@ -370,7 +380,7 @@ export default class SvgRenderer {
     }
 
     private toBoardCoordinate(coordinate: number): number {
-        return coordinate <= 0 ? 0 : coordinate >= 19 ? 19 : coordinate;
+        return coordinate <= 0 ? 0 : coordinate >= this.grids ? this.grids : coordinate;
     }
 
     private ownership(ownership: number, blackTurn: boolean): SGFColor {

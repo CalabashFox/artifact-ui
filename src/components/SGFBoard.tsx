@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useSelector} from "react-redux";
 import {SGFState, StoreState} from "models/StoreState";
 import {makeStyles} from '@material-ui/core/styles';
@@ -101,13 +101,30 @@ const SGFBoard: React.FC<SGFBoardProps> = ({click, grids, snapshot, stones, poli
     };
 
     const viewBox = `0 0 ${dimension} ${dimension}`;
-    const svgBoardDecorations = svgRenderer.boardElements();
-    const svgStones = svgRenderer.stoneElements(stones);
-    const svgBranches = svgRenderer.branchElements(snapshot);
-    const svgHoverStones = svgRenderer.hoverElement(hoverStone, hoverEffect);
-    const svgMoves = svgRenderer.recommendationElements(moveInfos);
-    const svgOwnership = svgRenderer.ownershipElements(ownership, moveColor);
-    const svgPolicy = svgRenderer.policyElements(policy);
+    useEffect(() => {
+        svgRenderer.updateRenderer();
+    }, [svgRenderer, stones, snapshot, moveInfos, ownership, moveColor, policy]);
+    const svgBoardDecorations = useMemo(() => {
+        return svgRenderer.boardElements();
+    }, [svgRenderer]);
+    const svgStones = useMemo(() => {
+        return svgRenderer.stoneElements(stones);
+    }, [svgRenderer, stones]);
+    const svgBranches = useMemo(() => {
+        return svgRenderer.branchElements(snapshot);
+    }, [svgRenderer, snapshot]);
+    const svgHoverStones = useMemo(() => {
+        return svgRenderer.hoverElement(hoverStone, hoverEffect);
+    }, [svgRenderer, hoverStone, hoverEffect]);
+    const svgMoves = useMemo(() => {
+        return svgRenderer.recommendationElements(moveInfos);
+    }, [svgRenderer, moveInfos]);
+    const svgOwnership = useMemo(() => {
+        return svgRenderer.ownershipElements(ownership, moveColor);
+    }, [svgRenderer, ownership, moveColor]);
+    const svgPolicy = useMemo(() => {
+        return svgRenderer.policyElements(policy);
+    }, [svgRenderer, policy]);
 
     return <svg viewBox={viewBox} preserveAspectRatio="xMidYMid meet" className={classes.svg}
         pointerEvents={'none'}

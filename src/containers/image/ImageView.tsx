@@ -105,20 +105,20 @@ const ImageView: React.FC = () => {
     const handleCaptureVideo = () => {
         try {
             navigator.mediaDevices.enumerateDevices()
-            .then(function(devices) {
-                devices.forEach(function(device) {
-                    console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
+                .then(function(devices) {
+                    devices.forEach(function(device) {
+                        console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
+                    });
+                })
+                .catch(function(err) {
+                    console.log(err.name + ": " + err.message);
                 });
-            })
-            .catch(function(err) {
-                console.log(err.name + ": " + err.message);
-            });
             navigator.mediaDevices
-            .getUserMedia(constraints)
-            .then(captureSuccess)
-            .catch(captureError);
+                .getUserMedia(constraints)
+                .then(captureSuccess)
+                .catch(captureError);
         } catch(e) {
-            
+            console.log(e);
         }
     };
 

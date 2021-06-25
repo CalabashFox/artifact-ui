@@ -10,6 +10,7 @@ export interface Game {
     moves: Array<SGFMove>
     stones: Array<SGFStone>
     removedStones: Array<SGFMove>
+    dimension: number
 }
 
 export interface Player {
@@ -64,6 +65,7 @@ export const InitialGameState = {
             time: 0,
             statList: new Array<MoveStat>()
         },
+        dimension: 19,
         inGame: false,
         currentMove: 0,
         moves: new Array<SGFMove>(),
